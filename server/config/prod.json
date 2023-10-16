@@ -1,0 +1,11 @@
+{
+    "URL": "https://pms.tworks.in",
+    "PORT": 5000,
+    "TOKEN": "TWORKS",
+    "SQL": {
+        "HOST": "localhost",
+        "USERNAME": "suhail",
+        "PASSWORD": "suhail",
+        "DATABASE": "tworksdb"
+    }
+}

@@ -1,0 +1,59 @@
+/* Dashboard.css */
+
+/* Style for the table container */
+.table-container {
+  max-width: 100%;
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+/* Style for the table */
+.table-custom {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for the table header */
+.table-custom thead {
+  background-color: #6c757d; /* A dull gray color */
+  color: #fff; /* White text color for contrast */
+}
+
+/* Style for table header cells */
+.table-custom th {
+  font-weight: bold;
+  text-align: left;
+  padding: 12px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* Style for table body cells */
+.table-custom td {
+  padding: 12px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Style for table rows on hover */
+.table-custom tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Style for the first column (ID) */
+.table-custom tbody td:first-child {
+  font-weight: bold;
+}
+
+/* Responsive styles */
+@media (max-width: 767px) {
+  /* Make the table scroll horizontally on smaller screens */
+  .table-container {
+    overflow-x: scroll;
+  }
+
+  /* Hide the first column (ID) on smaller screens */
+  .table-custom tbody td:first-child {
+    display: none;
+  }
+}

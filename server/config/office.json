@@ -1,0 +1,11 @@
+{
+  "URL": "http://192.168.212.10:5000",
+  "PORT": 5000,
+  "TOKEN": "TWORKS",
+  "SQL": {
+    "HOST": "localhost",
+    "USERNAME": "suhail",
+    "PASSWORD": "suhail",
+    "DATABASE": "tworksdb"
+  }
+}

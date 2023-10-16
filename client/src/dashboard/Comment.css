@@ -1,0 +1,97 @@
+/* Comment.css */
+
+/* Default styles for larger screens */
+.container {
+  margin-top: 20px;
+}
+
+h3 {
+  font-size: 24px;
+}
+
+.card-header.bg-primary {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.chat-card-body {
+  padding: 20px;
+}
+
+.first {
+  margin-top: 60px;
+}
+
+.message-container {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Media Query for Medium Screens (e.g., tablets) */
+@media (max-width: 768px) {
+  .container {
+    margin-top: 10px;
+  }
+
+  h3 {
+    font-size: 20px;
+  }
+
+  .chat-card-body {
+    padding: 10px;
+  }
+}
+
+/* Media Query for Small Screens (e.g., mobile devices) */
+@media (max-width: 576px) {
+  .container {
+    margin-top: 0;
+  }
+
+  h3 {
+    font-size: 9px;
+  }
+
+  .card-header.bg-primary {
+    font-size: 8px;
+  }
+
+  .chat-card-body {
+    padding: 2px;
+  }
+  .first {
+    margin-top: 60px;
+  }
+}
+
+@media screen and (max-width: 1024px) and (max-height: 600px) {
+  /* Comment.css */
+
+  /* Default styles for larger screens */
+  .container {
+    margin-top: 20px;
+  }
+
+  h3 {
+    font-size: 16px;
+  }
+
+  .card-header.bg-primary {
+    background-color: #ff3c00;
+    color: #fff;
+  }
+
+  .chat-card-body {
+    padding: 10px;
+  }
+
+  .first {
+    margin-top: 60px;
+  }
+
+  .message-container {
+    max-height: 400px;
+    overflow-y: auto;
+    color: red;
+  }
+}
