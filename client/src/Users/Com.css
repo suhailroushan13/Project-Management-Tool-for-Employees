@@ -16,6 +16,8 @@
   padding: 1rem;
 }
 
+/* In your CSS file */
+
 /* For .card-header */
 .card-header {
   background-color: #007bff; /* Primary color for the header */

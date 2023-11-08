@@ -1174,313 +1174,298 @@ const UserProjectManagement = () => {
           </div>
         </div>
 
-        <Row className="g-12">
-          <Col lg="12" md="12" sm="12">
-            <Card className="card-one">
-              <Card.Body className="overflow px-2 pb-3">
-                <Col xl="8" className="pb-3">
-                  <Row className="g-3">
-                    <Col xs="12" sm="6" md="4" xl="2">
-                      <Card className="card-one w-100">
-                        <Card.Body className="p-3">
-                          <div className="d-block fs-40 lh-1 text-primary mb-1">
-                            <i className="ri-file-list-line"></i>
-                          </div>
-                          <h1 className="card-value mb-0 ls--1 fs-36">
-                            {localData.length}
-                          </h1>
-                          <label className="d-block mb-1 mt-1 fw-medium text-dark">
-                            Total Projects
-                          </label>
-                        </Card.Body>
-                      </Card>
-                    </Col>
-                    {Completedcount > 0 && (
-                      <Col xs="12" sm="6" md="4" xl="2">
-                        <Card className="card-one w-100">
-                          <Card.Body className="p-3">
-                            <div className="d-block fs-40 lh-1 text-ui-02 mb-1">
-                              <i className="ri-check-double-line"></i>
-                            </div>
-                            <h1 className="card-value mb-0 fs-36 ls--1">
-                              {Completedcount}
-                            </h1>
-                            <label className="d-block mb-1 fw-medium text-dark">
-                              Completed Projects
-                            </label>
-                          </Card.Body>
-                        </Card>
-                      </Col>
-                    )}
-                    {onHoldCount > 0 && (
-                      <Col xs="12" sm="6" md="4" xl="2">
-                        <Card className="card-one w-100">
-                          <Card.Body className="p-3">
-                            <div className="d-block fs-36 lh-1 text-secondary mb-1">
-                              <i className="ri-information-line"></i>
-                            </div>
-                            <h1 className="card-value mb-0 fs-36 ls--1">
-                              {onHoldCount}
-                            </h1>
-                            <label className="d-block mb-1 fw-medium text-dark">
-                              On Hold Projects
-                            </label>
-                          </Card.Body>
-                        </Card>
-                      </Col>
-                    )}
-                    {notStarted > 0 && (
-                      <Col xs="12" sm="6" md="4" xl="2">
-                        <Card className="card-one w-100">
-                          <Card.Body className="p-3">
-                            <div className="d-block fs-40 lh-1 text-ui-02 mb-1">
-                              <i className="ri-draft-fill"></i>
-                            </div>
-                            <h1 className="card-value mb-0 fs-36 ls--1">
-                              {notStarted}
-                            </h1>
-                            <label className="d-block mb-1 fw-medium text-dark">
-                              Not Started
-                            </label>
-                          </Card.Body>
-                        </Card>
-                      </Col>
-                    )}
-                    {inProgress > 0 && (
-                      <Col xs="12" sm="6" md="4" xl="2">
-                        <Card className="card-one w-100">
-                          <Card.Body className="p-3">
-                            <div className="d-block fs-40 lh-1 text-ui-02 mb-1">
-                              <i className="ri-restart-line"></i>
-                            </div>
-                            <h1 className="card-value mb-0 fs-36 ls--1">
-                              {inProgress}
-                            </h1>
-                            <label className="d-block mb-1 fw-medium text-dark">
-                              In Progress
-                            </label>
-                          </Card.Body>
-                        </Card>
-                      </Col>
-                    )}
-                  </Row>
-                </Col>
+        <Card.Body className="overflow px-2 pb-3">
+          <Row className="g-3">
+            {/* Total Projects Card */}
+            <Col xl={1}>
+              <Card className="card-one w-100">
+                <Card.Body className="p-3">
+                  <div className="d-block fs-40 lh-1 text-primary mb-1">
+                    <i className="ri-file-list-line"></i>
+                  </div>
+                  <h1 className="card-value mb-0 ls--1 fs-36">
+                    {localData.length}
+                  </h1>
+                  <label className="d-block mb-1 mt-1 fw-medium text-dark">
+                    Total
+                  </label>
+                </Card.Body>
+              </Card>
+            </Col>
 
-                <br></br>
+            {/* Completed Projects Card */}
+            <Col xl={1}>
+              <Card className="card-one w-100">
+                <Card.Body className="p-3">
+                  <div className="d-block fs-40 lh-1 text-ui-02 mb-1">
+                    <i className="ri-check-double-line"></i>
+                  </div>
+                  <h1 className="card-value mb-0 fs-36 ls--1">
+                    {Completedcount}
+                  </h1>
+                  <label
+                    className="d-block mb-1 fw-medium text-dark"
+                    style={{ fontSize: "14px" }}
+                  >
+                    Completed
+                  </label>
+                </Card.Body>
+              </Card>
+            </Col>
 
-                <Row>
-                  {/* Left Column for Bar Graph */}
+            {/* On Hold Projects Card */}
+            <Col xl={1}>
+              <Card className="card-one w-100">
+                <Card.Body className="p-3">
+                  <div className="d-block fs-36 lh-1 text-secondary mb-1">
+                    <i className="ri-information-line"></i>
+                  </div>
+                  <h1 className="card-value mb-0 fs-36 ls--1">{onHoldCount}</h1>
+                  <label className="d-block mb-1 fw-medium text-dark">
+                    On Hold
+                  </label>
+                </Card.Body>
+              </Card>
+            </Col>
 
-                  <Col lg={6}>
-                    <Card className="card">
-                      <Card.Body>
-                        <ReactApexChart
-                          series={UserValuesArray}
-                          options={UserOpt}
-                          type="pie"
-                          height={200}
-                          width={600}
-                          className="ht-400"
-                        />
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                  <Col lg={6}>
-                    {/* <h2>{name}</h2> */}
-                    <Card className="card">
-                      <Card.Body>
-                        <Bar
-                          data={{
-                            labels: chartLabels,
-                            datasets: [
-                              {
-                                data: chartData,
-                                backgroundColor: "#506fd9",
-                                barPercentage: 0.5,
-                              },
-                            ],
-                          }}
-                          options={optionBar}
-                          height={200}
-                          width={170}
-                          className="ht-400"
-                        />
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                </Row>
-              </Card.Body>
-              <div className="grid-container">
-                {/* Table */}
-                <div className="table-responsive">
-                  <table {...getTableProps()} className="table-style">
-                    {/* Thead */}
-                    <thead>
-                      {headerGroups.map((headerGroup) => (
-                        <tr {...headerGroup.getHeaderGroupProps()}>
-                          {headerGroup.headers.map((column, columnIndex) => (
-                            <th
-                              {...column.getHeaderProps()}
-                              className="header-style text-center"
-                              key={column.id}
-                            >
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "space-between",
-                                }}
-                              >
-                                <div {...column.getSortByToggleProps()}>
-                                  {column.render("Header")}
-                                  <span>
-                                    {column.isSorted ? (
-                                      column.isSortedDesc ? (
-                                        <ChevronDown size={16} />
-                                      ) : (
-                                        <ChevronUp size={16} />
-                                      )
-                                    ) : (
-                                      ""
-                                    )}
-                                  </span>
-                                </div>
-                                {[2, 3, 4, 5, 6, 7].includes(columnIndex) &&
-                                  column.canFilter && (
-                                    <div
-                                      className="filter-align"
-                                      onClick={() =>
-                                        openFilter === column.id
-                                          ? setOpenFilter(null)
-                                          : setOpenFilter(column.id)
-                                      }
-                                    >
-                                      <Filter size={16} />
-                                    </div>
-                                  )}
-                              </div>
+            {/* Not Started Card */}
+            <Col xl={1}>
+              <Card className="card-one w-100">
+                <Card.Body className="p-3">
+                  <div className="d-block fs-40 lh-1 text-ui-02 mb-1">
+                    <i className="ri-draft-fill"></i>
+                  </div>
+                  <h1 className="card-value mb-0 fs-36 ls--1">{notStarted}</h1>
+                  <label className="d-block mb-1 fw-medium text-dark">
+                    Not Started
+                  </label>
+                </Card.Body>
+              </Card>
+            </Col>
 
-                              {openFilter === column.id && (
+            {/* In Progress Card */}
+            <Col xl={1}>
+              <Card className="card-one w-100">
+                <Card.Body className="p-3">
+                  <div className="d-block fs-40 lh-1 text-ui-02 mb-1">
+                    <i className="ri-restart-line"></i>
+                  </div>
+                  <h1 className="card-value mb-0 fs-36 ls--1">{inProgress}</h1>
+                  <label
+                    className="d-block mb-1 fw-medium text-dark"
+                    style={{ fontSize: "16px" }}
+                  >
+                    In Progress
+                  </label>
+                </Card.Body>
+              </Card>
+            </Col>
+
+            {/* Pie Chart */}
+            <Col xl={4}>
+              <Card className="card">
+                <Card.Body>
+                  <ReactApexChart
+                    series={UserValuesArray}
+                    options={UserOpt}
+                    type="pie"
+                    height={200}
+                  />
+                </Card.Body>
+              </Card>
+            </Col>
+
+            {/* Bar Chart */}
+            <Col xl={3}>
+              <Card className="card">
+                <Card.Body>
+                  <Bar
+                    data={{
+                      labels: chartLabels,
+                      datasets: [
+                        {
+                          data: chartData,
+                          backgroundColor: "#506fd9",
+                          barPercentage: 0.5,
+                        },
+                      ],
+                    }}
+                    options={optionBar}
+                    height={200}
+                  />
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+        </Card.Body>
+
+        <Card className="card-one">
+          <div className="grid-container">
+            {/* Table */}
+            <div className="table-responsive">
+              <table {...getTableProps()} className="table-style">
+                {/* Thead */}
+                <thead>
+                  {headerGroups.map((headerGroup) => (
+                    <tr {...headerGroup.getHeaderGroupProps()}>
+                      {headerGroup.headers.map((column, columnIndex) => (
+                        <th
+                          {...column.getHeaderProps()}
+                          className="header-style text-center"
+                          key={column.id}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <div {...column.getSortByToggleProps()}>
+                              {column.render("Header")}
+                              <span>
+                                {column.isSorted ? (
+                                  column.isSortedDesc ? (
+                                    <ChevronDown size={16} />
+                                  ) : (
+                                    <ChevronUp size={16} />
+                                  )
+                                ) : (
+                                  ""
+                                )}
+                              </span>
+                            </div>
+                            {[2, 3, 4, 5, 6, 7].includes(columnIndex) &&
+                              column.canFilter && (
                                 <div
-                                  className="dropdown-filter"
-                                  ref={dropdownRef}
+                                  className="filter-align"
+                                  onClick={() =>
+                                    openFilter === column.id
+                                      ? setOpenFilter(null)
+                                      : setOpenFilter(column.id)
+                                  }
                                 >
-                                  {column.render("Filter")}
+                                  <Filter size={16} />
                                 </div>
                               )}
-                            </th>
-                          ))}
-                        </tr>
+                          </div>
+
+                          {openFilter === column.id && (
+                            <div className="dropdown-filter" ref={dropdownRef}>
+                              {column.render("Filter")}
+                            </div>
+                          )}
+                        </th>
                       ))}
-                    </thead>
+                    </tr>
+                  ))}
+                </thead>
 
-                    {/* Tbody */}
+                {/* Tbody */}
 
-                    <tbody {...getTableBodyProps()}>
-                      {page.map((row) => {
-                        prepareRow(row);
-                        return (
-                          <tr
-                            className="table-active"
-                            {...row.getRowProps()}
-                            key={row.id}
-                          >
-                            {row.cells.map((cell, cellIndex) => (
-                              <td
-                                {...cell.getCellProps()}
-                                className="cell-style"
-                                key={cell.id}
-                              >
-                                {cellIndex === 2 ? (
-                                  <>
-                                    <div className="d-flex align-items-center gap-2">
-                                      <Avatar
-                                        img={getLeadImage(row.original.lead)}
-                                      />
-                                      <div>
-                                        <h6 className="mb-0">
-                                          {cell.render("Cell")}
-                                        </h6>
-                                        <span className="fs-xs text-secondary people">
-                                          Role
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </>
-                                ) : cellIndex === 3 ? (
-                                  <>
-                                    <div className="d-flex align-items-center gap-2">
-                                      <Avatar
-                                        img={
-                                          getLeadImage(row.original.owner) ||
-                                          dummyImage
-                                        }
-                                      />
-
-                                      <div>
-                                        <h6 className="mb-0">
-                                          {cell.render("Cell")}
-                                        </h6>
-                                        <span className="fs-xs text-secondary people">
-                                          Role
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </>
-                                ) : (
-                                  cell.render("Cell")
-                                )}
-                              </td>
-                            ))}
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-
-                <Pagination className="pagination-space pagination-circled mb-0">
-                  <Pagination.Item
-                    className="pagination-button"
-                    disabled={!canPreviousPage}
-                    onClick={() => {
-                      if (currentPageGroup > 0) {
-                        previousPage();
-                        setCurrentPageGroup(currentPageGroup - 1); // Decrement the currentPageGroup
-                      }
-                    }}
-                  >
-                    <i className="ri-arrow-left-s-line"></i>
-                  </Pagination.Item>
-                  <div className="pagination-circle-container">
-                    {circleOptions.map((page) => (
-                      <Pagination.Item
-                        key={page} // Add the key prop here
-                        active={pageIndex + 1 === page}
-                        onClick={() => gotoPage(page - 1)}
-                        className={`pagination-circle ${
-                          pageIndex + 1 === page ? "active" : ""
-                        }`}
+                <tbody {...getTableBodyProps()}>
+                  {page.map((row) => {
+                    prepareRow(row);
+                    return (
+                      <tr
+                        className="table-active"
+                        {...row.getRowProps()}
+                        key={row.id}
                       >
-                        {page}
-                      </Pagination.Item>
-                    ))}
-                  </div>
+                        {row.cells.map((cell, cellIndex) => (
+                          <td
+                            {...cell.getCellProps()}
+                            className="cell-style"
+                            key={cell.id}
+                          >
+                            {cellIndex === 2 ? (
+                              <>
+                                <div className="d-flex align-items-center gap-2">
+                                  <Avatar
+                                    img={getLeadImage(row.original.lead)}
+                                  />
+                                  <div>
+                                    <h6 className="mb-0">
+                                      {cell.render("Cell")}
+                                    </h6>
+                                    <span className="fs-xs text-secondary people">
+                                      Role
+                                    </span>
+                                  </div>
+                                </div>
+                              </>
+                            ) : cellIndex === 3 ? (
+                              <>
+                                <div className="d-flex align-items-center gap-2">
+                                  <Avatar
+                                    img={
+                                      getLeadImage(row.original.owner) ||
+                                      dummyImage
+                                    }
+                                  />
+
+                                  <div>
+                                    <h6 className="mb-0">
+                                      {cell.render("Cell")}
+                                    </h6>
+                                    <span className="fs-xs text-secondary people">
+                                      Role
+                                    </span>
+                                  </div>
+                                </div>
+                              </>
+                            ) : (
+                              cell.render("Cell")
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <Pagination className="pagination-space pagination-circled mb-0">
+              <Pagination.Item
+                className="pagination-button"
+                disabled={!canPreviousPage}
+                onClick={() => {
+                  if (currentPageGroup > 0) {
+                    previousPage();
+                    setCurrentPageGroup(currentPageGroup - 1); // Decrement the currentPageGroup
+                  }
+                }}
+              >
+                <i className="ri-arrow-left-s-line"></i>
+              </Pagination.Item>
+              <div className="pagination-circle-container">
+                {circleOptions.map((page) => (
                   <Pagination.Item
-                    className="pagination-button"
-                    disabled={!canNextPage}
-                    onClick={() => {
-                      nextPage();
-                      setCurrentPageGroup(currentPageGroup + 1); // Increment the currentPageGroup
-                    }}
+                    key={page} // Add the key prop here
+                    active={pageIndex + 1 === page}
+                    onClick={() => gotoPage(page - 1)}
+                    className={`pagination-circle ${
+                      pageIndex + 1 === page ? "active" : ""
+                    }`}
                   >
-                    <i className="ri-arrow-right-s-line"></i>
+                    {page}
                   </Pagination.Item>
-                </Pagination>
+                ))}
               </div>
-            </Card>
-          </Col>
-        </Row>
+              <Pagination.Item
+                className="pagination-button"
+                disabled={!canNextPage}
+                onClick={() => {
+                  nextPage();
+                  setCurrentPageGroup(currentPageGroup + 1); // Increment the currentPageGroup
+                }}
+              >
+                <i className="ri-arrow-right-s-line"></i>
+              </Pagination.Item>
+            </Pagination>
+          </div>
+        </Card>
       </div>
     </>
   );
