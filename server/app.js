@@ -48,7 +48,8 @@ app.use("/api/projects", projectRouter);
 app.use("/api/channel", channelRouter);
 
 app.use((req, res) => {
-  res.json({ msg: "Invalid Route Please Check Spelling Suhail" });
+  res.redirect("https://pms.tworks.in");
+  // res.json({ msg: "Invalid Route Please Check Spelling Suhail" });
 });
 
 await syncDatabase();
