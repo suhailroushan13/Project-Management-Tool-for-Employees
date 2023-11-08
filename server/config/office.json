@@ -7,5 +7,13 @@
     "USERNAME": "suhail",
     "PASSWORD": "suhail",
     "DATABASE": "tworksdb"
+  },
+  "EMAIL_SMTP": {
+    "HOST": "cpl12.main-hosting.eu",
+    "AUTH": {
+      "USER": "suhail@suhailroushan.com",
+      "PASS": "+Ya-@DhRk&cP"
+    },
+    "PORT": 465
   }
 }

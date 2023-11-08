@@ -1,13 +1,6 @@
 /* eslint-disable */
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "../assets/css/react-datepicker.min.css";
-import img from "../assets/img/user.png";
-import Avatar from "../components/Avatar";
-import config from "../config.json";
-import Footer from "../layouts/Footer";
-// import leadsDatajson from "../data/Leads.js";
 import {
   Alert,
   Badge,
@@ -30,6 +23,7 @@ import {
   MessageSquare,
   Trash2,
 } from "react-feather";
+import { Link, useNavigate } from "react-router-dom";
 import {
   useFilters,
   useGlobalFilter,
@@ -38,71 +32,61 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
+import { leadArray, ownerArray } from "../apps/data/Leadonwer";
+import "../assets/css/react-datepicker.min.css";
+import img from "../assets/img/user.png";
+import Avatar from "../components/Avatar";
+import config from "../config.json";
+import Footer from "../layouts/Footer";
 import ProjectHeader from "../layouts/ProjectHeader";
 
-import "./Table.css";
+import Select from "react-select";
+import user from "../assets/users/user.png";
+import LeadsData from "../data/LeadsData";
+
+import "./Project.css";
 ///////////////////////////////////////////////////////////
 
 const LeadsManagement = () => {
-  const url = config.PROD_URL;
+  const url = config.URL;
   const navigate = useNavigate();
-  const [leadsData, setLeadsData] = useState([]);
+
   const [localData, setLocalData] = useState([]);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
-  // console.log(leadsDatajson);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("");
+  const [timeoutId, setTimeoutId] = useState(null);
 
-  // Task Data
-  const [taskData, setTaskData] = useState({
-    projectName: "",
-    description: "",
-    lead: "",
-    owner: "",
-    newEndDate: "",
-    priority: "MEDIUM",
-    status: "NOT STARTED",
-    nextReview: "",
-  });
-
-  const [editedData, setEditedData] = useState({
-    name: "",
+  const [leadData, setLeadData] = useState({
+    firstName: "",
+    lastName: "",
     email: "",
-    role: "",
+    phone: "",
+    role: "Lead",
   });
 
-  // eslint-disable-next-line
-  const showAlert = () => {
-    setShowSuccessAlert(true);
+  const showAlert = (message, type) => {
+    setAlertMessage(message);
+    setAlertType(type); // 'success' or 'danger'
 
     // Hide the alert after 5 seconds
-    const timeoutId = setTimeout(() => {
-      setShowSuccessAlert(false);
+    const id = setTimeout(() => {
+      setAlertMessage("");
+      setAlertType("");
     }, 5000);
 
-    // Clear the timeout if the component unmounts
-    return () => clearTimeout(timeoutId);
+    setTimeoutId(id); // Store the timeout ID for possible cleanup
   };
-
-  // Trigger the showAlert function when the component mounts
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setShowSuccessAlert(false);
-    }, 4000);
-
-    // Clear the timeout if the component unmounts
-    return () => clearTimeout(timeoutId);
-  }, [showSuccessAlert]);
-
-  // eslint-disable-next-line
-  const [description, setDescription] = useState("");
-  // eslint-disable-next-line
-  const [leadOptions, setLeadOptions] = useState([]);
-  // eslint-disable-next-line
-  const [ownerOptions, setOwnerOptions] = useState("");
-  // eslint-disable-next-line
-  const [selectedLead, setSelectedLead] = useState("");
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [timeoutId]);
   // eslint-disable-next-line
   const [filterInput, setFilterInput] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -143,9 +127,6 @@ const LeadsManagement = () => {
   const closeAddModal = () => {
     setShowAddModal(false);
     // Clear form fields for Add modal (if necessary)
-    setDescription("");
-    setSelectedLead("");
-    setSelectedOwner("");
   };
 
   // Handle modal open and close for Edit
@@ -156,49 +137,41 @@ const LeadsManagement = () => {
 
   const closeEditModal = () => {
     setShowEditModal(false);
-    // Clear form fields for Edit modal (if necessary)
-    setDescription("");
-    setSelectedLead("");
-    setSelectedOwner("");
   };
   const handleSubmitAdd = async (e) => {
     e.preventDefault();
 
     // Check if any required field is empty
     if (
-      !taskData.projectName ||
-      !taskData.lead ||
-      !taskData.owner ||
-      !taskData.newEndDate ||
-      !taskData.priority ||
-      !taskData.status
+      !leadData.firstName ||
+      !leadData.lastName ||
+      !leadData.email ||
+      !leadData.phone
     ) {
-      setShowEmptyFieldAlert(true);
-      setShowSuccessAlert(false);
+      showAlert("Please fill out all required fields.", "danger");
+
       return;
     }
 
     try {
-      const response = await axios.post(`${url}/api/projects/add`, taskData);
-      console.log("Created item: ", response.data);
+      const response = await axios.post(`${url}/api/users/add`, leadData);
+      showAlert("Lead Added Successfully!", "success");
+      closeAddModal();
 
       // Clear the taskData object after successful submission
-      setTaskData({
-        projectName: "",
-        lead: "",
-        owner: "",
-        newEndDate: "",
-        priority: "",
-        status: "",
-      });
 
-      setShowSuccessAlert(true);
-      closeAddModal();
+      setLeadData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        role: "",
+        lastActive: "",
+      });
       fetchData();
     } catch (error) {
       console.error("Error: ", error);
-      // Optionally, show an error alert or message to the user
-      // setShowErrorAlert(true);
+      showAlert("Error adding lead. Please try again.", "danger");
     }
   };
 
@@ -206,32 +179,29 @@ const LeadsManagement = () => {
     e.preventDefault();
 
     if (
-      taskData.projectName === "" ||
-      taskData.lead === "" ||
-      taskData.owner === "" ||
-      taskData.newEndDate === "" ||
-      taskData.priority === "" ||
-      taskData.status === ""
+      !leadData.firstName ||
+      !leadData.lastName ||
+      !leadData.email ||
+      !leadData.phone
     ) {
-      setShowEmptyFieldAlert(true);
-      setShowSuccessAlert(false);
+      showAlert("Please fill out all required fields.", "danger");
+
       return;
     }
 
-    if (!editingItem) return;
-
     try {
       const response = await axios.put(
-        `${url}/api/projects/update/${editingItem.id}`,
-        taskData
+        `${url}/api/users/update/${editingItem.id}`,
+        leadData
       );
-      console.log("Updated item: ", response.data);
       closeEditModal(); // Close the modal
       setEditingItem(null);
-      setTaskData(taskData);
+      setLeadData(leadData);
+      showAlert("Lead Updated Successfully!", "success");
       fetchData();
     } catch (error) {
       console.error("Error: ", error);
+      showAlert(`${error.response.data.message}`, "danger");
     }
   };
 
@@ -239,7 +209,7 @@ const LeadsManagement = () => {
     try {
       // Make an API call to delete the project by its ID
       const response = await axios.delete(
-        `${url}/api/projects/delete/${itemToDelete.id}`
+        `${url}/api/users/delete/${itemToDelete.id}`
       );
 
       if (response.data.success) {
@@ -247,12 +217,17 @@ const LeadsManagement = () => {
         const updatedData = localData.filter((i) => i !== itemToDelete);
         setLocalData(updatedData);
         setShowDeleteModal(false); // Close the delete confirmation modal
+        showAlert("Lead Deleted Successfully!", "success");
       } else {
-        console.error("Error deleting project:", response.data.message);
+        console.error("Error deleting lead:", response.data.message);
+        showAlert("Error adding lead. Please try again.", "danger");
+
         // Handle error here (e.g., display an error message)
       }
     } catch (error) {
-      console.error("Error deleting project:", error);
+      console.error("Error deleting lead:", error);
+      showAlert("Error adding lead. Please try again.", "danger");
+
       // Handle error here (e.g., display an error message)
     }
   };
@@ -264,8 +239,7 @@ const LeadsManagement = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${url}/api/users/getall`);
-      console.log(response.data);
+      const response = await axios.get(`${url}/api/users/getleads`);
       // Sort the array in descending order based on the "id" field
       const sortedData = response.data.sort((a, b) => a.id - b.id);
 
@@ -277,29 +251,23 @@ const LeadsManagement = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditedData((prevState) => ({
-      ...prevState,
+    setLeadData((prevData) => ({
+      ...prevData,
       [name]: value,
     }));
   };
+
   const handleEdit = (item) => {
     // Populate the form with the selected item's data for editing
-    setEditedData({
-      name: item.name,
+    setLeadData({
+      id: item.id,
+      firstName: item.firstName,
+      lastName: item.lastName,
       email: item.email,
+      phone: item.phone,
       role: item.role,
+      lastActive: item.lastActive,
     });
-    // setTaskData({
-    //   id: item.id,
-    //   projectName: item.projectName,
-    //   description: item.description,
-    //   lead: item.lead,
-    //   owner: item.owner,
-    //   newEndDate: item.newEndDate,
-    //   priority: item.priority,
-    //   status: item.status,
-    //   nextReview: item.nextReview,
-    // });
     setEditingItem(item);
     setShowEditModal(true);
   };
@@ -314,14 +282,17 @@ const LeadsManagement = () => {
         width: 100,
       },
       {
-        Header: "Name",
-        accessor: "name",
+        Header: "First Name",
+        accessor: "firstName",
         Filter: DropdownFilter,
         filter: multiSelectFilterFn,
         Cell: ({ value }) => (
-          <div style={{ textAlign: "justify" }}>{value}</div>
+          <div style={{ textAlign: "left" }}>
+            {value.length > 30 ? value.substring(0, 50) + "..." : value}
+          </div>
         ),
       },
+
       {
         Header: "Email",
         accessor: "email",
@@ -330,11 +301,31 @@ const LeadsManagement = () => {
         Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
       },
       {
-        Header: "Profile",
-        accessor: "path",
-        Cell: ({ row }) => <img src={row.values.path} alt={row.values.name} />,
+        Header: "Phone",
+        accessor: "phone",
+        Filter: DropdownFilter,
+        filter: multiSelectFilterFn,
+
+        Cell: ({ value }) => (
+          <div
+            style={{ textAlign: "center", cursor: "pointer" }}
+            onClick={() => {
+              const whatsappUrl = `https://wa.me/${value}`; // Removes any non-digit characters
+              window.open(whatsappUrl, "_blank");
+            }}
+          >
+            {value}
+          </div>
+        ),
       },
 
+      {
+        Header: "Last Login",
+        accessor: "lastActive",
+        Cell: ({ value }) => (
+          <div style={{ textAlign: "center" }}>{`🟢 ${value}`}</div>
+        ),
+      },
       {
         Header: "Actions",
         accessor: "editDelete",
@@ -355,6 +346,25 @@ const LeadsManagement = () => {
                 <Edit size={20} color="blue" />
               </OverlayTrigger>
             </span>
+            {/* <span
+              className="comment-icon"
+              onClick={() => {
+                navigate(`/projects/comment/${row.original.id}`, {
+                  state: { selectedProject: row.original },
+                });
+              }}
+            >
+              <OverlayTrigger
+                placement="top"
+                overlay={
+                  <Tooltip>
+                    <strong>Comment</strong>
+                  </Tooltip>
+                }
+              >
+                <MessageSquare size={20} color="blue" />
+              </OverlayTrigger>
+            </span> */}
 
             <span
               className="delete-icon"
@@ -410,13 +420,13 @@ const LeadsManagement = () => {
   } = useTable(
     {
       columns,
-      // data: leadsDatajson,
+      data: localData,
       initialState: {
         pageIndex: 0, // Initial page index
-        pageSize: 6, // Set the default page size to 8
+        pageSize: 8, // Set the default page size to 8
       },
     },
-
+    useFilters,
     useGlobalFilter,
     useSortBy,
     useResizeColumns,
@@ -425,6 +435,17 @@ const LeadsManagement = () => {
     useResizeColumns,
     usePagination
   );
+
+  // function handleRowClick(row, cellIndex) {
+  //   // Assume you want to trigger WhatsApp link only for the 5th cell (cellIndex 4) of a numeric row
+  //   if (row) {
+  //     const whatsappNumber = row.cells[0].row.values.phone;
+  //     console.log(whatsappNumber);
+
+  //     const whatsappUrl = `https://wa.me/${whatsappNumber}`;
+  //     window.open(whatsappUrl, "_blank");
+  //   }
+  // }
 
   const itemsPerPage = 4;
   const [currentPageGroup, setCurrentPageGroup] = useState(0);
@@ -439,6 +460,21 @@ const LeadsManagement = () => {
     (_, index) => index + 1
   ).slice(startIndex, endIndex);
 
+  const imageMap = leadsData.reduce((acc, lead) => {
+    acc[lead.name] = lead.path;
+    return acc;
+  }, {});
+
+  const getLeadImage = (firstName) => {
+    return imageMap[firstName] || user; // returns user image as default if firstName not found in imageMap
+  };
+
+  const roleSelectOptions = [
+    { value: "Admin", label: "Admin" },
+    { value: "Lead", label: "Lead" },
+    { value: "Owner", label: "Owner" },
+    { value: "User", label: "User" },
+  ];
   return (
     <>
       <ProjectHeader></ProjectHeader>
@@ -447,29 +483,27 @@ const LeadsManagement = () => {
           <div>
             <ol className="breadcrumb fs-sm mb-1">
               <li className="breadcrumb-item">
-                <Link to="#">Leads Management</Link>
+                <Link to="#">Leads </Link>
               </li>
               <li className="breadcrumb-item active" aria-current="page"></li>
             </ol>
           </div>
 
-          {/* {showSuccessAlert && (
-            <Alert variant="success">Project Added Successfully!</Alert>
-          )} */}
+          {alertMessage && <Alert variant={alertType}>{alertMessage}</Alert>}
 
           <div className="d-flex justify-content-center align-items-center mt-3 mt-md-0">
-            {/* <Button
+            <Button
               variant="primary"
               className="d-flex align-items-center gap-2"
               onClick={openAddModal}
             >
-              <i className="ri-add-line fs-18 lh-1"></i>Add Project
-            </Button> */}
+              <i className="ri-add-line fs-18 lh-1"></i>Add Lead
+            </Button>
 
             {/* Add Task Modal */}
-            {/* <Modal show={showAddModal} onHide={() => setShowAddModal(false)}>
+            <Modal show={showAddModal} onHide={() => setShowAddModal(false)}>
               <Modal.Header closeButton>
-                <Modal.Title>Add Project</Modal.Title>
+                <Modal.Title>Add Lead</Modal.Title>
               </Modal.Header>
               {showEmptyFieldAlert && (
                 <div className="alert alert-danger">
@@ -481,105 +515,71 @@ const LeadsManagement = () => {
                 <Container>
                   <Form>
                     <Form.Group>
-                      <Form.Label>Project Name</Form.Label>
+                      <Form.Label>First Name</Form.Label>
                       <Form.Control
                         type="text"
-                        name="projectName"
-                        value={taskData.projectName}
+                        name="firstName"
+                        value={leadData.firstName}
                         onChange={handleInputChange}
                       />
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label>Description</Form.Label>
+                      <Form.Label>Last Name</Form.Label>
                       <Form.Control
-                        as="textarea"
+                        type="text"
+                        name="lastName"
+                        value={leadData.lastName}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group>
+
+                    <Form.Group>
+                      <Form.Label>Email</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="email"
+                        value={leadData.email}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group>
+
+                    <Form.Group>
+                      <Form.Label>Password</Form.Label>
+                      <Form.Control
+                        type="password"
+                        name="password"
+                        value={leadData.password}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group>
+
+                    <Form.Group>
+                      <Form.Label>Phone</Form.Label>
+                      <Form.Control
+                        type="text"
                         rows={3}
-                        name="description"
-                        value={taskData.description}
+                        name="phone"
+                        value={leadData.phone}
                         onChange={handleInputChange}
                       />
                     </Form.Group>
 
                     <Form.Group>
-                      <Form.Label>Lead Name</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="lead"
-                        value={taskData.lead}
-                        onChange={handleInputChange}
-                      >
-                        <option value="">Select Lead Name</option>
-                        {leadArray.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </Form.Control>
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Owner Name</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="owner"
-                        value={taskData.owner}
-                        onChange={handleInputChange}
-                      >
-                        <option value="">Select Owner Name</option>
-                        {ownerArray.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </Form.Control>
-                    </Form.Group>
-
-                    <Form.Group>
-                      <Form.Label>Due Date</Form.Label>
-                      <Form.Control
-                        type="date"
-                        name="newEndDate"
-                        value={taskData.newEndDate}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Priority</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="priority"
-                        value={taskData.priority}
-                        onChange={handleInputChange}
-                      >
-                        <option value="HIGH">HIGH</option>
-                        <option value="MEDIUM">MEDIUM</option>
-                        <option value="LOW">LOW</option>
-                        <option value="NA">NA</option>
-                      </Form.Control>
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Status</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="status"
-                        value={taskData.status}
-                        onChange={handleInputChange}
-                      >
-                        <option value="COMPLETED">COMPLETED</option>
-                        <option value="IN PROGRESS">IN PROGRESS</option>
-
-                        <option value="NOT STARTED">NOT STARTED</option>
-                        <option value="ON HOLD">ON HOLD</option>
-
-                        <option value="OVERDUE">OVERDUE</option>
-                      </Form.Control>
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Next Review</Form.Label>
-                      <Form.Control
-                        type="date"
-                        name="nextReview"
-                        value={taskData.nextReview}
-                        onChange={handleInputChange}
+                      <Form.Label>Role</Form.Label>
+                      <Select
+                        options={roleSelectOptions}
+                        isSearchable={true}
+                        value={roleSelectOptions.find(
+                          (option) => option.value === leadData.role
+                        )}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "role",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
                       />
                     </Form.Group>
                   </Form>
@@ -596,13 +596,13 @@ const LeadsManagement = () => {
                   Add
                 </Button>
               </Modal.Footer>
-            </Modal> */}
+            </Modal>
 
             {/* Edit Modal */}
 
             <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
               <Modal.Header closeButton>
-                <Modal.Title>Edit Project</Modal.Title>
+                <Modal.Title>Edit Lead</Modal.Title>
               </Modal.Header>
               {showEmptyFieldAlert && (
                 <div className="alert alert-danger">
@@ -614,11 +614,20 @@ const LeadsManagement = () => {
                 <Container>
                   <Form>
                     <Form.Group>
-                      <Form.Label>Name</Form.Label>
+                      <Form.Label>First Name</Form.Label>
                       <Form.Control
                         type="text"
-                        name="name"
-                        value={editedData?.name}
+                        name="firstName"
+                        value={leadData.firstName}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group>
+                    <Form.Group>
+                      <Form.Label>Last Name</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="lastName"
+                        value={leadData.lastName}
                         onChange={handleInputChange}
                       />
                     </Form.Group>
@@ -627,86 +636,38 @@ const LeadsManagement = () => {
                       <Form.Control
                         type="text"
                         name="email"
-                        value={editedData?.email}
+                        value={leadData.email}
                         onChange={handleInputChange}
                       />
                     </Form.Group>
-
                     <Form.Group>
-                      <Form.Label>Role</Form.Label>
+                      <Form.Label>Phone</Form.Label>
                       <Form.Control
                         type="text"
-                        name="role"
-                        value={editedData?.role}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                    {/* <Form.Group>
-                      <Form.Label>Owner Name</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="owner"
-                        value={taskData.owner}
-                        onChange={handleInputChange}
-                      >
-                        <option value="">Select Owner Name</option>
-                        {ownerArray.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </Form.Control>
-                    </Form.Group>
-
-                    <Form.Group>
-                      <Form.Label>Due Date</Form.Label>
-                      <Form.Control
-                        type="date"
-                        name="newEndDate"
-                        value={taskData.newEndDate}
+                        rows={3}
+                        name="phone"
+                        value={leadData.phone}
                         onChange={handleInputChange}
                       />
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label>Priority</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="priority"
-                        value={taskData.priority}
-                        onChange={handleInputChange}
-                      >
-                        <option value="HIGH">HIGH</option>
-                        <option value="MEDIUM">MEDIUM</option>
-                        <option value="LOW">LOW</option>
-                        <option value="NA">NA</option>
-                      </Form.Control>
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Status</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="status"
-                        value={taskData.status}
-                        onChange={handleInputChange}
-                      >
-                        <option value="COMPLETED">COMPLETED</option>
-                        <option value="IN PROGRESS">IN PROGRESS</option>
-
-                        <option value="NOT STARTED">NOT STARTED</option>
-                        <option value="ON HOLD">ON HOLD</option>
-
-                        <option value="OVERDUE">OVERDUE</option>
-                      </Form.Control>
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Next Review</Form.Label>
-                      <Form.Control
-                        type="date"
-                        name="nextReview"
-                        value={taskData.nextReview}
-                        onChange={handleInputChange}
+                      <Form.Label>Role</Form.Label>
+                      <Select
+                        options={roleSelectOptions}
+                        isSearchable={true}
+                        value={roleSelectOptions.find(
+                          (option) => option.value === leadData.role
+                        )}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "role",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
                       />
-                    </Form.Group> */}
+                    </Form.Group>
                   </Form>
                 </Container>
               </Modal.Body>
@@ -718,7 +679,7 @@ const LeadsManagement = () => {
                   Close
                 </Button>
                 <Button variant="primary" onClick={handleSubmitEdit}>
-                  Edit
+                  Update
                 </Button>
               </Modal.Footer>
             </Modal>
@@ -786,7 +747,7 @@ const LeadsManagement = () => {
                                       )}
                                     </span>
                                   </div>
-                                  {[2, 3, 4, 5, 6, 7].includes(columnIndex) &&
+                                  {[9].includes(columnIndex) &&
                                     column.canFilter && (
                                       <div
                                         className="filter-align"
@@ -823,23 +784,32 @@ const LeadsManagement = () => {
                             <tr
                               className="table-active"
                               {...row.getRowProps()}
-                              key={row.id}
+                              key={row.id} // It's better to use row.id if it's available
                             >
                               {row.cells.map((cell, cellIndex) => (
                                 <td
                                   {...cell.getCellProps()}
                                   className="cell-style"
-                                  key={cell.id}
+                                  key={cellIndex} // It's better to use cell.id if it's available
                                 >
-                                  {cellIndex === 3 ? (
+                                  {cellIndex === 2 ? (
                                     <>
                                       <div className="d-flex align-items-center gap-2">
-                                        {console.log(cell.row.original.path)}
-                                        {/* <Avatar img={cell.row.original.path} /> */}
+                                        <Avatar
+                                          img={getLeadImage(
+                                            row.original.firstName
+                                          )}
+                                          // height="35px"
+                                          // width="35px"
+                                        />
+
                                         <div>
                                           <h6 className="mb-0">
-                                            {cell.row.original.role}
+                                            {cell.render("Cell")}
                                           </h6>
+                                          <span className="fs-xs text-secondary people">
+                                            Role
+                                          </span>
                                         </div>
                                       </div>
                                     </>
@@ -871,7 +841,7 @@ const LeadsManagement = () => {
                     <div className="pagination-circle-container">
                       {circleOptions.map((page) => (
                         <Pagination.Item
-                          key={page}
+                          key={page} // Add the key prop here
                           active={pageIndex + 1 === page}
                           onClick={() => gotoPage(page - 1)}
                           className={`pagination-circle ${
@@ -933,7 +903,7 @@ const DropdownFilter = ({ column }) => {
       </div>
       <div className="filter-body">
         {options.map((option, i) => (
-          <label key={i} className="checkbox-label">
+          <label key={option.optionId} className="checkbox-label">
             <input
               type="checkbox"
               value={option}
@@ -959,30 +929,30 @@ const DropdownFilter = ({ column }) => {
   );
 };
 
-function formatDate(inputDate) {
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
+// function formatDate(inputDate) {
+//   const months = [
+//     "Jan",
+//     "Feb",
+//     "Mar",
+//     "Apr",
+//     "May",
+//     "Jun",
+//     "Jul",
+//     "Aug",
+//     "Sep",
+//     "Oct",
+//     "Nov",
+//     "Dec",
+//   ];
 
-  const parts = inputDate.split("-");
-  if (parts.length === 3) {
-    const year = parts[0].slice(2); // Get the last two digits of the year
-    const month = months[parseInt(parts[1], 10) - 1]; // Adjust month to be zero-based
-    const day = parts[2];
+//   const parts = inputDate.split("-");
+//   if (parts.length === 3) {
+//     const year = parts[0].slice(2); // Get the last two digits of the year
+//     const month = months[parseInt(parts[1], 10) - 1]; // Adjust month to be zero-based
+//     const day = parts[2];
 
-    return `${day} ${month}, ${year}`;
-  }
+//     return `${day} ${month}, ${year}`;
+//   }
 
-  return inputDate; // Return the input as is if it doesn't match the format
-}
+//   return inputDate; // Return the input as is if it doesn't match the format
+// }

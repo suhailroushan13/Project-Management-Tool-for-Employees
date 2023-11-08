@@ -37,13 +37,9 @@ router.get("/getall", async (req, res) => {
 
 router.post("/add", async (req, res) => {
   try {
-    const { username, email, password, firstName, lastName, role, phone } =
-      req.body;
-
-    console.log(req.body);
+    const { email, password, firstName, lastName, role, phone } = req.body;
 
     const requiredFields = [
-      "username",
       "email",
       "password",
       "firstName",
@@ -65,14 +61,14 @@ router.post("/add", async (req, res) => {
     // Check if a user with the same email or username already exists
     const existingAdmin = await Admin.findOne({
       where: {
-        [Op.or]: [{ email }, { username }, { phone }],
+        [Op.or]: [{ email }, { phone }],
       },
     });
 
     if (existingAdmin) {
       return res.status(400).json({
         success: false,
-        message: "Admin with the same email or username already exists.",
+        message: "Admin with the same email or phone already exists.",
       });
     }
 
@@ -81,7 +77,6 @@ router.post("/add", async (req, res) => {
 
     // Create a new user in the database
     const newAdmin = await Admin.create({
-      username,
       email,
       password: hashedPassword,
       firstName,
@@ -178,8 +173,7 @@ router.post("/add", async (req, res) => {
 router.put("/update/:id", async (req, res) => {
   try {
     const adminId = req.params.id;
-    const { username, email, password, phone, firstName, lastName, role } =
-      req.body;
+    const { email, password, phone, firstName, lastName, role } = req.body;
 
     // Hash the new password if it's provided
     let hashedPassword = null;
@@ -189,7 +183,6 @@ router.put("/update/:id", async (req, res) => {
 
     // Prepare the data to update
     const updatedData = {
-      username,
       email,
       phone,
       password,
@@ -268,6 +261,30 @@ router.delete("/deleteall", async (req, res) => {
     res.status(500).json({
       success: false,
       message: "An error occurred while deleting all admins.",
+    });
+  }
+});
+
+// drop admins table
+router.delete("/dropadmins", async (req, res) => {
+  try {
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 0");
+
+    // Drop the 'users' table
+    await sequelize.getQueryInterface().dropTable("admins");
+
+    // Re-enable foreign key checks
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 1");
+
+    // await syncModels();
+
+    res.json({ success: true, message: "'admins' Table Dropped Forcefully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message:
+        "An error occurred while deleting comments and dropping the 'users' table.",
     });
   }
 });

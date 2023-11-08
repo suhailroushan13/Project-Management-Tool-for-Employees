@@ -1,0 +1,132 @@
+/* Add your styles for edit and delete icons here */
+
+.one {
+  padding-top: 40px;
+}
+
+/* For .two */
+.two {
+  padding-top: 70px;
+}
+
+/* For .parent-card */
+.parent-card {
+  /* Add a shadow and padding */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+}
+
+/* For .card-header */
+.card-header {
+  background-color: #007bff; /* Primary color for the header */
+  color: #fff; /* White text color */
+  padding: 1rem;
+}
+
+/* For .card */
+.card {
+  /* Add margin and padding */
+  margin-bottom: 1rem;
+  padding: 1rem;
+  /* Add border or other styles as needed */
+}
+
+/* For .comment-card */
+.comment-card {
+  /* Add padding and border */
+  padding: 1rem !important;
+  border-radius: 10px !important;
+  border: 1px solid #ccc !important;
+  margin-top: 10px !important;
+
+  /* Add margin or other styles as needed */
+}
+
+/* For .comment-container */
+.comment-container {
+  display: flex;
+  align-items: center;
+}
+
+/* For .comment-container-wrapper */
+.comment-container-wrapper {
+  max-height: 400px; /* Adjust the maximum height as needed */
+  overflow-y: auto; /* Enable vertical scrolling when content exceeds the maximum height */
+}
+
+/* For .avatar-container */
+.avatar-container {
+  margin-right: 1rem;
+}
+
+/* For .avatar-image */
+.avatar-image {
+  width: 40px; /* Adjust as needed */
+  height: 40px; /* Adjust as needed */
+  border-radius: 50%; /* Rounded avatar */
+  object-fit: cover;
+}
+
+/* For .comment-text */
+.comment-text {
+  /* Add styles for comment text */
+  margin-bottom: 0.5rem;
+}
+
+/* For .comment-timestamp */
+.comment-timestamp {
+  color: #888; /* Adjust timestamp color */
+  /* Add other timestamp styles as needed */
+}
+
+/* For .edit-icon and .delete-icon */
+.edit-icon,
+.delete-icon,
+.comment-icon,
+.info-icon {
+  cursor: pointer;
+  /* Add margin or other styles as needed */
+}
+
+/* For .new-comment-card */
+.new-comment-card {
+  /* Add padding, background color, and border */
+  padding: 0.8rem; /* Increased padding */
+  margin: 0.5rem 0; /* Added margin */
+  background-color: #f0f0f0; /* Slightly lighter background color */
+  border: 1px solid #ddd; /* Softer border color */
+  border-radius: 5px; /* Increased border-radius for more rounding */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Added box shadow */
+  /* Add other styles as needed */
+}
+
+/* For .message-input-group */
+.message-input-group {
+  /* Add styles for the input group */
+  align-items: center;
+}
+
+/* For .message-input */
+.message-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  /* Add other input styles as needed */
+}
+
+/* For .send-button */
+.send-button {
+  background-color: #007bff; /* Primary color for the send button */
+  color: #fff; /* White text color */
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  /* Add margin or other button styles as needed */
+}
+
+/* For .send */
+.send {
+  /* Add styles for the send icon */
+}

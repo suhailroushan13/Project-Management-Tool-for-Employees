@@ -35,8 +35,7 @@ const Project = sequelize.define("projects", {
       "OVERDUE",
       "IN PROGRESS",
       "COMPLETED",
-      "TO BE REVIEWED BY CEO",
-      "READY FOR EXECUTION",
+
       "CANCELED"
     ),
     allowNull: true,

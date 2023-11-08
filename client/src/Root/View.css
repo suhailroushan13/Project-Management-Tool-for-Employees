@@ -1,0 +1,88 @@
+.neumorphic-card {
+  background: #e0e0e0;
+  border-radius: 40px;
+  padding: 20px;
+  box-shadow: 8px 8px 16px #bcbcbc, 8px 8px 16px #ffffff;
+  max-width: 400px;
+  margin: 10px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cards .card {
+  border-radius: 40px !important;
+  margin-left: 300px !important;
+  margin-top: 50px !important;
+}
+.profile-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Image Actions Styling */
+.image-actions {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.image-upload {
+  display: none; /* Hide the default file input */
+}
+
+.profile-image {
+  margin-top: 40px;
+  width: 280px; /* This is the fixed width */
+  height: 280px; /* This is the fixed height */
+  margin-bottom: 20px;
+  object-fit: cover;
+  border-radius: 50%; /* This will make the image container circular */
+  overflow: hidden; /* This ensures that the image inside respects the circular boundary */
+}
+
+.profile-image img {
+  width: 100%; /* We want the image to fill its container */
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%; /* This ensures the image itself is also circular, especially important if the image doesn't fill the container entirely */
+}
+
+.profile-name {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.profile-bio,
+.profile-created-at,
+.profile-last-login,
+.profile-role {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-size: 20px;
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
+
+.contact-info-list {
+  list-style: none;
+  padding: 0;
+}
+
+.contact-info-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.contact-info-list i {
+  margin-right: 10px;
+  font-size: 18px;
+  color: #555;
+}

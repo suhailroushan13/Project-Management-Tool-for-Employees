@@ -1,16 +1,16 @@
-import React, { useContext, useState, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import UserContext from "../dashboard/UserContext";
-import dummyImage from "../assets/leads/user.png";
-import anand from "../assets/leads/anand.png";
-import meera from "../assets/leads/meera.jpg";
-import firoz from "../assets/leads/firoz.jpg";
-import raj from "../assets/leads/raj.png";
-import sanjay from "../assets/leads/sanjay.jpg";
-import veera from "../assets/leads/veera.png";
-import { dashboardMenu } from "../data/Menu";
+import { Link, NavLink } from "react-router-dom";
+import UserContext from "../Root/Context";
+import anand from "../assets/users/anand.png";
+import firoz from "../assets/users/firoz.jpg";
+import meera from "../assets/users/meera.jpg";
+import raj from "../assets/users/raj.png";
+import sanjay from "../assets/users/sanjay.png";
+import dummyImage from "../assets/users/user.png";
+import veera from "../assets/users/veera.png";
 import { leadsData } from "../data/Leads";
+import { dashboardMenu } from "../data/Menu";
 
 const Sidebar = () => {
   const context = useContext(UserContext);
@@ -47,6 +47,8 @@ const Sidebar = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("userImage");
+    localStorage.removeItem("role");
+
     window.location.href = "/";
   };
 

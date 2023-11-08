@@ -1,14 +1,16 @@
 import express from "express";
 import { Op } from "sequelize"; // Import Op from Sequelize
 import Project from "../../models/Project.js";
-import Comment from "../../models/Comment.js";
+// import { Comment, CommentAttachment } from "../../models/Comment.js";
 import axios from "axios";
+import { syncModels } from "../../utils/dbConnect.js";
 
 const router = express.Router();
 
 router.get("/getall", async (req, res) => {
   try {
-    const projects = await Project.findAll({ include: Comment });
+    // const projects = await Project.findAll({ include: Comment });
+    const projects = await Project.findAll({});
 
     res.status(200).json(projects);
   } catch (error) {
@@ -35,7 +37,6 @@ router.get("/get/:id", async (req, res) => {
   try {
     const project = await Project.findOne({
       where: { id }, // Find the project by id
-      include: Comment, // Include associated comments
     });
 
     if (!project) {
@@ -50,6 +51,37 @@ router.get("/get/:id", async (req, res) => {
     res.status(500).json({
       success: false,
       error: "An error occurred while fetching the project.",
+    });
+  }
+});
+
+router.get("/getbylead/:leadName", async (req, res) => {
+  const { leadName } = req.params; // Extract the lead name from the URL parameter
+
+  try {
+    const projects = await Project.findAll({
+      where: {
+        [Op.or]: [
+          { lead: leadName }, // Find projects with the specified lead name
+          { owner: leadName }, // Find projects with the specified owner name
+        ],
+      },
+    });
+
+    if (!projects || projects.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No projects found for this lead or owner",
+      });
+    }
+
+    res.status(200).json(projects);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      error:
+        "An error occurred while fetching projects by lead name or owner name.",
     });
   }
 });
@@ -337,5 +369,23 @@ router.delete("/deleteall", async (req, res) => {
 //     });
 //   }
 // });
+
+router.delete("/reset", async (req, res) => {
+  try {
+    // Drop the comments table
+
+    await CommentAttachment.drop();
+    // await Comment.drop();
+    await Project.drop();
+
+    // Sync the models to recreate the tables
+    await syncModels();
+
+    res.status(200).send("Projects table dropped successfully.");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 export default router;

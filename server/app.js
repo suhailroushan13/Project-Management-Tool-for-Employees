@@ -4,13 +4,16 @@ import cors from "cors";
 import morgan from "morgan";
 import path from "path";
 import fs from "fs";
+import multer from "multer";
+
 import { fileURLToPath } from "url";
+import syncDatabase from "./utils/sync.js";
 
 import userRouter from "./controllers/users/index.js";
 import adminRouter from "./controllers/admins/index.js";
 import loginRouter from "./controllers/login/index.js";
 import projectRouter from "./controllers/projects/index.js";
-import commentRouter from "./controllers/comments/index.js";
+import channelRouter from "./controllers/Channel/newIndex.js";
 
 const PORT = config.get("PORT");
 const __filename = fileURLToPath(import.meta.url);
@@ -42,10 +45,16 @@ app.use("/api/login", loginRouter);
 app.use("/api/users", userRouter);
 app.use("/api/admins", adminRouter);
 app.use("/api/projects", projectRouter);
-app.use("/api/comments", commentRouter);
+app.use("/api/channel", channelRouter);
+
+app.use((req, res) => {
+  res.json({ msg: "Invalid Route Please Check Spelling Suhail" });
+});
+
+await syncDatabase();
 
 app.listen(PORT, () => {
   console.log(`Server Started AT ${PORT}`);
   console.log(`Yoo Deployed at : ${config.get("URL")}`);
-  console.log("Redis is running and active.");
+  // console.log("Redis is running and active.");
 });

@@ -1,12 +1,13 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 
 import Main from "./layouts/Main";
 import NotFound from "./pages/NotFound";
-import Login from "./dashboard/Login";
+import Login from "./Root/Login.js";
 import publicRoutes from "./routes/PublicRoutes.js";
 import protectedRoutes from "./routes/ProtectedRoutes";
-import UserContext from "./dashboard/UserContext.js"; // Update the path as needed
+import Context from "./Root/Context.js"; // Update the path as needed
+import { TableProvider } from "../src/Context/TableContext.js"; // Import the TableProvider
 
 // import css
 import "./assets/css/remixicon.css";
@@ -30,28 +31,35 @@ export default function App() {
   return (
     <React.Fragment>
       <BrowserRouter>
-        <UserContext.Provider value={{ email, setEmail }}>
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/" element={<Main />}>
+        <Context.Provider value={{ email, setEmail }}>
+          <TableProvider>
+            <Routes>
+              <Route path="/" element={<Login />} />
               {protectedRoutes.map((route, index) => {
-                return (
-                  <Route
-                    path={route.path}
-                    element={route.element}
-                    key={index}
-                  />
-                );
+                const currentRole = localStorage.getItem("role");
+
+                if (route.roles.includes(currentRole)) {
+                  return (
+                    <Route
+                      key={index}
+                      path={route.path}
+                      element={route.element}
+                    />
+                  );
+                } else {
+                  return (
+                    <Route
+                      key={index}
+                      path={route.path}
+                      element={<NotFound />}
+                    />
+                  );
+                }
               })}
-            </Route>
-            {publicRoutes.map((route, index) => {
-              return (
-                <Route path={route.path} element={route.element} key={index} />
-              );
-            })}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </UserContext.Provider>
+              {/* Add other routes as needed */}
+            </Routes>
+          </TableProvider>
+        </Context.Provider>
       </BrowserRouter>
     </React.Fragment>
   );

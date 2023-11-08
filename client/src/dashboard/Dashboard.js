@@ -16,7 +16,7 @@ import "chart.js/auto";
 function Dashboard() {
   const [leadData, setLeadData] = useState([]);
   const [localData, setLocalData] = useState([]);
-  const url = config.PROD_URL;
+  const url = config.URL;
 
   useEffect(() => {
     // Moved Prism.highlightAll() outside of the axios request since it's not related to the data fetching.

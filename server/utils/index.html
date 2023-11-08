@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        .card {
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .card-content {
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .contact-info {
+            margin-top: 20px;
+        }
+
+        .contact-info p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <div class="card-title">Welcome to T-Works!</div>
+        <div class="card-content">
+            <p>Hi ${name}</p>
+            <p>We're delighted to invite you to join
+                <br>
+                T-Works! Your skills and enthusiasm have impressed us, and we're
+                excited to have you on board.
+            </p>
+        </div>
+        <div class="contact-info">
+            <p><strong>Company:</strong> T-Works</p>
+            <p><strong>Position:</strong> ${role}</p>
+            <p><strong>Start Date:</strong> <span id="start-date"></span></p>
+            <p><strong>Location:</strong> <a href="https://maps.app.goo.gl/GM9XNu2kWfCAPFk46">Hyderabad</a> </p>
+        </div>
+        <div class="card-content">
+            <p>We'll assist you with onboarding
+            </p>
+        </div>
+        <div class="card-content">
+            <p>We look forward to your contributions!</p>
+        </div>
+        <div class="card-content">
+            <p><strong>Best regards,</strong></p>
+            <p>T-Works</p>
+        </div>
+    </div>
+
+    <script>
+        // Get the current date
+        const currentDate = new Date();
+
+        // Format the date as "YYYY-MM-DD"
+        const formattedDate = currentDate.toLocaleDateString().slice(0, 10);
+
+        // Set the formatted date in the "Start Date" span
+        document.getElementById("start-date").textContent = formattedDate;
+    </script>
+</body>
+
+</html>

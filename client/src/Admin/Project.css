@@ -1,0 +1,383 @@
+/* Add this CSS in your stylesheet */
+
+/* Style the table container for responsiveness */
+.grid-container {
+  overflow-x: auto;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+/* Style the table */
+.table-style {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Style table cells and headers */
+.table-style th,
+.table-style td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+/* Style the table header */
+.table-style th {
+  background-color: #ffffff64;
+  color: rgb(0, 0, 0);
+  font-weight: normal;
+}
+
+/* Add responsiveness for smaller screens */
+@media (max-width: 768px) {
+  .table-style th,
+  .table-style td {
+    padding: 8px;
+    font-size: 14px;
+  }
+}
+
+/* Remove left border from the first column */
+.table-style th:first-child,
+.table-style td:first-child {
+  border-left: none;
+}
+
+/* Add this CSS in your stylesheet */
+
+/* Style the filter dropdown */
+.filter-dropdown {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.header-style:hover .filter-dropdown {
+  display: block;
+}
+
+.filter-dropdown .filter-header {
+  text-align: center;
+  padding: 10px;
+  background-color: #e0e0e0;
+}
+
+.filter-dropdown .filter-body {
+  padding: 10px;
+  max-height: 400px; /* Add max height for scroll if needed */
+  overflow-y: auto; /* Add scrollbar if the content overflows */
+}
+
+.filter-dropdown label {
+  padding: 10px;
+  margin: 0;
+  display: block;
+}
+
+.filter-dropdown label input[type="checkbox"] {
+  margin-right: 8px;
+  transform: scale(1.5);
+  vertical-align: middle; /* Align checkboxes vertically */
+}
+
+.filter-dropdown label span {
+  vertical-align: middle; /* Align labels vertically */
+}
+
+.filter-dropdown label:hover {
+  background-color: #f1f1f1;
+}
+
+.filter-dropdown .filter-footer {
+  text-align: center;
+  padding: 10px;
+}
+
+/* Style for the "Check All" and "Clear" buttons */
+.check-all-button {
+  display: inline-block;
+  padding: 5px 20px;
+  font-size: 16px;
+  background-color: #007bff; /* Blue background color */
+  color: #fff; /* White text color */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.clear-filter {
+  display: inline-block;
+  padding: 5px 20px;
+  font-size: 16px;
+  background-color: #1bc229; /* Blue background color */
+  color: #fff; /* White text color */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.check-all-button:hover {
+  background-color: #b7b7b8; /* Darker blue on hover */
+  transform: scale(1.05); /* Slight scale-up effect on hover */
+}
+
+/* Add this CSS to your stylesheet */
+.filter-body .checkbox-label {
+  display: block;
+  text-align: left;
+  margin-left: 0; /* Adjust the left margin as needed */
+  margin-right: 20px; /* Add spacing between checkbox and label */
+  white-space: nowrap; /* Prevent label text from wrapping */
+}
+
+.filter-body .checkbox-label input[type="checkbox"] {
+  margin-right: 10px; /* Adjust the space between the checkbox and label text */
+  transform: scale(1.5); /* Adjust the scale factor as needed */
+  vertical-align: left; /* Align checkboxes vertically with label text */
+}
+
+.table-style td:nth-child(1),
+.table-style td:nth-child(2) {
+  width: 250px; /* Adjust the width as needed */
+  /* You can also add other styling specific to the second column here */
+}
+
+/* .table-style td:nth-child(3) {
+  width: 150px;
+}
+
+.table-style td:nth-child(4) {
+  width: 150px;
+}
+
+.table-style td:nth-child(9) {
+  width: 200px;
+} */
+
+@media (max-width: 768px) {
+  .table-style th,
+  .table-style td {
+    padding: 5px;
+    font-size: 12px;
+  }
+
+  /* Decrease the font size of the <thead> elements */
+  .table-style thead th {
+    font-size: 14px; /* Adjust the font size as needed */
+  }
+}
+
+/* Custom CSS for the custom-select class */
+.custom-select {
+  /* Common styling for all screen sizes */
+  border: 2px solid #ccc;
+  padding: 10px;
+  width: 100%;
+  /* Add more common styles as needed */
+
+  /* Responsive styling */
+  @media (max-width: 576px) {
+    /* Styles for small screens (e.g., mobile devices) */
+    font-size: 14px;
+  }
+
+  @media (min-width: 577px) and (max-width: 992px) {
+    /* Styles for medium screens (e.g., tablets) */
+    font-size: 16px;
+  }
+
+  /* Add more media queries for other screen sizes as needed */
+}
+
+/* Center the icons both horizontally and vertically */
+.edit-icon,
+.delete-icon,
+.comment-icon {
+  display: inline;
+  justify-content: center;
+  align-items: center;
+  font-size: x-large;
+  cursor: pointer;
+  margin: 8px;
+  transition: color 0.3s; /* Adding a smooth color transition effect */
+}
+
+/* Style for the edit icon */
+.edit-icon {
+  color: #007bff; /* Change the color to your preferred edit icon color */
+}
+
+/* Style for the delete icon */
+.delete-icon {
+  color: #ff0000; /* Change the color to your preferred delete icon color */
+}
+
+/* Hover effect for both icons */
+.edit-icon:hover,
+.delete-icon:hover {
+  color: #555; /* Change to a different color when hovered */
+}
+
+.avatar-and-cell {
+  display: flex; /* Display items side by side */
+  align-items: left; /* Vertically align items in the center */
+  text-align: right;
+}
+
+.avatar-and-cell img {
+  margin-right: 30px;
+}
+
+.avatar-and-cell .nameandrole {
+  flex-grow: 1; /* Allow the name to expand and fill the available space to the right */
+  margin-left: 10px;
+}
+
+.footer-text {
+  text-align: center;
+  margin-right: 20px;
+  font-size: 12px; /* Adjust the font size as needed */
+  color: #777; /* Adjust the color as needed */
+}
+
+.people {
+  display: none;
+}
+
+.table-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Adjust alignment as needed */
+}
+
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-left: 20px; /* Adjust the margin as needed */
+}
+
+.pagination-button {
+  padding: 8px 16px; /* Adjust padding as needed */
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.pagination-circle-container {
+  display: flex;
+  align-items: center;
+  margin: 0 16px; /* Adjust margin as needed */
+}
+
+/* Adjust the margin and font size to your liking */
+
+/* Add any other custom styles as needed */
+
+@media screen and (max-width: 1024px) and (max-height: 600px) {
+  .table-style {
+    font-size: 7px; /* Reduce font size for smaller screens */
+  }
+  .table-style th,
+  .table-style td {
+    padding: 5px;
+    font-size: 7px;
+  }
+  .mb-0 {
+    font-size: 7px;
+  }
+  .avatar {
+    height: 10px;
+    width: 10px;
+  }
+  .avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 100%;
+    display: block;
+    position: relative;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: inherit;
+      display: block;
+    }
+  }
+  .badge {
+    font-size: 10px;
+  }
+  .cell-style {
+    width: 20px;
+    height: 20px;
+  }
+
+  .edit-icon,
+  .delete-icon,
+  .comment-icon {
+    display: inline;
+    justify-content: center;
+    align-items: center;
+    font-size: x-large;
+    cursor: pointer;
+    margin: 5px;
+    transition: color 0.3s; /* Adding a smooth color transition effect */
+  }
+
+  /* Style for the edit icon */
+  .edit-icon {
+    color: #555; /* Change the color to your preferred edit icon color */
+  }
+
+  /* Style for the delete icon */
+  .delete-icon {
+    color: #555; /* Change the color to your preferred delete icon color */
+  }
+
+  /* Hover effect for both icons */
+  .edit-icon:hover,
+  .delete-icon:hover {
+    color: #555; /* Change to a different color when hovered */
+  }
+
+  /* Additional adjustments as needed */
+}
+
+@media screen and (max-width: 1024px) and (max-height: 600px) {
+  .edit-icon,
+  .comment-icon,
+  .delete-icon {
+    display: table-cell; /* Display icons in a row */
+    height: 10px; /* Adjust the height as needed */
+    width: 10px; /* Adjust the width as needed */
+    margin: 10px; /* Adjust the horizontal spacing as needed */
+    font-size: 30px; /* Adjust the icon size as needed */
+    cursor: pointer;
+    transition: color 0.3s; /* Adding a smooth color transition effect */
+  }
+  .filter-align {
+    display: table-cell; /* Display icons in a row */
+    height: 10px; /* Adjust the height as needed */
+    width: 10px; /* Adjust the width as needed */
+    margin: 10px; /* Adjust the horizontal spacing as needed */
+    cursor: pointer;
+    transition: color 0.3s; /* Adding a smooth color transition effect */
+  }
+}
+.cell-content-with-icon {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.cell-content-with-icon .ri-whatsapp-line {
+  margin-left: 10px; /* Adjust the margin as needed */
+  padding: 5px; /* Adjust padding as needed */
+}

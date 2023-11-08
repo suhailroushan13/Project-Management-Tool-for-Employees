@@ -623,7 +623,7 @@
     "newStartDate": "2023-04-01",
     "newEndDate": "",
     "priority": "MEDIUM",
-    "status": "TO BE REVIEWED BY CEO",
+    "status": "ON HOLD",
     "attentionRequired": "Yes",
     "comments": "Pending review. Have to set a date",
     "nextReview": ""
@@ -657,7 +657,7 @@
     "newStartDate": "2023-05-01",
     "newEndDate": "2023-08-25",
     "priority": "HIGH",
-    "status": "READY FOR EXECUTION",
+    "status": "ON HOLD",
     "attentionRequired": "Yes",
     "comments": "Do one review before rolling out",
     "nextReview": ""
@@ -963,7 +963,7 @@
     "newStartDate": "2023-07-27",
     "newEndDate": "2023-08-25",
     "priority": "HIGH",
-    "status": "READY FOR EXECUTION",
+    "status": "ON HOLD",
     "attentionRequired": "",
     "comments": "Firoz needs more time, has to review with Varun. Need a date so we can publish it online and use it for BD End Date given as 25th Aug  File uploaded by Varun in Clickup",
     "nextReview": "2023-08-11"
@@ -1711,7 +1711,7 @@
     "newStartDate": "",
     "newEndDate": "",
     "priority": "HIGH",
-    "status": "READY FOR EXECUTION",
+    "status": "ON HOLD",
     "attentionRequired": "",
     "comments": "businesses we are in , revenue model to be presented to the team",
     "nextReview": ""
@@ -2053,7 +2053,7 @@
     "priority": "NA",
     "status": "COMPLETED",
     "attentionRequired": "",
-    "comments": "TO BE REVIEWED BY CEO",
+    "comments": "ON HOLD",
     "nextReview": ""
   },
   {
@@ -2068,7 +2068,7 @@
     "newStartDate": "",
     "newEndDate": "",
     "priority": "NA",
-    "status": "TO BE REVIEWED BY CEO",
+    "status": "ON HOLD",
     "attentionRequired": "No",
     "comments": "Sanjay to give a plan. To be reviewed by the CEO",
     "nextReview": ""

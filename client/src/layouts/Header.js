@@ -4,8 +4,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 // import anand from "../assets/img/img1.jpg";
 import notification from "../data/Notification";
 // import anand from "../assets/img/anand.png";
-import adminImage from "../assets/img/user.png";
-
+import dummyImage from "../assets/users/user.png";
 
 import { payload } from "./dashboard/Login";
 import leadsData from "../data/Leads";
@@ -64,7 +63,7 @@ export default function Header({ onSkin }) {
     const lead = leadsData.find((lead) => lead.email === email);
 
     // If a matching lead is found, return its image path; otherwise, return a default image path
-    return lead ? lead.path : defaultImagePath;
+    return lead ? lead.path : dummyImage;
   };
   // const skinMode = (e) => {
   //   e.preventDefault();

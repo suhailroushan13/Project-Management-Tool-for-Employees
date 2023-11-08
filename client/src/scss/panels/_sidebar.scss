@@ -10,8 +10,8 @@
 
     .header-main,
     .main-mobile-header,
-    .main { 
-      transform: translateX($sidebar-width + 40px); 
+    .main {
+      transform: translateX($sidebar-width + 40px);
     }
 
     .main-backdrop {
@@ -27,8 +27,12 @@
     box-shadow: none;
   }
 
-  .header-main { left: 0; }
-  .main { margin-left: 0; }
+  .header-main {
+    left: 0;
+  }
+  .main {
+    margin-left: 0;
+  }
 
   &.sidebar-show {
     overflow: hidden;
@@ -36,12 +40,13 @@
     .sidebar {
       left: 0;
       box-shadow: 1px 0 1px rgba($gray-900, 0.01),
-                  4px 0 4px rgba($gray-900, 0.01),
-                  16px 0 16px rgba($gray-900, 0.01);
+        4px 0 4px rgba($gray-900, 0.01), 16px 0 16px rgba($gray-900, 0.01);
     }
 
     .header-main,
-    .main { transform: translateX($sidebar-width); }
+    .main {
+      transform: translateX($sidebar-width);
+    }
 
     .main-backdrop {
       opacity: 1;
@@ -63,9 +68,13 @@
       border-left-width: 0;
     }
 
-    .main { margin-left: 0; }
+    .main {
+      margin-left: 0;
+    }
 
-    .music-player { left: 23px; }
+    .music-player {
+      left: 23px;
+    }
   }
 }
 
@@ -86,21 +95,22 @@
     opacity: 1;
     visibility: visible;
     left: 0;
-    box-shadow: 1px 0 1px rgba($gray-900, 0.01),
-                4px 0 4px rgba($gray-900, 0.01),
-                16px 0 16px rgba($gray-900, 0.01);
+    box-shadow: 1px 0 1px rgba($gray-900, 0.01), 4px 0 4px rgba($gray-900, 0.01),
+      16px 0 16px rgba($gray-900, 0.01);
   }
 
-  @include media-breakpoint-up(xxl) { width: $sidebar-width; }
+  @include media-breakpoint-up(xxl) {
+    width: $sidebar-width;
+  }
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    background-color: rgba(#fff, .6);
+    background-color: rgba(#fff, 0.6);
     z-index: 5;
     opacity: 0;
     visibility: hidden;
@@ -113,7 +123,9 @@
       opacity: 1;
     }
 
-    .sidebar-footer { bottom: 0; }
+    .sidebar-footer {
+      bottom: 0;
+    }
   }
 }
 
@@ -137,8 +149,12 @@
     border-bottom: 1px solid $gray-200;
 
     &.show {
-      .nav-label::after { content: '\EA4E'; }
-      .nav-sidebar { display: block; }
+      .nav-label::after {
+        content: "\EA4E";
+      }
+      .nav-sidebar {
+        display: block;
+      }
     }
   }
 
@@ -149,7 +165,7 @@
     font-family: $ff-secondary;
     text-transform: uppercase;
     color: $gray-600;
-    letter-spacing: .7px;
+    letter-spacing: 0.7px;
     position: relative;
     cursor: pointer;
 
@@ -159,15 +175,15 @@
     }
 
     &::after {
-      content: '\EA6E';
-      font-family: 'remixicon';
+      content: "\EA6E";
+      font-family: "remixicon";
       font-size: 14px;
       font-weight: 400;
       position: absolute;
       top: 50%;
       right: 15px;
       line-height: 0;
-      opacity: .6;
+      opacity: 0.6;
     }
   }
 
@@ -175,9 +191,13 @@
     display: none;
     padding: 0 0 20px;
 
-    .nav-link { padding: 8px 20px; }
+    .nav-link {
+      padding: 8px 20px;
+    }
 
-    .nav-item.show .nav-sub { display: block; }
+    .nav-item.show .nav-sub {
+      display: block;
+    }
   }
 
   > .ps__rail-y {
@@ -194,7 +214,6 @@
 
 .sidebar-footer {
   position: absolute;
-  bottom: -250px;
   left: 0;
   right: 0;
   border-top: 1px solid $gray-200;
@@ -212,12 +231,12 @@
     justify-content: center;
     font-size: 20px;
     color: $secondary;
-    opacity: .6;
+    opacity: 0.6;
     @include transition(all 0.25s);
 
     &:hover,
     &:focus {
-      background-color: rgba($gray-200, .6);
+      background-color: rgba($gray-200, 0.6);
       opacity: 1;
     }
   }
@@ -258,7 +277,9 @@
     margin-bottom: 2px;
     font-weight: 600;
 
-    a { color: $dark; }
+    a {
+      color: $dark;
+    }
   }
 
   p {
@@ -299,14 +320,16 @@
 
   hr {
     margin: 10px 10px;
-    opacity: .12;
+    opacity: 0.12;
   }
 }
 
-.sidebar-right { width: 290px; }
+.sidebar-right {
+  width: 290px;
+}
 
 .sidebar-label {
-  display:  block;
+  display: block;
   margin-bottom: 5px;
   padding: 0 10px;
   font-size: $font-size-xs;

@@ -23,8 +23,6 @@ const authenticateDB = async () => {
 
 authenticateDB();
 
-
-
 const syncModels = async () => {
   try {
     // Sync all models to create tables
@@ -37,4 +35,4 @@ const syncModels = async () => {
 
 syncModels();
 // Export the Sequelize instance and the synchronization function
-export { db as sequelize };
+export { db as sequelize, syncModels };

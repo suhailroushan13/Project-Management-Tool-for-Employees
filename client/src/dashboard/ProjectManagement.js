@@ -34,19 +34,25 @@ import {
 } from "react-table";
 import { leadArray, ownerArray } from "../apps/data/Leadonwer";
 import "../assets/css/react-datepicker.min.css";
-import img from "../assets/img/user.png";
 import Avatar from "../components/Avatar";
 import config from "../config.json";
 import Footer from "../layouts/Footer";
 import ProjectHeader from "../layouts/ProjectHeader";
 
-import anand from "../assets/leads/anand.png";
-import firoz from "../assets/leads/firoz.jpg";
-import meera from "../assets/leads/meera.jpg";
-import raj from "../assets/leads/raj.png";
-import sanjay from "../assets/leads/sanjay.jpg";
-import user from "../assets/leads/user.png";
-import veera from "../assets/leads/veera.png";
+import anand from "../assets/users/anand.png";
+import firoz from "../assets/users/firoz.jpg";
+import meera from "../assets/users/meera.jpg";
+import nikhila from "../assets/users/nikhila.png";
+import rahman from "../assets/users/rahman.png";
+import raj from "../assets/users/raj.png";
+import sanjay from "../assets/users/sanjay.png";
+import suhail from "../assets/users/suhail.png";
+import user from "../assets/users/user.png";
+import veera from "../assets/users/veera.png";
+
+import Select from "react-select";
+import LeadsData from "../data/LeadsData";
+
 import "./Project.css";
 ///////////////////////////////////////////////////////////
 
@@ -58,6 +64,10 @@ const ProjectManagement = () => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("");
+  const [timeoutId, setTimeoutId] = useState(null);
 
   // Task Data
   const [taskData, setTaskData] = useState({
@@ -72,27 +82,25 @@ const ProjectManagement = () => {
   });
 
   // eslint-disable-next-line
-  const showAlert = () => {
-    setShowSuccessAlert(true);
+  const showAlert = (message, type) => {
+    setAlertMessage(message);
+    setAlertType(type); // 'success' or 'danger'
 
     // Hide the alert after 5 seconds
-    const timeoutId = setTimeout(() => {
-      setShowSuccessAlert(false);
+    const id = setTimeout(() => {
+      setAlertMessage("");
+      setAlertType("");
     }, 5000);
 
-    // Clear the timeout if the component unmounts
-    return () => clearTimeout(timeoutId);
+    setTimeoutId(id); // Store the timeout ID for possible cleanup
   };
-
-  // Trigger the showAlert function when the component mounts
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setShowSuccessAlert(false);
-    }, 4000);
-
-    // Clear the timeout if the component unmounts
-    return () => clearTimeout(timeoutId);
-  }, [showSuccessAlert]);
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [timeoutId]);
 
   // eslint-disable-next-line
   const [description, setDescription] = useState("");
@@ -160,6 +168,8 @@ const ProjectManagement = () => {
     setSelectedLead("");
     setSelectedOwner("");
   };
+
+  /////////////////////////// Add Data ///////////////////////////////
   const handleSubmitAdd = async (e) => {
     e.preventDefault();
 
@@ -172,13 +182,12 @@ const ProjectManagement = () => {
       !taskData.priority ||
       !taskData.status
     ) {
-      setShowEmptyFieldAlert(true);
-      setShowSuccessAlert(false);
+      showAlert("Please fill out all required fields.", "danger");
       return;
     }
 
     try {
-      const response = await axios.post(`${url}/api/projects/add`, taskData);
+      await axios.post(`${url}/api/projects/add`, taskData);
 
       // Clear the taskData object after successful submission
       setTaskData({
@@ -190,67 +199,64 @@ const ProjectManagement = () => {
         status: "",
       });
 
-      setShowSuccessAlert(true);
       closeAddModal();
+
+      showAlert("Project Added Successfully!", "success");
       fetchData();
     } catch (error) {
       console.error("Error: ", error);
-      // Optionally, show an error alert or message to the user
-      // setShowErrorAlert(true);
+      showAlert("Error adding project. Please try again.", "danger");
     }
   };
-
+  // ////////////////////////// Edit Data /////////////////////////////////////////////////
   const handleSubmitEdit = async (e) => {
     e.preventDefault();
 
     if (
-      taskData.projectName === "" ||
-      taskData.lead === "" ||
-      taskData.owner === "" ||
-      taskData.newEndDate === "" ||
-      taskData.priority === "" ||
-      taskData.status === ""
+      !taskData.projectName ||
+      !taskData.lead ||
+      !taskData.owner ||
+      !taskData.newEndDate ||
+      !taskData.priority ||
+      !taskData.status
     ) {
-      setShowEmptyFieldAlert(true);
-      setShowSuccessAlert(false);
+      showAlert("Please fill out all required fields.", "danger");
       return;
     }
 
-    if (!editingItem) return;
-
     try {
-      const response = await axios.put(
-        `${url}/api/projects/update/${editingItem.id}`,
-        taskData
-      );
-      closeEditModal(); // Close the modal
+      await axios.put(`${url}/api/projects/update/${editingItem.id}`, taskData);
+      closeEditModal();
       setEditingItem(null);
       setTaskData(taskData);
+      showAlert("Project Updated Successfully!", "success");
       fetchData();
     } catch (error) {
       console.error("Error: ", error);
+      showAlert("Error adding project. Please try again.", "danger");
     }
   };
 
+  // ///////////////////////Delete Data //////////////////////////
+
   const handleDelete = async () => {
     try {
-      // Make an API call to delete the project by its ID
       const response = await axios.delete(
         `${url}/api/projects/delete/${itemToDelete.id}`
       );
 
       if (response.data.success) {
-        // Delete the item from the local data
         const updatedData = localData.filter((i) => i !== itemToDelete);
         setLocalData(updatedData);
-        setShowDeleteModal(false); // Close the delete confirmation modal
+        setShowDeleteModal(false);
+        showAlert("Project Deleted Successfully!", "success");
       } else {
         console.error("Error deleting project:", response.data.message);
-        // Handle error here (e.g., display an error message)
+        showAlert("Error adding project. Please try again.", "danger");
       }
     } catch (error) {
       console.error("Error deleting project:", error);
-      // Handle error here (e.g., display an error message)
+      showAlert("Error adding project. Please try again.", "danger");
     }
   };
 
@@ -311,7 +317,9 @@ const ProjectManagement = () => {
         Filter: DropdownFilter,
         filter: multiSelectFilterFn,
         Cell: ({ value }) => (
-          <div style={{ textAlign: "justify" }}>{value}</div>
+          <div style={{ textAlign: "left" }}>
+            {value.length > 30 ? value.substring(0, 50) + "..." : value}
+          </div>
         ),
       },
       {
@@ -499,7 +507,7 @@ const ProjectManagement = () => {
             <span
               className="comment-icon"
               onClick={() => {
-                navigate(`/dashboard/projects/comment/${row.original.id}`, {
+                navigate(`/projects/comment/${row.original.id}`, {
                   state: { selectedProject: row.original },
                 });
               }}
@@ -599,24 +607,24 @@ const ProjectManagement = () => {
     (_, index) => index + 1
   ).slice(startIndex, endIndex);
 
-  const getLeadImage = (name) => {
-    switch (name) {
-      case "Anand":
-        return anand;
-      case "Meera":
-        return meera;
-      case "Firoz":
-        return firoz;
-      case "Raj":
-        return raj;
-      case "Sanjay":
-        return sanjay;
-      case "Veera":
-        return veera;
-      default:
-        return user; // You can provide a default image path if needed
-    }
+  const imageMap = leadsData.reduce((acc, lead) => {
+    acc[lead.name] = lead.path;
+    return acc;
+  }, {});
+
+  const getLeadImage = (firstName) => {
+    return imageMap[firstName] || user; // returns user image as default if firstName not found in imageMap
   };
+
+  const leadSelectOptions = leadArray.map((option) => ({
+    value: option,
+    label: option,
+  }));
+
+  const ownerSelectOptions = ownerArray.map((option) => ({
+    value: option,
+    label: option,
+  }));
 
   return (
     <>
@@ -632,9 +640,7 @@ const ProjectManagement = () => {
             </ol>
           </div>
 
-          {showSuccessAlert && (
-            <Alert variant="success">Project Added Successfully!</Alert>
-          )}
+          {alertMessage && <Alert variant={alertType}>{alertMessage}</Alert>}
 
           <div className="d-flex justify-content-center align-items-center mt-3 mt-md-0">
             <Button
@@ -681,35 +687,39 @@ const ProjectManagement = () => {
 
                     <Form.Group>
                       <Form.Label>Lead Name</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="lead"
-                        value={taskData.lead}
-                        onChange={handleInputChange}
-                      >
-                        <option value="">Select Lead Name</option>
-                        {leadArray.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </Form.Control>
+                      <Select
+                        options={leadSelectOptions}
+                        isSearchable={true}
+                        value={leadSelectOptions.find(
+                          (option) => option.value === taskData.lead
+                        )}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "lead",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
                     </Form.Group>
                     <Form.Group>
                       <Form.Label>Owner Name</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="owner"
-                        value={taskData.owner}
-                        onChange={handleInputChange}
-                      >
-                        <option value="">Select Owner Name</option>
-                        {ownerArray.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </Form.Control>
+                      <Select
+                        options={ownerSelectOptions}
+                        isSearchable={true}
+                        value={ownerSelectOptions.find(
+                          (option) => option.value === taskData.owner
+                        )}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "owner",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
                     </Form.Group>
 
                     <Form.Group>
@@ -1038,6 +1048,8 @@ const ProjectManagement = () => {
                                     <>
                                       <div className="d-flex align-items-center gap-2">
                                         <Avatar
+                                          // height="35px"
+                                          // width="35px"
                                           img={getLeadImage(row.original.owner)}
                                         />
                                         <div>

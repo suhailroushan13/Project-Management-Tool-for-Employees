@@ -1,56 +1,74 @@
 [
   {
-    "username": "anand",
     "email": "anand@tworks.in",
     "password": "anand@tworks.in",
-    "phone": "+919618211626",
+    "phone": "+919618211621",
     "firstName": "Anand",
     "lastName": "Rajagopalan",
-    "role": "lead"
+    "role": "Lead"
   },
   {
-    "username": "meera",
     "email": "meera@tworks.in",
     "password": "meera@tworks.in",
     "phone": "+919618211625",
-    "firstName": "Mohammad Mohiddin",
-    "lastName": "Meera",
-    "role": "lead"
+    "firstName": "Meera",
+    "lastName": "Mohammad Mohiddin",
+    "role": "Lead"
   },
   {
-    "username": "veera",
     "email": "veera@tworks.in",
     "password": "veera@tworks.in",
     "phone": "+919618211620",
     "firstName": "Veera",
     "lastName": "Chappi",
-    "role": "lead"
+    "role": "Lead"
   },
   {
-    "username": "sanjay",
     "email": "sanjay@tworks.in",
     "password": "sanjay@tworks.in",
-    "phone": "+919618211621",
+    "phone": "+919618211656",
     "firstName": "Sanjay",
     "lastName": "Gajjala Kumar",
-    "role": "lead"
+    "role": "Lead"
   },
   {
-    "username": "firoz",
     "email": "firoz@tworks.in",
     "password": "firoz@tworks.in",
     "phone": "+919618211627",
     "firstName": "Firoz",
     "lastName": "Ahammad",
-    "role": "lead"
+    "role": "Lead"
   },
   {
-    "username": "rajshekhar",
     "email": "rajshekhar@tworks.in",
     "password": "rajshekhar@tworks.in",
     "phone": "+919618211622",
     "firstName": "Raj",
     "lastName": "Shekhar",
-    "role": "lead"
+    "role": "Lead"
+  },
+  {
+    "email": "suhail@tworks.in",
+    "password": "suhail@tworks.in",
+    "phone": "+919618211626",
+    "firstName": "Suhail",
+    "lastName": "Roushan",
+    "role": "User"
+  },
+  {
+    "email": "rahman@tworks.in",
+    "password": "rahman@tworks.in",
+    "phone": "+919840903819",
+    "firstName": "Abdur",
+    "lastName": "Rahman",
+    "role": "User"
+  },
+  {
+    "email": "nikhila@tworks.in",
+    "password": "nikhila@tworks.in",
+    "phone": "+919390647305",
+    "firstName": "Nikhila",
+    "lastName": "Sai",
+    "role": "User"
   }
 ]

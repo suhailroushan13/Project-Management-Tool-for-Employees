@@ -45,10 +45,21 @@ router.post("/", async (req, res) => {
       { expiresIn: "1h" }
     );
 
+    let role = entity.role;
+
+    // console.log("Updating lastLogin for entity:", entity.email);
+    entity.lastLogin = new Date();
+    // console.log("New lastLogin value:", entity.lastLogin);
+    await entity.save();
+    // console.log("Entity saved:", entity);
+
     res.status(200).json({
       success: true,
       message: "Authentication successful",
       token,
+      role,
+      entity,
+      user,
     });
   } catch (error) {
     console.error("Error during login:", error);

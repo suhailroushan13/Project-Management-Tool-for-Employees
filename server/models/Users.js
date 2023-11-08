@@ -1,24 +1,48 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../utils/dbConnect.js";
 
+function timeAgo(pastDate) {
+  if (!pastDate) {
+    return "Never logged in";
+  }
+
+  const differenceInSeconds = Math.floor(
+    (new Date() - new Date(pastDate)) / 1000
+  );
+  const minute = 60;
+  const hour = minute * 60;
+  const day = hour * 24;
+  const week = day * 7;
+
+  if (differenceInSeconds < minute) {
+    return `${differenceInSeconds} seconds ago`;
+  } else if (differenceInSeconds < hour) {
+    return `${Math.floor(differenceInSeconds / minute)} minutes ago`;
+  } else if (differenceInSeconds < day) {
+    return `${Math.floor(differenceInSeconds / hour)} hours ago`;
+  } else if (differenceInSeconds < week) {
+    return `${Math.floor(differenceInSeconds / day)} days ago`;
+  } else {
+    return `${Math.floor(differenceInSeconds / week)} weeks ago`;
+  }
+}
+
 const User = sequelize.define("users", {
-  username: {
-    type: DataTypes.STRING,
-    unique: true,
-    allowNull: false,
-  },
   firstName: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   lastName: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
+  },
+  fullName: {
+    type: DataTypes.STRING,
   },
   email: {
     type: DataTypes.STRING,
     unique: true,
-    allowNull: false,
+    allowNull: true,
     validate: {
       isEmail: true,
     },
@@ -26,39 +50,39 @@ const User = sequelize.define("users", {
   phone: {
     type: DataTypes.STRING,
     unique: true,
-    allowNull: false,
+    allowNull: true,
     validate: {
       isNumeric: true,
     },
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   role: {
-    type: DataTypes.ENUM(
-      "admin",
-      "lead",
-      "owner",
-      "developer",
-      "designer",
-      "client",
-      "user"
-    ),
-    allowNull: false,
+    type: DataTypes.ENUM("Admin", "Lead", "Owner", "User"),
+    allowNull: true,
+    defaultValue: "User",
   },
-  profileImageUrl: {
+  title: {
+    type: DataTypes.TEXT,
+  },
+  profileImage: {
     type: DataTypes.STRING,
     defaultValue: null,
+    allowNull: true,
   },
-  bio: {
-    type: DataTypes.TEXT,
-    defaultValue: null,
+
+  lastLogin: {
+    type: DataTypes.DATE,
+    allowNull: true,
   },
-  isActive: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
+
+  lastActive: {
+    type: DataTypes.VIRTUAL,
+    get() {
+      return timeAgo(this.getDataValue("lastLogin"));
+    },
   },
 });
 

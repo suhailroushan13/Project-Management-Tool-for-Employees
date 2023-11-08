@@ -1,56 +1,155 @@
 [
   {
-    "username": "anand",
-    "email": "anand@tworks.in",
-    "password": "anand@tworks.in",
-    "phone": "+919618211626",
-    "firstName": "Anand",
-    "lastName": "Rajagopalan",
-    "role": "lead"
+    "firstName": "Ravariya",
+    "lastName": "Ashleshaben Jagdishbhai",
+    "fullName": "Ravariya Ashleshaben Jagdishbhai",
+    "email": null,
+    "password": null,
+    "role": "User",
+    "title": "Associate- Ceramic Craft"
   },
   {
-    "username": "meera",
-    "email": "meera@tworks.in",
-    "password": "meera@tworks.in",
-    "phone": "+919618211625",
-    "firstName": "Mohammad Mohiddin",
-    "lastName": "Meera",
-    "role": "lead"
+    "firstName": "Jatin",
+    "lastName": "Arrvapalli",
+    "fullName": "Jatin Arrvapalli",
+    "email": null,
+    "password": null,
+    "role": "User",
+    "title": "External Consultant"
   },
   {
-    "username": "veera",
-    "email": "veera@tworks.in",
-    "password": "veera@tworks.in",
-    "phone": "+919618211620",
-    "firstName": "Veera",
-    "lastName": "Chappi",
-    "role": "lead"
+    "firstName": "Chetan",
+    "lastName": "",
+    "fullName": "Chetan",
+    "email": null,
+    "password": null,
+    "role": "User",
+    "title": "External Consultant"
   },
   {
-    "username": "sanjay",
-    "email": "sanjay@tworks.in",
-    "password": "sanjay@tworks.in",
-    "phone": "+919618211621",
-    "firstName": "Sanjay",
-    "lastName": "Gajjala Kumar",
-    "role": "lead"
+    "firstName": "Takbir",
+    "lastName": "Fatima",
+    "fullName": "Takbir Fatima",
+    "email": null,
+    "password": null,
+    "role": "User",
+    "title": "Senior Fellow"
   },
   {
-    "username": "firoz",
-    "email": "firoz@tworks.in",
-    "password": "firoz@tworks.in",
-    "phone": "+919618211627",
-    "firstName": "Firoz",
-    "lastName": "Ahammad",
-    "role": "lead"
+    "firstName": "Kannoju",
+    "lastName": "Naveen",
+    "fullName": "Kannoju Naveen",
+    "email": null,
+    "password": null,
+    "role": "User",
+    "title": "Junior Fellow"
   },
   {
-    "username": "rajshekhar",
-    "email": "rajshekhar@tworks.in",
-    "password": "rajshekhar@tworks.in",
-    "phone": "+919618211622",
-    "firstName": "Raj",
-    "lastName": "Shekhar",
-    "role": "lead"
+    "firstName": "Adhityan",
+    "lastName": "Ravichandran",
+    "fullName": "Adhityan Ravichandran",
+    "email": null,
+    "password": null,
+    "role": "User",
+    "title": "Design Intern"
+  },
+  {
+    "firstName": "Barkavi",
+    "lastName": "S",
+    "fullName": "Barkavi S",
+    "email": null,
+    "password": null,
+    "role": "User",
+    "title": "Design intern "
+  },
+  {
+    "firstName": "Potla Bharath",
+    "lastName": "Sai",
+    "fullName": "Potla Bharath Sai",
+    "email": null,
+    "password": null,
+    "role": "User",
+    "title": "Photography Intern"
+  },
+  {
+    "firstName": "Mir Omar",
+    "lastName": "Ali khan",
+    "fullName": "Mir Omar Ali khan",
+    "email": null,
+    "password": null,
+    "role": "User",
+    "title": "Woodworking Intern"
+  },
+  {
+    "firstName": "Sai Priyatham",
+    "lastName": "Sriramou",
+    "fullName": "Sai Priyatham Sriramou",
+    "email": null,
+    "password": null,
+    "role": "User",
+    "title": "Mechanical Intern"
+  },
+  {
+    "firstName": "Chiruvolu Vishnu",
+    "lastName": "Teja",
+    "fullName": "Chiruvolu Vishnu Teja",
+    "email": null,
+    "password": null,
+    "role": "User",
+    "title": "Electronics Intern"
+  },
+  {
+    "firstName": "Hiral",
+    "lastName": "Shah",
+    "fullName": "Hiral Shah",
+    "email": null,
+    "password": null,
+    "role": "User",
+    "title": "Apprentice"
+  },
+  {
+    "firstName": "Karampudi",
+    "lastName": "Pranav",
+    "fullName": "Karampudi Pranav",
+    "email": null,
+    "password": null,
+    "role": "User",
+    "title": "Mechanical Intern"
+  },
+  {
+    "firstName": "Nidhi",
+    "lastName": "Jain",
+    "fullName": "Nidhi Jain",
+    "email": null,
+    "password": null,
+    "role": "User",
+    "title": "UAV Intern"
+  },
+  {
+    "firstName": "Vedala Radha",
+    "lastName": "Soundarya Sundar Ananth",
+    "fullName": "Vedala Radha Soundarya Sundar Ananth",
+    "email": null,
+    "password": null,
+    "role": "User",
+    "title": "Electronics Intern"
+  },
+  {
+    "firstName": "Karthikraj",
+    "lastName": "S",
+    "fullName": "S Karthikraj",
+    "email": null,
+    "password": null,
+    "role": "User",
+    "title": "Electronics Intern"
+  },
+  {
+    "firstName": "Korandlaa",
+    "lastName": "Laasyasri",
+    "fullName": "Korandla Laasyasri",
+    "email": null,
+    "password": null,
+    "role": "User",
+    "title": "Operations Intern"
   }
 ]
