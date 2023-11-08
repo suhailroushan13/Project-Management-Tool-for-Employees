@@ -1,5 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../utils/dbConnect.js";
+import Project from "./Project.js";
+import Legacy from "./Legacy.js";
 
 function timeAgo(pastDate) {
   if (!pastDate) {
@@ -86,4 +88,13 @@ const User = sequelize.define("users", {
   },
 });
 
+User.hasMany(Project, {
+  foreignKey: "createdBy",
+  as: "projects",
+});
+
+User.hasMany(Legacy, {
+  foreignKey: "createdBy",
+  as: "legacys",
+});
 export default User;

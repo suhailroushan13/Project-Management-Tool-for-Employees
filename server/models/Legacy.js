@@ -3,7 +3,7 @@ import { sequelize } from "../utils/dbConnect.js";
 import { parse, format } from "date-fns";
 import User from "./Users.js";
 
-const Project = sequelize.define("projects", {
+const Legacy = sequelize.define("legacys", {
   projectName: {
     type: DataTypes.STRING,
   },
@@ -55,4 +55,4 @@ const Project = sequelize.define("projects", {
   },
 });
 
-export default Project;
+export default Legacy;

@@ -1,7 +1,7 @@
 import axios from "axios";
 import fs from "fs/promises";
 
-const apiUrl = "http://localhost:5000/api/projects/add";
+const apiUrl = "http://localhost:5000/api/legacy/add";
 
 async function sendData() {
   try {

@@ -14,6 +14,7 @@ import adminRouter from "./controllers/admins/index.js";
 import loginRouter from "./controllers/login/index.js";
 import projectRouter from "./controllers/projects/index.js";
 import channelRouter from "./controllers/Channel/newIndex.js";
+import legacyRouter from "./controllers/legacy/index.js";
 
 const PORT = config.get("PORT");
 const __filename = fileURLToPath(import.meta.url);
@@ -42,14 +43,15 @@ app.get("/", (req, res) => {
 
 // API routes
 app.use("/api/login", loginRouter);
-app.use("/api/user", userRouter);
+app.use("/api/users", userRouter);
 app.use("/api/admins", adminRouter);
 app.use("/api/projects", projectRouter);
+app.use("/api/legacy", legacyRouter);
 app.use("/api/channel", channelRouter);
 
-app.use((req, res) => {
-  res.redirect("https://pms.tworks.in");
-  // res.json({ msg: "Invalid Route Please Check Spelling Suhail" });
+app.use("/*", (req, res) => {
+  // res.redirect("https://pms.tworks.in");
+  res.json({ msg: "Invalid Route Please Check Spelling Suhail" });
 });
 
 await syncDatabase();

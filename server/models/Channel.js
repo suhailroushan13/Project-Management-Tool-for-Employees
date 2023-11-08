@@ -2,6 +2,7 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../utils/dbConnect.js";
 import Project from "./Project.js";
 import User from "./Users.js";
+import Legacy from "./Legacy.js";
 
 // Channel Model
 const Channel = sequelize.define("channel", {
@@ -111,5 +112,18 @@ Message.belongsToMany(User, {
   foreignKey: "messageId",
 });
 User.belongsToMany(Message, { through: Tag });
+
+// Now, set the relationship
+Project.belongsTo(User, {
+  foreignKey: "createdBy",
+  as: "creator",
+});
+
+Legacy.belongsTo(User, {
+  foreignKey: "createdBy",
+  as: "creator",
+});
+
+// Now, set the relationship
 
 export { User, Channel, ChannelMember, Message, Attachment, Tag };

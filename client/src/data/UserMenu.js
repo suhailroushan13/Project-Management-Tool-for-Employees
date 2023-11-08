@@ -4,11 +4,25 @@ const UserDashboardMenu = [
     link: "/user/dashboard",
     icon: "ri-bar-chart-2-line",
   },
+
   {
-    label: "Master Sheet",
-    link: "/user/mastersheet",
-    icon: "ri-file-text-line",
+    label: "Watch List",
+    link: "/user/watchlist",
+    icon: "ri-star-line",
   },
+
+  {
+    label: "Legacy",
+    link: "/user/legacy",
+    icon: "ri-file-chart-line",
+  },
+  {
+    label: "Feedback",
+    link: "https://forms.gle/77TomY2wKHGw3o6i7",
+    icon: "ri-customer-service-line",
+    target: "_blank", // This line opens the link in a new tab
+  },
+
   // {
   //   label: "My Projects",
   //   link: "/user/projects",

@@ -8,7 +8,10 @@ import AdminUsersManagement from "../Admin/AdminUsersManagement";
 import AdminLeadsManagement from "../Admin/AdminLeadsManagement";
 import AdminComment from "../Admin/AdminComment";
 import AdminDashboard from "../Admin/AdminDashboard";
+import AdminLegacy from "../Admin/AdminLegacy";
+import AdminAddedProjects from "../Admin/AdminAddedProjects";
 import AdminViewProfile from "../Admin/AdminViewProfile";
+import AdminFeedback from "../Admin/AdminFeeback";
 
 import UserProjectManagement from "../Users/UserProjectManagement";
 // import UserUsersManagement from "../User/UserUsersManagement";
@@ -18,6 +21,9 @@ import UserDashboard from "../Users/UserDashboard";
 import UserProjectInfo from "../Users/UserProjectInfo";
 import UserViewProfile from "../Users/UserViewProfile";
 import UserAllProjects from "../Users/UserAllProjects";
+import UserAddedProjects from "../Users/UserAddedProjects";
+import UserFeedback from "../Users/UserFeedback";
+import UserLegacy from "../Users/UserLegacy";
 
 const protectedRoutes = [
   {
@@ -51,6 +57,21 @@ const protectedRoutes = [
     roles: ["Admin"],
   },
   {
+    path: "/admin/legacy",
+    element: <AdminLegacy />,
+    roles: ["Admin"],
+  },
+  {
+    path: "/admin/feedback",
+    element: <AdminFeedback />,
+    roles: ["Admin"],
+  },
+  {
+    path: "/admin/watchlist",
+    element: <AdminAddedProjects />,
+    roles: ["Admin"],
+  },
+  {
     path: "/user/dashboard",
     element: <UserProjectManagement />,
     roles: ["User", "Lead"],
@@ -75,6 +96,21 @@ const protectedRoutes = [
   {
     path: "/user/view",
     element: <UserViewProfile />,
+    roles: ["User", "Lead"],
+  },
+  {
+    path: "/user/watchlist",
+    element: <UserAddedProjects />,
+    roles: ["User", "Lead"],
+  },
+  {
+    path: "/user/feedback",
+    element: <UserFeedback />,
+    roles: ["User", "Lead"],
+  },
+  {
+    path: "/user/legacy",
+    element: <UserLegacy />,
     roles: ["User", "Lead"],
   },
   // {

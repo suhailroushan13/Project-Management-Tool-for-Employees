@@ -177,7 +177,7 @@ const AdminProjectManagement = () => {
       !taskData.priority ||
       !taskData.status
     ) {
-      showAlert("Please fill out all required fields.", "danger");
+      showAlert("Please complete the following * fields.", "danger");
       return;
     }
 
@@ -215,7 +215,7 @@ const AdminProjectManagement = () => {
       !taskData.priority ||
       !taskData.status
     ) {
-      showAlert("Please fill out all required fields.", "danger");
+      showAlert("Please complete the following * fields.", "danger");
       return;
     }
 
@@ -577,7 +577,7 @@ const AdminProjectManagement = () => {
       data: localData,
       initialState: {
         pageIndex: 0, // Initial page index
-        pageSize: 6, // Set the default page size to 8
+        pageSize: 10, // Set the default page size to 8
         globalFilter: "",
       },
     },
@@ -640,13 +640,17 @@ const AdminProjectManagement = () => {
           <div>
             <ol className="breadcrumb fs-sm mb-1">
               <li className="breadcrumb-item">
-                <Link to="#">Project Management Tool</Link>
+                <Link to="#">Project Management</Link>
               </li>
               <li className="breadcrumb-item active" aria-current="page"></li>
             </ol>
           </div>
 
-          {alertMessage && <Alert variant={alertType}>{alertMessage}</Alert>}
+          <div style={{ textAlign: "center", padding: "10px" }}>
+            {alertMessage && <Alert variant={alertType}>{alertMessage}</Alert>}
+          </div>
+
+          {/* {alertMessage && <Alert variant={alertType}>{alertMessage}</Alert>} */}
 
           <div className="d-flex justify-content-center align-items-center mt-3 mt-md-0">
             <Button
@@ -662,22 +666,35 @@ const AdminProjectManagement = () => {
               <Modal.Header closeButton>
                 <Modal.Title>Add Project</Modal.Title>
               </Modal.Header>
-              {showEmptyFieldAlert && (
-                <div className="alert alert-danger">
-                  Please fill out all required fields.
-                </div>
-              )}
+
+              <div style={{ textAlign: "center", padding: "10px" }}>
+                {alertMessage && (
+                  <Alert variant={alertType}>{alertMessage}</Alert>
+                )}
+              </div>
 
               <Modal.Body>
                 <Container>
                   <Form>
                     <Form.Group>
-                      <Form.Label>Project Name</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Project Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Form.Control
                         type="text"
                         name="projectName"
                         value={taskData.projectName}
                         onChange={handleInputChange}
+                        required
                       />
                     </Form.Group>
                     <Form.Group>
@@ -692,7 +709,18 @@ const AdminProjectManagement = () => {
                     </Form.Group>
 
                     <Form.Group>
-                      <Form.Label>Lead Name</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Lead Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Select
                         options={leadSelectOptions}
                         isSearchable={true}
@@ -710,7 +738,18 @@ const AdminProjectManagement = () => {
                       />
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label>Owner Name</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Owner Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Select
                         options={ownerSelectOptions}
                         isSearchable={true}
@@ -729,7 +768,18 @@ const AdminProjectManagement = () => {
                     </Form.Group>
 
                     <Form.Group>
-                      <Form.Label>Due Date</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Due Date{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Form.Control
                         type="date"
                         name="newEndDate"
@@ -738,7 +788,18 @@ const AdminProjectManagement = () => {
                       />
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label>Priority</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Priority{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Form.Control
                         as="select"
                         name="priority"
@@ -752,7 +813,18 @@ const AdminProjectManagement = () => {
                       </Form.Control>
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label>Status</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Status{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Form.Control
                         as="select"
                         name="status"
@@ -799,17 +871,28 @@ const AdminProjectManagement = () => {
               <Modal.Header closeButton>
                 <Modal.Title>Edit Project</Modal.Title>
               </Modal.Header>
-              {showEmptyFieldAlert && (
-                <div className="alert alert-danger">
-                  Please fill out all required fields.
-                </div>
-              )}
+              <div style={{ textAlign: "center", padding: "10px" }}>
+                {alertMessage && (
+                  <Alert variant={alertType}>{alertMessage}</Alert>
+                )}
+              </div>
 
               <Modal.Body>
                 <Container>
                   <Form>
                     <Form.Group>
-                      <Form.Label>Project Name</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Project Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Form.Control
                         type="text"
                         name="projectName"
@@ -829,40 +912,77 @@ const AdminProjectManagement = () => {
                     </Form.Group>
 
                     <Form.Group>
-                      <Form.Label>Lead Name</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="lead"
-                        value={taskData.lead}
-                        onChange={handleInputChange}
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
                       >
-                        <option value="">Select Lead Name</option>
-                        {leadArray.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </Form.Control>
+                        Lead Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
+                      <Select
+                        options={leadSelectOptions}
+                        isSearchable={true}
+                        value={leadSelectOptions.find(
+                          (option) => option.value === taskData.lead
+                        )}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "lead",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label>Owner Name</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="owner"
-                        value={taskData.owner}
-                        onChange={handleInputChange}
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
                       >
-                        <option value="">Select Owner Name</option>
-                        {ownerArray.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </Form.Control>
+                        Owner Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
+                      <Select
+                        options={ownerSelectOptions}
+                        isSearchable={true}
+                        value={ownerSelectOptions.find(
+                          (option) => option.value === taskData.owner
+                        )}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "owner",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
                     </Form.Group>
 
                     <Form.Group>
-                      <Form.Label>Due Date</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Due Date{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Form.Control
                         type="date"
                         name="newEndDate"
@@ -871,7 +991,18 @@ const AdminProjectManagement = () => {
                       />
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label>Priority</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Priority{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Form.Control
                         as="select"
                         name="priority"
@@ -885,7 +1016,18 @@ const AdminProjectManagement = () => {
                       </Form.Control>
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label>Status</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Status{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Form.Control
                         as="select"
                         name="status"

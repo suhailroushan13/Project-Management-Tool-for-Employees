@@ -12,6 +12,7 @@ import admin from "../assets/users/user.png";
 import axios from "axios";
 import { useParams, useLocation } from "react-router-dom";
 import React, { useContext } from "react";
+import config from "../config.json";
 import Context from "../Root/Context";
 
 const leadsData = [
@@ -112,9 +113,8 @@ async function Leads() {
     // const { id } = useParams();
 
     const response = await axios.get(
-      `http://192.168.212.10:5000/api/users/getimage/2`
+      `${config.get("URL")}/api/users/getimage/2`
     );
-
     console.log(response.data);
     console.log("Hello");
 

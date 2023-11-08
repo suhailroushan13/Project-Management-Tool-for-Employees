@@ -316,6 +316,10 @@ function AdminDashboard() {
   const optionBar = {
     maintainAspectRatio: false,
     responsive: true,
+    legend: {
+      fontFamily: legendFontStyle.fontFamily,
+      fontSize: legendFontStyle.fontSize,
+    },
     plugins: {
       legend: {
         display: false,
@@ -350,23 +354,11 @@ function AdminDashboard() {
             </li>
             <li className="breadcrumb-item active" aria-current="page"></li>
           </ol>
-          <Col xl="8" className="pb-3">
-            <Row className="g-3">
-              {renderCard(
-                localData.length,
-                "ri-file-list-line",
-                "Total Projects"
-              )}
-              {renderCard(
-                Completedcount,
-                "ri-check-double-line",
-                "Completed Projects"
-              )}
-              {renderCard(
-                onHoldCount,
-                "ri-information-line",
-                "On Hold Projects"
-              )}
+          <Col xl="12" className="col-12 pb-3">
+            <Row className="g-6 g-md-3 g-lg-2 justify-content-between">
+              {renderCard(localData.length, "ri-file-list-line", "Total")}
+              {renderCard(Completedcount, "ri-check-double-line", "Completed")}
+              {renderCard(onHoldCount, "ri-information-line", "On Hold")}
               {renderCard(notStarted, "ri-draft-fill", "Not Started")}
               {renderCard(inProgress, "ri-restart-line", "In Progress")}
             </Row>
@@ -422,7 +414,7 @@ function AdminDashboard() {
 
   function renderCard(count, icon, label) {
     return (
-      <Col xs="6" sm="2">
+      <Col xs="12" sm="2">
         <Card className="card-one w-100">
           <Card.Body className="p-3">
             <div className="d-block fs-40 lh-1 text-primary mb-1">

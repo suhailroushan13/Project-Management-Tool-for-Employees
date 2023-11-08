@@ -41,7 +41,7 @@ import "../assets/css/react-datepicker.min.css";
 import Avatar from "../components/Avatar";
 import config from "../config.json";
 import Footer from "../layouts/Footer";
-import UserProjectHeader from "../layouts/UserProjectHeader";
+import AdminProjectHeader from "../layouts/AdminProjectHeader";
 import Loader from "../Root/Loader.js";
 import Reload from "../Root/Reload.js";
 
@@ -60,7 +60,7 @@ import Select from "react-select";
 // import "../";
 ///////////////////////////////////////////////////////////
 
-const UserProjectManagement = () => {
+const AdminAddedProjects = () => {
   const url = config.URL;
   const navigate = useNavigate();
 
@@ -85,7 +85,6 @@ const UserProjectManagement = () => {
     priority: "MEDIUM",
     status: "NOT STARTED",
     nextReview: "",
-    createdBy: null,
   });
 
   useEffect(() => {
@@ -116,32 +115,6 @@ const UserProjectManagement = () => {
   }, [timeoutId]);
 
   // eslint-disable-next-line
-  const [description, setDescription] = useState("");
-  // eslint-disable-next-line
-  const [leadOptions, setLeadOptions] = useState([]);
-  // eslint-disable-next-line
-  const [ownerOptions, setOwnerOptions] = useState("");
-  // eslint-disable-next-line
-  const [selectedLead, setSelectedLead] = useState("");
-  // eslint-disable-next-line
-  const [filterInput, setFilterInput] = useState("");
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState(null);
-  const [showEmptyFieldAlert, setShowEmptyFieldAlert] = useState(false);
-
-  // Function to open the delete confirmation modal
-  const openDeleteModal = (item) => {
-    setItemToDelete(item);
-    setShowDeleteModal(true);
-  };
-
-  // Function to close the delete confirmation modal
-  const closeDeleteModal = () => {
-    setItemToDelete(null);
-    setShowDeleteModal(false);
-  };
-
-  // eslint-disable-next-line
   const [selectedOwner, setSelectedOwner] = useState("");
   const [editingItem, setEditingItem] = useState(null);
   // Define and initialize the missing variables
@@ -156,182 +129,33 @@ const UserProjectManagement = () => {
   };
 
   // Handle modal open and close for Add
-  const openAddModal = () => {
-    setShowAddModal(true);
-  };
-
-  const closeAddModal = () => {
-    setShowAddModal(false);
-    // Clear form fields for Add modal (if necessary)
-    setDescription("");
-    setSelectedLead("");
-    setSelectedOwner("");
-  };
-
-  // Handle modal open and close for Edit
-  // eslint-disable-next-line
-  const openEditModal = () => {
-    setShowEditModal(true);
-  };
-
-  const closeEditModal = () => {
-    setShowEditModal(false);
-    // Clear form fields for Edit modal (if necessary)
-    setDescription("");
-    setSelectedLead("");
-    setSelectedOwner("");
-  };
-
-  let userData = localStorage.getItem("userData");
-  let stringToObject = JSON.parse(userData);
-  let userID = stringToObject.id;
-  console.log(userID);
-
-  /////////////////////////// Add Data ///////////////////////////////
-  const handleSubmitAdd = async (e) => {
-    e.preventDefault();
-
-    // Check if any required field is empty
-    if (
-      !taskData.projectName ||
-      !taskData.lead ||
-      !taskData.owner ||
-      !taskData.newEndDate ||
-      !taskData.priority ||
-      !taskData.status
-    ) {
-      showAlert("Please fill out all required fields.", "danger");
-      return;
-    }
-
-    try {
-      console.log(userID);
-
-      taskData.createdBy = userID;
-      console.log(taskData);
-
-      await axios.post(`${url}/api/projects/add`, taskData);
-
-      // Clear the taskData object after successful submission
-      setTaskData({
-        projectName: "",
-        lead: "",
-        owner: "",
-        newEndDate: "",
-        priority: "",
-        status: "",
-      });
-
-      closeAddModal();
-
-      showAlert("Project Added Successfully!", "success");
-      fetchData();
-    } catch (error) {
-      console.error("Error: ", error);
-      showAlert("Error adding project. Please try again.", "danger");
-    }
-  };
-  // ////////////////////////// Edit Data /////////////////////////////////////////////////
-  const handleSubmitEdit = async (e) => {
-    e.preventDefault();
-
-    if (
-      !taskData.projectName ||
-      !taskData.lead ||
-      !taskData.owner ||
-      !taskData.newEndDate ||
-      !taskData.priority ||
-      !taskData.status
-    ) {
-      showAlert("Please fill out all required fields.", "danger");
-      return;
-    }
-
-    try {
-      await axios.put(`${url}/api/projects/update/${editingItem.id}`, taskData);
-      closeEditModal();
-      setEditingItem(null);
-      setTaskData(taskData);
-      showAlert("Project Updated Successfully!", "success");
-      fetchData();
-    } catch (error) {
-      console.error("Error: ", error);
-      showAlert("Error adding project. Please try again.", "danger");
-    }
-  };
-
-  // ///////////////////////Delete Data //////////////////////////
-
-  const handleDelete = async () => {
-    try {
-      const response = await axios.delete(
-        `${url}/api/projects/delete/${itemToDelete.id}`
-      );
-
-      if (response.data.success) {
-        const updatedData = localData.filter((i) => i !== itemToDelete);
-        setLocalData(updatedData);
-        setShowDeleteModal(false);
-        showAlert("Project Deleted Successfully!", "success");
-      } else {
-        console.error("Error deleting project:", response.data.message);
-        showAlert("Error adding project. Please try again.", "danger");
-      }
-    } catch (error) {
-      console.error("Error deleting project:", error);
-      showAlert("Error adding project. Please try again.", "danger");
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line
-  }, []);
 
   //////// Get Specific User Data /////////////////////////////
 
-  let fetchData = async () => {
-    try {
-      console.log(userName);
+  let user = localStorage.getItem("userData");
+  let stringToObject = JSON.parse(user);
+  let userID = stringToObject.id;
+  console.log(userID);
 
-      const response = await axios.get(
-        `${url}/api/projects/getbylead/${userName}`
-      );
+  let fetchData = async () => {
+    console.log("Hello S");
+
+    try {
+      console.log("Hello");
+
+      const response = await axios.get(`${url}/api/projects/user/${userID}`);
 
       console.log(response);
 
       // Sort the array in descending order based on the "id" field
       const sortedData = response.data.sort((a, b) => b.id - a.id);
 
-      setLocalData(sortedData);
+      console.log(sortedData);
+
+      // setLocalData(sortedData);
     } catch (error) {
       console.error("Error fetching data: ", error);
     }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setTaskData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const handleEdit = (item) => {
-    // Populate the form with the selected item's data for editing
-    setTaskData({
-      id: item.id,
-      projectName: item.projectName,
-      description: item.description,
-      lead: item.lead,
-      owner: item.owner,
-      newEndDate: item.newEndDate,
-      priority: item.priority,
-      status: item.status,
-      nextReview: item.nextReview,
-    });
-    setEditingItem(item);
-    setShowEditModal(true);
   };
 
   const columns = React.useMemo(
@@ -522,37 +346,6 @@ const UserProjectManagement = () => {
         Cell: ({ row }) => (
           <div style={{ textAlign: "center" }}>
             <span
-              className="edit-icon"
-              onClick={() => handleEdit(row.original)}
-            >
-              <OverlayTrigger
-                placement="top"
-                overlay={
-                  <Tooltip>
-                    <strong>Edit</strong>
-                  </Tooltip>
-                }
-              >
-                <Edit size={20} color="blue" />
-              </OverlayTrigger>
-            </span>
-
-            <span
-              className="delete-icon"
-              onClick={() => openDeleteModal(row.original)}
-            >
-              <OverlayTrigger
-                placement="top"
-                overlay={
-                  <Tooltip>
-                    <strong>Delete</strong>
-                  </Tooltip>
-                }
-              >
-                <Trash2 size={20} color="red" />
-              </OverlayTrigger>
-            </span>
-            {/* <span
               className="comment-icon"
               onClick={() => {
                 navigate(`/user/projects/comment/${row.original.id}`, {
@@ -570,7 +363,7 @@ const UserProjectManagement = () => {
               >
                 <MessageSquare size={20} color="blue" />
               </OverlayTrigger>
-            </span> */}
+            </span>
             <span
               className="info-icon"
               onClick={() => {
@@ -700,7 +493,7 @@ const UserProjectManagement = () => {
 
   fetchData = async () => {
     try {
-      const response = await axios.get(`${url}/api/projects/getleadsdata`);
+      const response = await axios.get(`${url}/api/projects/user/`);
       setLeadData(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -711,22 +504,22 @@ const UserProjectManagement = () => {
     if (!sessionStorage.getItem("hasReloaded")) {
       // Set a flag indicating the page is going to be reloaded
       sessionStorage.setItem("hasReloaded", "true");
-      window.location.reload(true);
+      // window.location.reload(true);
     }
   }
   const fetchAllData = async () => {
     try {
-      const response = await axios.get(`${url}/api/projects/getall`);
+      console.log();
 
-      const sortedData = response.data
-        .filter((item) => item.lead === name)
-        .sort((a, b) => b.id - a.id);
+      const response = await axios.get(`${url}/api/projects/user/${userID}`);
+      let projects = response.data.projects;
+      console.log(projects);
+      setLocalData(projects);
 
-      if (sortedData.length == 0) {
-        // window.location.reload(true);
-        // run();
+      if (!projects.length == 0) {
+        return null;
       } else {
-        setLocalData(sortedData);
+        setLocalData(projects);
       }
     } catch (error) {
       console.error("Error fetching data: ", error);
@@ -811,81 +604,6 @@ const UserProjectManagement = () => {
     ],
   };
 
-  const Completedcount = localData.filter(
-    (project) => project.status === "COMPLETED"
-  ).length;
-  const onHoldCount = localData.filter(
-    (project) => project.status === "ON HOLD"
-  ).length;
-  const inProgress = localData.filter(
-    (project) => project.status === "IN PROGRESS"
-  ).length;
-  const notStarted = localData.filter(
-    (project) => project.status === "NOT STARTED"
-  ).length;
-
-  console.log(Completedcount);
-
-  const userValuesArray = Object.values(userStatusCounts);
-  const userKeysArray = Object.keys(userStatusCounts);
-
-  const userOpt = {
-    labels: userKeysArray,
-    responsive: [
-      {
-        breakpoint: 100,
-        options: {
-          chart: {
-            width: 200,
-          },
-          legend: {
-            position: "bottom",
-          },
-        },
-      },
-    ],
-  };
-
-  const statusCounts = {};
-  localData.forEach((project) => {
-    const status = project.status;
-    if (!statusCounts[status]) {
-      statusCounts[status] = 1;
-    } else {
-      statusCounts[status]++;
-    }
-  });
-
-  const chartLabels = Object.keys(statusCounts);
-  const chartData = Object.values(statusCounts);
-  const maxCount = Math.ceil(localData.length / 10) * 10;
-
-  const optionBar = {
-    maintainAspectRatio: false,
-    responsive: true,
-    plugins: {
-      legend: {
-        display: false,
-      },
-    },
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: "Status",
-        },
-      },
-      y: {
-        beginAtZero: true,
-        max: maxCount,
-        title: {
-          display: true,
-          text: "Projects",
-        },
-      },
-    },
-  };
-
   const badgeClassesForPriority = {
     NA: "primary",
     LOW: "secondary",
@@ -903,7 +621,7 @@ const UserProjectManagement = () => {
 
   return (
     <>
-      <UserProjectHeader></UserProjectHeader>
+      <AdminProjectHeader></AdminProjectHeader>
       <div className="main main-app p-3 p-lg-4">
         <div className="d-md-flex align-items-center justify-content-between mb-4">
           <div>
@@ -918,15 +636,6 @@ const UserProjectManagement = () => {
           {alertMessage && <Alert variant={alertType}>{alertMessage}</Alert>}
 
           <div className="d-flex justify-content-center align-items-center mt-3 mt-md-0">
-            {/* Add Task Modal */}
-
-            <Button
-              variant="primary"
-              className="d-flex align-items-center gap-2"
-              onClick={openAddModal}
-            >
-              <i className="ri-add-line fs-18 lh-1"></i>Add Project
-            </Button>
             {/* <Button
               variant="primary"
               className="d-flex align-items-center gap-2"
@@ -934,401 +643,9 @@ const UserProjectManagement = () => {
             >
               <i className="ri-add-line fs-18 lh-1"></i>Add Project
             </Button> */}
-            <Modal show={showAddModal} onHide={() => setShowAddModal(false)}>
-              <Modal.Header closeButton>
-                <Modal.Title>Add Project</Modal.Title>
-              </Modal.Header>
-              {showEmptyFieldAlert && (
-                <div className="alert alert-danger">
-                  Please fill out all required fields.
-                </div>
-              )}
-
-              <Modal.Body>
-                <Container>
-                  <Form>
-                    <Form.Group>
-                      <Form.Label>Project Name</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="projectName"
-                        value={taskData.projectName}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Description</Form.Label>
-                      <Form.Control
-                        as="textarea"
-                        rows={3}
-                        name="description"
-                        value={taskData.description}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-
-                    <Form.Group>
-                      <Form.Label>Lead Name</Form.Label>
-                      <Select
-                        options={leadSelectOptions}
-                        isSearchable={true}
-                        value={leadSelectOptions.find(
-                          (option) => option.value === taskData.lead
-                        )}
-                        onChange={(selectedOption) =>
-                          handleInputChange({
-                            target: {
-                              name: "lead",
-                              value: selectedOption.value,
-                            },
-                          })
-                        }
-                      />
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Owner Name</Form.Label>
-                      <Select
-                        options={ownerSelectOptions}
-                        isSearchable={true}
-                        value={ownerSelectOptions.find(
-                          (option) => option.value === taskData.owner
-                        )}
-                        onChange={(selectedOption) =>
-                          handleInputChange({
-                            target: {
-                              name: "owner",
-                              value: selectedOption.value,
-                            },
-                          })
-                        }
-                      />
-                    </Form.Group>
-
-                    <Form.Group>
-                      <Form.Label>Due Date</Form.Label>
-                      <Form.Control
-                        type="date"
-                        name="newEndDate"
-                        value={taskData.newEndDate}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Priority</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="priority"
-                        value={taskData.priority}
-                        onChange={handleInputChange}
-                      >
-                        <option value="HIGH">HIGH</option>
-                        <option value="MEDIUM">MEDIUM</option>
-                        <option value="LOW">LOW</option>
-                        <option value="NA">NA</option>
-                      </Form.Control>
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Status</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="status"
-                        value={taskData.status}
-                        onChange={handleInputChange}
-                      >
-                        <option value="COMPLETED">COMPLETED</option>
-                        <option value="IN PROGRESS">IN PROGRESS</option>
-
-                        <option value="NOT STARTED">NOT STARTED</option>
-                        <option value="ON HOLD">ON HOLD</option>
-
-                        <option value="OVERDUE">OVERDUE</option>
-                      </Form.Control>
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Next Review</Form.Label>
-                      <Form.Control
-                        type="date"
-                        name="nextReview"
-                        value={taskData.nextReview}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                  </Form>
-                </Container>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button
-                  variant="secondary"
-                  onClick={() => setShowAddModal(false)}
-                >
-                  Close
-                </Button>
-                <Button variant="primary" onClick={handleSubmitAdd}>
-                  Add
-                </Button>
-              </Modal.Footer>
-            </Modal>
-
-            {/* Edit Modal */}
-
-            <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
-              <Modal.Header closeButton>
-                <Modal.Title>Edit Project</Modal.Title>
-              </Modal.Header>
-              {showEmptyFieldAlert && (
-                <div className="alert alert-danger">
-                  Please fill out all required fields.
-                </div>
-              )}
-
-              <Modal.Body>
-                <Container>
-                  <Form>
-                    <Form.Group>
-                      <Form.Label>Project Name</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="projectName"
-                        value={taskData.projectName}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Description</Form.Label>
-                      <Form.Control
-                        as="textarea"
-                        rows={3}
-                        name="description"
-                        value={taskData.description}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-
-                    <Form.Group>
-                      <Form.Label>Lead Name</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="lead"
-                        value={taskData.lead}
-                        onChange={handleInputChange}
-                      >
-                        <option value="">Select Lead Name</option>
-                        {leadArray.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </Form.Control>
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Owner Name</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="owner"
-                        value={taskData.owner}
-                        onChange={handleInputChange}
-                      >
-                        <option value="">Select Owner Name</option>
-                        {ownerArray.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </Form.Control>
-                    </Form.Group>
-
-                    <Form.Group>
-                      <Form.Label>Due Date</Form.Label>
-                      <Form.Control
-                        type="date"
-                        name="newEndDate"
-                        value={taskData.newEndDate}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Priority</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="priority"
-                        value={taskData.priority}
-                        onChange={handleInputChange}
-                      >
-                        <option value="HIGH">HIGH</option>
-                        <option value="MEDIUM">MEDIUM</option>
-                        <option value="LOW">LOW</option>
-                        <option value="NA">NA</option>
-                      </Form.Control>
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Status</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="status"
-                        value={taskData.status}
-                        onChange={handleInputChange}
-                      >
-                        <option value="COMPLETED">COMPLETED</option>
-                        <option value="IN PROGRESS">IN PROGRESS</option>
-
-                        <option value="NOT STARTED">NOT STARTED</option>
-                        <option value="ON HOLD">ON HOLD</option>
-
-                        <option value="OVERDUE">OVERDUE</option>
-                      </Form.Control>
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Next Review</Form.Label>
-                      <Form.Control
-                        type="date"
-                        name="nextReview"
-                        value={taskData.nextReview}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                  </Form>
-                </Container>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button
-                  variant="secondary"
-                  onClick={() => setShowEditModal(false)}
-                >
-                  Close
-                </Button>
-                <Button variant="primary" onClick={handleSubmitEdit}>
-                  Update
-                </Button>
-              </Modal.Footer>
-            </Modal>
-
-            {/* Delete Modal */}
-
-            <Modal show={showDeleteModal} onHide={closeDeleteModal}>
-              <Modal.Header closeButton>
-                <Modal.Title>Confirm Deletion</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                Are you sure you want to delete this item?
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={closeDeleteModal}>
-                  Cancel
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => handleDelete(itemToDelete)}
-                >
-                  Delete
-                </Button>
-              </Modal.Footer>
-            </Modal>
+            {/* Add Task Modal */}
           </div>
         </div>
-        <Card.Body className="overflow px-2 pb-3">
-          <Row className="g-3">
-            {/* Total Projects Card */}
-            <Col xl={2} lg={2} md={6} sm={12}>
-              <Card className="card-one w-100">
-                <Card.Body className="p-3">
-                  <div className="d-block fs-40 lh-1 text-primary mb-1">
-                    <i className="ri-file-list-line"></i>
-                  </div>
-                  <h1 className="card-value mb-0 ls--1 fs-36">
-                    {localData.length}
-                  </h1>
-                  <label className="d-block mb-1 mt-1 fw-medium text-dark">
-                    Total
-                  </label>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* Completed Projects Card */}
-            <Col xl={2} lg={4} md={6} sm={12}>
-              <Card className="card-one w-100">
-                <Card.Body className="p-3">
-                  <div className="d-block fs-40 lh-1 text-ui-02 mb-1">
-                    <i className="ri-check-double-line"></i>
-                  </div>
-                  <h1 className="card-value mb-0 fs-36 ls--1">
-                    {Completedcount}
-                  </h1>
-                  <label
-                    className="d-block mb-1 fw-medium text-dark"
-                    style={{ fontSize: "14px" }}
-                  >
-                    Completed
-                  </label>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* On Hold Projects Card */}
-            <Col xl={2} lg={4} md={6} sm={12}>
-              <Card className="card-one w-100">
-                <Card.Body className="p-3">
-                  <div className="d-block fs-36 lh-1 text-secondary mb-1">
-                    <i className="ri-information-line"></i>
-                  </div>
-                  <h1 className="card-value mb-0 fs-36 ls--1">{onHoldCount}</h1>
-                  <label className="d-block mb-1 fw-medium text-dark">
-                    On Hold
-                  </label>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* Not Started Card */}
-            <Col xl={2} lg={4} md={6} sm={12}>
-              <Card className="card-one w-100">
-                <Card.Body className="p-3">
-                  <div className="d-block fs-40 lh-1 text-ui-02 mb-1">
-                    <i className="ri-draft-fill"></i>
-                  </div>
-                  <h1 className="card-value mb-0 fs-36 ls--1">{notStarted}</h1>
-                  <label className="d-block mb-1 fw-medium text-dark">
-                    Not Started
-                  </label>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* In Progress Card */}
-            <Col xl={2} lg={4} md={6} sm={12}>
-              <Card className="card-one w-100">
-                <Card.Body className="p-3">
-                  <div className="d-block fs-40 lh-1 text-ui-02 mb-1">
-                    <i className="ri-restart-line"></i>
-                  </div>
-                  <h1 className="card-value mb-0 fs-36 ls--1">{inProgress}</h1>
-                  <label
-                    className="d-block mb-1 fw-medium text-dark"
-                    style={{ fontSize: "16px" }}
-                  >
-                    In Progress
-                  </label>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* Pie Chart */}
-            <Col xl={2} lg={12}>
-              <Card className="card">
-                <Card.Body>
-                  <ReactApexChart
-                    series={UserValuesArray}
-                    options={UserOpt}
-                    type="pie"
-                    height={200}
-                  />
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* Bar Chart */}
-          </Row>
-        </Card.Body>
 
         <Card className="card-one">
           <div className="grid-container">
@@ -1502,7 +819,7 @@ const UserProjectManagement = () => {
   );
 };
 
-export default UserProjectManagement;
+export default AdminAddedProjects;
 
 const DropdownFilter = ({ column }) => {
   const { filterValue = [], setFilter, preFilteredRows, id } = column;

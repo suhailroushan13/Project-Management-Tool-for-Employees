@@ -20,47 +20,40 @@ import {
   ChevronUp,
   Edit,
   Filter,
-  Info,
   MessageSquare,
   Trash2,
 } from "react-feather";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  useTable,
   useFilters,
   useGlobalFilter,
+  usePagination,
   useResizeColumns,
   useSortBy,
-  usePagination,
+  useTable,
 } from "react-table";
 import { leadArray, ownerArray } from "../apps/data/Leadonwer";
 import "../assets/css/react-datepicker.min.css";
 import Avatar from "../components/Avatar";
 import config from "../config.json";
-import Footer from "../layouts/Footer";
 import UserProjectHeader from "../layouts/UserProjectHeader";
-import { useTableContext } from "../Context/TableContext";
+import Footer from "../layouts/Footer";
 
-import anand from "../assets/users/anand.png";
-import firoz from "../assets/users/firoz.jpg";
-import meera from "../assets/users/meera.jpg";
-import nikhila from "../assets/users/nikhila.png";
-import rahman from "../assets/users/rahman.png";
-import raj from "../assets/users/raj.png";
-import sanjay from "../assets/users/sanjay.png";
-import suhail from "../assets/users/suhail.png";
 import user from "../assets/users/user.png";
-import veera from "../assets/users/veera.png";
 
 import Select from "react-select";
 import { leadsData } from "../data/Leads";
 
+import { useTableContext } from "../Context/TableContext";
+
 // import "../";
 ///////////////////////////////////////////////////////////
 
-const UserAllProjects = () => {
+const UserLegacy = () => {
   const url = config.URL;
   const navigate = useNavigate();
+
+  const { globalFilter } = useTableContext();
 
   const [localData, setLocalData] = useState([]);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -70,8 +63,6 @@ const UserAllProjects = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
   const [timeoutId, setTimeoutId] = useState(null);
-
-  const { globalFilter } = useTableContext();
 
   // Task Data
   const [taskData, setTaskData] = useState({
@@ -191,7 +182,7 @@ const UserAllProjects = () => {
     }
 
     try {
-      await axios.post(`${url}/api/projects/add`, taskData);
+      await axios.post(`${url}/api/legacy/add`, taskData);
 
       // Clear the taskData object after successful submission
       setTaskData({
@@ -229,7 +220,7 @@ const UserAllProjects = () => {
     }
 
     try {
-      await axios.put(`${url}/api/projects/update/${editingItem.id}`, taskData);
+      await axios.put(`${url}/api/legacy/update/${editingItem.id}`, taskData);
       closeEditModal();
       setEditingItem(null);
       setTaskData(taskData);
@@ -246,7 +237,7 @@ const UserAllProjects = () => {
   const handleDelete = async () => {
     try {
       const response = await axios.delete(
-        `${url}/api/projects/delete/${itemToDelete.id}`
+        `${url}/api/legacy/delete/${itemToDelete.id}`
       );
 
       if (response.data.success) {
@@ -271,7 +262,7 @@ const UserAllProjects = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${url}/api/projects/getall`);
+      const response = await axios.get(`${url}/api/legacy/getall`);
       // Sort the array in descending order based on the "id" field
       const sortedData = response.data.sort((a, b) => b.id - a.id);
 
@@ -488,7 +479,6 @@ const UserAllProjects = () => {
           <div style={{ textAlign: "center" }}>{formatDate(value)}</div>
         ),
       },
-
       {
         Header: "Actions",
         accessor: "editDelete",
@@ -512,7 +502,7 @@ const UserAllProjects = () => {
             <span
               className="comment-icon"
               onClick={() => {
-                navigate(`/user/projects/comment/${row.original.id}`, {
+                navigate(`/admin/projects/comment/${row.original.id}`, {
                   state: { selectedProject: row.original },
                 });
               }}
@@ -525,9 +515,10 @@ const UserAllProjects = () => {
                   </Tooltip>
                 }
               >
-                <MessageSquare size={20} color="orange" />
+                <MessageSquare size={20} color="blue" />
               </OverlayTrigger>
             </span>
+
             <span
               className="delete-icon"
               onClick={() => openDeleteModal(row.original)}
@@ -541,29 +532,6 @@ const UserAllProjects = () => {
                 }
               >
                 <Trash2 size={20} color="red" />
-              </OverlayTrigger>
-            </span>
-            <span
-              className="info-icon"
-              onClick={() => {
-                navigate(`/user/projects/info/${row.original.id}`, {
-                  state: { selectedProject: row.original },
-                });
-              }}
-            >
-              <OverlayTrigger
-                placement="top"
-                overlay={
-                  <Tooltip>
-                    <strong>Info</strong>
-                  </Tooltip>
-                }
-              >
-                <Info
-                  size={20}
-                  color="grey"
-                  style={{ marginLeft: "10px", marginBottom: "8px" }}
-                />
               </OverlayTrigger>
             </span>
           </div>
@@ -593,39 +561,45 @@ const UserAllProjects = () => {
     getTableBodyProps,
     prepareRow,
     headerGroups,
-    page,
-    setGlobalFilter, // Notice e
-    state: { pageIndex, pageSize }, // globalFilter state is destructured from the state
-    canNextPage,
+    page, // Updated to use the "page" property
+    // eslint-disable-next-line
+    state: { pageIndex, pageSize },
     nextPage,
     previousPage,
+    setGlobalFilter,
     gotoPage, // Add gotoPage as a prop
+    canNextPage,
     pageCount,
     canPreviousPage,
   } = useTable(
     {
       columns,
       data: localData,
-      initialState: { pageIndex: 0, pageSize: 10, globalFilter: "" }, // Set an initial state for globalFilter
+      initialState: {
+        pageIndex: 0, // Initial page index
+        pageSize: 10, // Set the default page size to 8
+        globalFilter: "",
+      },
     },
-    useFilters, // use this hook if you have column filters
-    useGlobalFilter, // This hook is for the global filter
+    useFilters,
+    useGlobalFilter,
     useSortBy,
+    useResizeColumns,
+    useGlobalFilter,
+    useSortBy,
+    useResizeColumns,
     usePagination
   );
 
-  // Effect for setting the global filter
   React.useEffect(() => {
     setGlobalFilter(globalFilter); // This is how you set the global filter
   }, [globalFilter, setGlobalFilter]);
 
-  // Handler for the search input change
   const handleFilterChange = (e) => {
     const value = e.target.value || undefined;
     setGlobalFilter(value); // Set the filter globally
     setFilterInput(value); // Update the state with the new search input
   };
-
   const itemsPerPage = 4;
   const [currentPageGroup, setCurrentPageGroup] = useState(0);
 
@@ -666,7 +640,7 @@ const UserAllProjects = () => {
           <div>
             <ol className="breadcrumb fs-sm mb-1">
               <li className="breadcrumb-item">
-                <Link to="#">Project Management Tool</Link>
+                <Link to="#">Project Management</Link>
               </li>
               <li className="breadcrumb-item active" aria-current="page"></li>
             </ol>
@@ -1155,7 +1129,7 @@ const UserAllProjects = () => {
   );
 };
 
-export default UserAllProjects;
+export default UserLegacy;
 
 const DropdownFilter = ({ column }) => {
   const { filterValue = [], setFilter, preFilteredRows, id } = column;

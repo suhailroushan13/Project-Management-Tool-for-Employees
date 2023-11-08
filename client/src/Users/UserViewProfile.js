@@ -121,61 +121,60 @@ function UserViewProfile() {
     <>
       <UserProjectHeader />
       <HeaderMobile />
-      <br></br>
-      <br></br>
-      <br></br>
-      <div className="cards">
-        <Card className="neumorphic-card card">
-          <Card.Body className="profile-card-content">
-            <Card.Img
-              variant="top"
-              src={userImage}
-              className="profile-image"
-              alt="User Image"
-            />
-
-            {/* <Card.Img
-              variant="top"
-              src={imageUrl || dummyImage}
-              className="profile-image"
-              alt="User Image"
-            /> */}
-
-            <Card.Title className="profile-name">
-              {fullName || "Employee"}
-            </Card.Title>
-            <Card.Text className="profile-bio">
-              <b>Bio: </b> {bio || "User"}
-            </Card.Text>
-            <Card.Text className="profile-created-at">
-              <b>Created At : </b>
-              {createdAt ? timeAgo(createdAt) : "Unknown"}
-            </Card.Text>
-            <Card.Text className="profile-last-login">
-              <b>Last Login At : </b>
-              {lastLogin ? timeAgo(lastLogin) : "Unknown"}
-            </Card.Text>
-            <Card.Text className="profile-role">
-              <b>Role : </b>
-              {role || "User"}
-            </Card.Text>
-            <Card.Header className="section-title">
-              Contact Information
-            </Card.Header>
-            <ul className="contact-info-list">
-              <li>
-                <i className="ri-mail-fill"></i>
-                <span>{email}</span>
-              </li>
-              <li>
-                <i className="ri-phone-fill"></i>
-                <span>{phone || "XXXXXXXXXXXXX"}</span>
-              </li>
-            </ul>
-          </Card.Body>
-        </Card>
+      <div className="main main-app p-3 p-lg-4">
+        <div className="md-flex">
+          <ol className="breadcrumb fs-sm mb-1">
+            <li className="breadcrumb-item">
+              <Link to="#">Dashboard</Link>
+            </li>
+            <li className="breadcrumb-item active" aria-current="page"></li>
+          </ol>
+          <div className="cards">
+            <Card className="neumorphic-card card">
+              <Card.Body className="profile-card-content">
+                <Card.Img
+                  variant="top"
+                  src={userImage}
+                  className="profile-image"
+                  alt="User Image"
+                />
+                <Card.Title className="profile-name">
+                  {fullName || "Employee"}
+                </Card.Title>
+                <Card.Text className="profile-bio">
+                  <b>Bio: </b> {bio || "User"}
+                </Card.Text>
+                <Card.Text className="profile-created-at">
+                  <b>Created At : </b>
+                  {createdAt ? timeAgo(createdAt) : "Unknown"}
+                </Card.Text>
+                <Card.Text className="profile-last-login">
+                  <b>Last Login At : </b>
+                  {lastLogin ? timeAgo(lastLogin) : "Unknown"}
+                </Card.Text>
+                <Card.Text className="profile-role">
+                  <b>Role : </b>
+                  {role || "User"}
+                </Card.Text>
+                <Card.Header className="section-title">
+                  Contact Information
+                </Card.Header>
+                <ul className="contact-info-list">
+                  <li>
+                    <i className="ri-mail-fill"></i>
+                    <span>{email}</span>
+                  </li>
+                  <li>
+                    <i className="ri-phone-fill"></i>
+                    <span>{phone || "XXXXXXXXXXXXX"}</span>
+                  </li>
+                </ul>
+              </Card.Body>
+            </Card>
+            <Footer />
+          </div>
+        </div>
       </div>
-      <Footer />
     </>
   );
 }

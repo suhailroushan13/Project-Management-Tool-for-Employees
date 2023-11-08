@@ -21,7 +21,7 @@ async function sendData() {
         console.log("Success:", response.data);
 
         // Add a delay between requests to prevent overwhelming the server
-        await setTimeout(500);
+        // await setTimeout(500);/
       } catch (error) {
         console.error("Error:", error.response?.data || error.message);
         errorProjects.push(project);

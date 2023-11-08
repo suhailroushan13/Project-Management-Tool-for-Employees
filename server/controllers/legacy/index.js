@@ -1,7 +1,7 @@
 import express from "express";
 import { Op } from "sequelize"; // Import Op from Sequelize
-import Project from "../../models/Project.js";
-import User from "../../models/Users.js"
+// import Legacy from "../../models/Legacy.js";
+import Legacy from "../../models/Legacy.js";
 // import { Comment, CommentAttachment } from "../../models/Comment.js";
 import axios from "axios";
 import { syncModels } from "../../utils/dbConnect.js";
@@ -10,8 +10,8 @@ const router = express.Router();
 
 router.get("/getall", async (req, res) => {
   try {
-    // const projects = await Project.findAll({ include: Comment });
-    const projects = await Project.findAll({});
+    // const projects = await Legacy.findAll({ include: Comment });
+    const projects = await Legacy.findAll({});
 
     res.status(200).json(projects);
   } catch (error) {
@@ -36,14 +36,14 @@ router.get("/get/:id", async (req, res) => {
   const { id } = req.params; // Extract the project id from the URL parameter
 
   try {
-    const project = await Project.findOne({
+    const project = await Legacy.findOne({
       where: { id }, // Find the project by id
     });
 
     if (!project) {
       return res
         .status(404)
-        .json({ success: false, message: "Project not found" });
+        .json({ success: false, message: "Legacy not found" });
     }
 
     res.status(200).json(project);
@@ -60,7 +60,7 @@ router.get("/getbylead/:leadName", async (req, res) => {
   const { leadName } = req.params; // Extract the lead name from the URL parameter
 
   try {
-    const projects = await Project.findAll({
+    const projects = await Legacy.findAll({
       where: {
         [Op.or]: [
           { lead: leadName }, // Find projects with the specified lead name
@@ -89,7 +89,7 @@ router.get("/getbylead/:leadName", async (req, res) => {
 
 router.get("/getleadsdata", async (req, res) => {
   try {
-    let response = await Project.findAll();
+    let response = await Legacy.findAll();
 
     const leadCounts = response.reduce((counts, project) => {
       if (project.status !== "COMPLETED") {
@@ -151,7 +151,7 @@ router.post("/add", async (req, res) => {
     console.log(projectData);
 
     // Check if a project with the same name already exists in the database
-    const existingProject = await Project.findOne({
+    const existingProject = await Legacy.findOne({
       where: { projectName: projectData.projectName },
     });
 
@@ -164,12 +164,12 @@ router.post("/add", async (req, res) => {
     }
 
     // Create a new project in the database using Sequelize
-    await Project.create(projectData);
+    await Legacy.create(projectData);
 
     // Respond with the created project data and a success status code (201)
     res.status(201).json({
       success: true,
-      msg: "Project Added Successfully",
+      msg: "Legacy Added Successfully",
     });
   } catch (error) {
     // Handle any errors that occur during the process
@@ -188,13 +188,13 @@ router.put("/update/:id", async (req, res) => {
     const id = req.params.id; // Get the project ID from the URL parameter
 
     // Find the project by ID in the database
-    const project = await Project.findOne({ where: { id } });
+    const project = await Legacy.findOne({ where: { id } });
 
     // Check if the project exists
     if (!project) {
       return res
         .status(404)
-        .json({ success: false, message: "Project not found." });
+        .json({ success: false, message: "Legacy not found." });
     }
 
     // Define which fields can be updated
@@ -235,13 +235,13 @@ router.delete("/delete/:id", async (req, res) => {
     const id = req.params.id; // Get the project ID from the URL parameter
 
     // Find the project by ID in the database
-    const project = await Project.findOne({ where: { id } });
+    const project = await Legacy.findOne({ where: { id } });
 
     // Check if the project exists
     if (!project) {
       return res
         .status(404)
-        .json({ success: false, message: "Project not found." });
+        .json({ success: false, message: "Legacy not found." });
     }
 
     // Delete the project from the database
@@ -250,7 +250,7 @@ router.delete("/delete/:id", async (req, res) => {
     // Return a success message as a response
     res
       .status(200)
-      .json({ success: true, message: "Project deleted successfully." });
+      .json({ success: true, message: "Legacy deleted successfully." });
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -263,7 +263,7 @@ router.delete("/delete/:id", async (req, res) => {
 router.delete("/deleteall", async (req, res) => {
   try {
     // Delete all projects from the database
-    await Project.destroy({ where: {} });
+    await Legacy.destroy({ where: {} });
 
     // Return a success message as a response
     res
@@ -286,7 +286,7 @@ router.delete("/deleteall", async (req, res) => {
 //     const { commentId } = req.params;
 
 //     // Find a project that has a comment with the given commentId
-//     const projectWithComment = await Project.findOne({
+//     const projectWithComment = await Legacy.findOne({
 //       where: {
 //         comments: {
 //           [Op.contains]: [{ commentId: commentId }],
@@ -325,12 +325,12 @@ router.delete("/deleteall", async (req, res) => {
 //     console.log(id);
 
 //     // Find the project with the given id
-//     const project = await Project.findOne({ where: { id: id } });
+//     const project = await Legacy.findOne({ where: { id: id } });
 
 //     if (!project) {
 //       return res
 //         .status(404)
-//         .json({ success: false, error: "Project not found." });
+//         .json({ success: false, error: "Legacy not found." });
 //     }
 
 //     // Extract the new comment data from req.body
@@ -380,7 +380,7 @@ router.delete("/reset", async (req, res) => {
 
     await CommentAttachment.drop();
     // await Comment.drop();
-    await Project.drop();
+    await Legacy.drop();
 
     // Sync the models to recreate the tables
     await syncModels();
@@ -394,20 +394,15 @@ router.delete("/reset", async (req, res) => {
 
 router.get("/user/:userId", async (req, res) => {
   try {
+    // Extract the user ID from the request parameters
     const { userId } = req.params;
 
-    // Find all projects for the given user ID and include the User data
-    const projects = await Project.findAll({
+    // Find all projects where the createdBy field matches the user ID
+    const projects = await Legacy.findAll({
       where: { createdBy: userId },
-      include: [
-        {
-          model: User, // Make sure this matches the name of your imported User model
-          as: "creator", // This alias should match the alias you set up in your association
-          attributes: { exclude: ["password"] }, // Exclude sensitive information like password
-        },
-      ],
     });
 
+    // If no projects are found, return a 404 status code with a message
     if (!projects || projects.length === 0) {
       return res.status(404).json({
         success: false,
@@ -415,12 +410,16 @@ router.get("/user/:userId", async (req, res) => {
       });
     }
 
+    // Respond with the found projects and a success status code (200)
     res.status(200).json({
       success: true,
       projects,
     });
   } catch (error) {
+    // Handle any errors that occur during the process
     console.error(error);
+
+    // Respond with a 500 (Internal Server Error) status code and an error message
     res.status(500).json({
       success: false,
       error: "An error occurred while retrieving the projects.",
