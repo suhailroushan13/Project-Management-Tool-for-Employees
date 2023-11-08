@@ -51,29 +51,29 @@ const protectedRoutes = [
     roles: ["Admin"],
   },
   {
-    path: "/user/dashboard",
+    path: "/users/dashboard",
     element: <UserProjectManagement />,
     roles: ["User", "Lead"],
   },
 
   {
-    path: "/user/mastersheet",
+    path: "/users/mastersheet",
     element: <UserAllProjects />,
     roles: ["User", "Lead"],
   },
   {
-    path: "/user/projects/comment/:id",
+    path: "/users/projects/comment/:id",
     element: <UserComment />,
     roles: ["User", "Lead"],
   },
 
   {
-    path: "/user/projects/info/:id",
+    path: "/users/projects/info/:id",
     element: <UserProjectInfo />,
     roles: ["User", "Lead"],
   },
   {
-    path: "/user/view",
+    path: "/users/view",
     element: <UserViewProfile />,
     roles: ["User", "Lead"],
   },

@@ -1,12 +1,12 @@
 const UserDashboardMenu = [
   {
     label: "My Dashboard",
-    link: "/user/dashboard",
+    link: "/users/dashboard",
     icon: "ri-bar-chart-2-line",
   },
   {
     label: "Master Sheet",
-    link: "/user/mastersheet",
+    link: "/users/mastersheet",
     icon: "ri-file-text-line",
   },
   // {

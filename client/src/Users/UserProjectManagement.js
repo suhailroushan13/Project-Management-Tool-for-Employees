@@ -1194,8 +1194,8 @@ const UserProjectManagement = () => {
             </Col>
 
             {/* Completed Projects Card */}
-            <Col xl={1}>
-              <Card className="card-one w-100">
+            <Col xl={2}>
+              <Card className="card-one w-200">
                 <Card.Body className="p-3">
                   <div className="d-block fs-40 lh-1 text-ui-02 mb-1">
                     <i className="ri-check-double-line"></i>
@@ -1214,8 +1214,8 @@ const UserProjectManagement = () => {
             </Col>
 
             {/* On Hold Projects Card */}
-            <Col xl={1}>
-              <Card className="card-one w-100">
+            <Col xl={2}>
+              <Card className="card-one w-200">
                 <Card.Body className="p-3">
                   <div className="d-block fs-36 lh-1 text-secondary mb-1">
                     <i className="ri-information-line"></i>
@@ -1230,7 +1230,7 @@ const UserProjectManagement = () => {
 
             {/* Not Started Card */}
             <Col xl={1}>
-              <Card className="card-one w-100">
+              <Card className="card-one w-200">
                 <Card.Body className="p-3">
                   <div className="d-block fs-40 lh-1 text-ui-02 mb-1">
                     <i className="ri-draft-fill"></i>
@@ -1245,7 +1245,7 @@ const UserProjectManagement = () => {
 
             {/* In Progress Card */}
             <Col xl={1}>
-              <Card className="card-one w-100">
+              <Card className="card-one w-200">
                 <Card.Body className="p-3">
                   <div className="d-block fs-40 lh-1 text-ui-02 mb-1">
                     <i className="ri-restart-line"></i>
@@ -1276,26 +1276,6 @@ const UserProjectManagement = () => {
             </Col>
 
             {/* Bar Chart */}
-            <Col xl={3}>
-              <Card className="card">
-                <Card.Body>
-                  <Bar
-                    data={{
-                      labels: chartLabels,
-                      datasets: [
-                        {
-                          data: chartData,
-                          backgroundColor: "#506fd9",
-                          barPercentage: 0.5,
-                        },
-                      ],
-                    }}
-                    options={optionBar}
-                    height={200}
-                  />
-                </Card.Body>
-              </Card>
-            </Col>
           </Row>
         </Card.Body>
 
