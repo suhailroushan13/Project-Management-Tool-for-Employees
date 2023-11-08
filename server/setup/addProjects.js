@@ -1,20 +1,19 @@
 import axios from "axios";
 import fs from "fs/promises";
 
-const apiUrl = "http://localhost:5000/api/legacy/add";
+const apiUrl = "https://pms.tworks.in/api/legacy/add";
 
 async function sendData() {
   try {
     const jsonData = await fs.readFile(
-      "/home/suhail/newsquad/server/setup/db.json",
+      "/home/suhail/Cloud-Squad/server/setup/db.json",
       "utf8"
     );
     const projects = JSON.parse(jsonData);
 
-    
     const errorProjects = []; // Array to store objects with errors
 
-    for (const project of projects) {
+    async function sendProjectWithDelay(project) {
       try {
         const response = await axios.post(apiUrl, project);
         console.log("Success:", response.data);
@@ -27,6 +26,11 @@ async function sendData() {
           "utf8"
         );
       }
+    }
+
+    for (const project of projects) {
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Delay for 500 milliseconds
+      await sendProjectWithDelay(project);
     }
 
     // Write the objects with errors to "error.json" file

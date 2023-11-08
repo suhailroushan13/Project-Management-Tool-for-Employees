@@ -8,7 +8,7 @@ const DELAY_BETWEEN_REQUESTS = 500; // Delay of 500ms
 async function sendData() {
   try {
     const jsonData = await fs.readFile(
-      "/home/suhail/newsquad/server/setup/alluser.json",
+      "/home/suhail/Cloud-Squad/server/setup/alluser.json",
       "utf8"
     );
     const projects = JSON.parse(jsonData);
@@ -21,7 +21,7 @@ async function sendData() {
         console.log("Success:", response.data);
 
         // Add a delay between requests to prevent overwhelming the server
-        // await setTimeout(500);/
+         await setTimeout(500)
       } catch (error) {
         console.error("Error:", error.response?.data || error.message);
         errorProjects.push(project);
