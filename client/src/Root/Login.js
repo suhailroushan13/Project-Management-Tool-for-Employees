@@ -20,7 +20,7 @@ const Login = () => {
     if (role === "Admin") {
       navigate("/admin/dashboard");
     } else if (["Lead", "User", "Owner"].includes(role)) {
-      navigate("/users/dashboard");
+      navigate("/user/dashboard");
     }
   }, [navigate]);
 
@@ -50,7 +50,7 @@ const Login = () => {
         if (role === "Admin") {
           navigate("/admin/dashboard");
         } else if (["Lead", "User", "Owner"].includes(role)) {
-          navigate("/users/dashboard");
+          navigate("/user/dashboard");
         }
       }
     } catch (error) {
