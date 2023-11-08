@@ -42,7 +42,7 @@ app.get("/", (req, res) => {
 
 // API routes
 app.use("/api/login", loginRouter);
-app.use("/api/users", userRouter);
+app.use("/api/user", userRouter);
 app.use("/api/admins", adminRouter);
 app.use("/api/projects", projectRouter);
 app.use("/api/channel", channelRouter);
