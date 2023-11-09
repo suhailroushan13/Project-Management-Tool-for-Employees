@@ -8,6 +8,8 @@ import publicRoutes from "./routes/PublicRoutes.js";
 import protectedRoutes from "./routes/ProtectedRoutes";
 import Context from "./Root/Context.js"; // Update the path as needed
 import { TableProvider } from "../src/Context/TableContext.js"; // Import the TableProvider
+import Mobile from "./Root/Mobile.js";
+import { isMobile } from "react-device-detect";
 
 // import css
 import "./assets/css/remixicon.css";
@@ -27,6 +29,12 @@ window.addEventListener("load", function () {
 
 export default function App() {
   const [email, setEmail] = useState("");
+  console.log(isMobile);
+
+  if (isMobile) {
+    // Render only the mobile warning component for mobile users
+    return <Mobile />;
+  }
 
   return (
     <React.Fragment>

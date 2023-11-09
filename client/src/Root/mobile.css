@@ -1,0 +1,27 @@
+/* mobile.css */
+
+.mobile-warning {
+  display: none; /* Hide by default */
+  position: fixed; /* Fixed positioning */
+  top: 50%; /* Position halfway down the viewport */
+  left: 50%; /* Position halfway across the viewport */
+  transform: translate(-50%, -50%); /* Center the div */
+  width: 80%; /* Width relative to the screen size */
+  max-width: 320px; /* Maximum width, adjust as needed */
+  padding: 20px; /* Padding inside the card */
+  background-color: #ffffff; /* Solid background color */
+  border-radius: 8px; /* Rounded corners for the card look */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+  text-align: center; /* Center text */
+  z-index: 1000; /* Stack above other content */
+}
+
+/* Media query to display the warning only on mobile devices */
+@media (max-width: 768px) {
+  .mobile-warning {
+    display: flex; /* Use flexbox to center the content */
+    flex-direction: column; /* Stack flex items vertically */
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+  }
+}
