@@ -15,15 +15,8 @@ import {
   Row,
   Tooltip,
 } from "react-bootstrap";
-import {
-  ChevronDown,
-  ChevronUp,
-  Edit,
-  Filter,
-  MessageSquare,
-  Trash2,
-} from "react-feather";
-import { Link, useNavigate } from "react-router-dom";
+import { ChevronDown, ChevronUp, Edit, Filter, Trash2 } from "react-feather";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   useFilters,
   useGlobalFilter,
@@ -32,27 +25,22 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
-import { leadArray, ownerArray } from "../apps/data/Leadonwer";
 import "../assets/css/react-datepicker.min.css";
 import Avatar from "../components/Avatar";
 import config from "../config.json";
 import AdminProjectHeader from "../layouts/AdminProjectHeader";
 import Footer from "../layouts/Footer";
-
-import user from "../assets/users/user.png";
-
+import dummyImage from "../assets/users/user.png";
 import Select from "react-select";
-import { leadsData } from "../data/Leads";
-
 import { useTableContext } from "../Context/TableContext";
+import { getLeads, getRest } from "../apps/data/Leadowner";
 
-// import "../";
 ///////////////////////////////////////////////////////////
 
 const AdminLegacy = () => {
   const url = config.URL;
   const navigate = useNavigate();
-
+  const { id } = useParams();
   const { globalFilter } = useTableContext();
 
   const [localData, setLocalData] = useState([]);
@@ -76,6 +64,27 @@ const AdminLegacy = () => {
     nextReview: "",
   });
 
+  const [leadImage, setLeadImage] = useState("");
+  const [ownerImage, setOwnerImage] = useState("");
+
+  useEffect(() => {
+    // Fetch data when the component mounts
+    fetchData().then((data) => {
+      if (data && data.length > 0) {
+        // Check if the first project in the array has the necessary data
+        const firstProject = data[0];
+
+        if (firstProject.Lead && firstProject.Lead.profileImage) {
+          setLeadImage(firstProject.Lead.profileImage); // Set lead image path
+        }
+
+        if (firstProject.Owner && firstProject.Owner.profileImage) {
+          setOwnerImage(firstProject.Owner.profileImage); // Set owner image path
+        }
+      }
+    });
+  }, []);
+
   // eslint-disable-next-line
   const showAlert = (message, type) => {
     setAlertMessage(message);
@@ -96,6 +105,24 @@ const AdminLegacy = () => {
       }
     };
   }, [timeoutId]);
+
+  const [leadSelectOptions, setLeadSelectOptions] = useState([]);
+  const [ownerSelectOptions, setOwnerSelectOptions] = useState([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const leads = await getLeads();
+      // console.log(leads);
+
+      const owners = await getRest();
+      // console.log(owners);
+
+      setLeadSelectOptions(leads);
+      setOwnerSelectOptions(owners);
+    }
+
+    fetchData();
+  }, []);
 
   // eslint-disable-next-line
   const [description, setDescription] = useState("");
@@ -322,14 +349,30 @@ const AdminLegacy = () => {
         accessor: "lead",
         Filter: DropdownFilter,
         filter: multiSelectFilterFn,
-        Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
+        Cell: ({ row }) => (
+          <div className="d-flex align-items-center gap-2">
+            <Avatar
+              img={row.original.Lead.profileImage || dummyImage}
+              alt="Lead Avatar"
+            />
+            <span>{row.original.Lead.displayName}</span>
+          </div>
+        ),
       },
       {
         Header: "Owner",
         accessor: "owner",
         Filter: DropdownFilter,
         filter: multiSelectFilterFn,
-        Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
+        Cell: ({ row }) => (
+          <div className="d-flex align-items-center gap-2">
+            <Avatar
+              img={row.original.Owner.profileImage || dummyImage}
+              alt="Owner Avatar"
+            />
+            <span>{row.original.Owner.displayName}</span>
+          </div>
+        ),
       },
       {
         Header: "Due Date",
@@ -613,25 +656,6 @@ const AdminLegacy = () => {
     (_, index) => index + 1
   ).slice(startIndex, endIndex);
 
-  const imageMap = leadsData.reduce((acc, lead) => {
-    acc[lead.name] = lead.path;
-    return acc;
-  }, {});
-
-  const getLeadImage = (firstName) => {
-    return imageMap[firstName] || user; // returns user image as default if firstName not found in imageMap
-  };
-
-  const leadSelectOptions = leadArray.map((option) => ({
-    value: option,
-    label: option,
-  }));
-
-  const ownerSelectOptions = ownerArray.map((option) => ({
-    value: option,
-    label: option,
-  }));
-
   return (
     <>
       <AdminProjectHeader></AdminProjectHeader>
@@ -717,7 +741,9 @@ const AdminLegacy = () => {
                         </span>
                       </Form.Label>
                       <Select
-                        options={leadSelectOptions}
+                        options={[...leadSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
                         isSearchable={true}
                         value={leadSelectOptions.find(
                           (option) => option.value === taskData.lead
@@ -746,7 +772,9 @@ const AdminLegacy = () => {
                         </span>
                       </Form.Label>
                       <Select
-                        options={ownerSelectOptions}
+                        options={[...ownerSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
                         isSearchable={true}
                         value={ownerSelectOptions.find(
                           (option) => option.value === taskData.owner
@@ -920,7 +948,9 @@ const AdminLegacy = () => {
                         </span>
                       </Form.Label>
                       <Select
-                        options={leadSelectOptions}
+                        options={[...leadSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
                         isSearchable={true}
                         value={leadSelectOptions.find(
                           (option) => option.value === taskData.lead
@@ -949,7 +979,9 @@ const AdminLegacy = () => {
                         </span>
                       </Form.Label>
                       <Select
-                        options={ownerSelectOptions}
+                        options={[...ownerSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
                         isSearchable={true}
                         value={ownerSelectOptions.find(
                           (option) => option.value === taskData.owner
@@ -1096,7 +1128,7 @@ const AdminLegacy = () => {
                   <div className="table-responsive">
                     <table {...getTableProps()} className="table-style">
                       {/* Thead */}
-                      <thead>
+                      <thead className="custom-thead">
                         {headerGroups.map((headerGroup) => (
                           <tr {...headerGroup.getHeaderGroupProps()}>
                             {headerGroup.headers.map((column, columnIndex) => (
@@ -1160,56 +1192,56 @@ const AdminLegacy = () => {
                         {page.map((row) => {
                           prepareRow(row);
                           return (
-                            <tr
-                              className="table-active"
-                              {...row.getRowProps()}
-                              key={row.id}
-                            >
-                              {row.cells.map((cell, cellIndex) => (
-                                <td
-                                  {...cell.getCellProps()}
-                                  className="cell-style"
-                                  key={cell.id}
-                                >
-                                  {cellIndex === 2 ? (
-                                    <>
+                            <tr {...row.getRowProps()}>
+                              {row.cells.map((cell) => {
+                                if (cell.column.id === "lead") {
+                                  // Render cell for lead with profile image
+                                  return (
+                                    <td {...cell.getCellProps()}>
                                       <div className="d-flex align-items-center gap-2">
                                         <Avatar
-                                          img={getLeadImage(row.original.lead)}
+                                          img={
+                                            row.original.Lead.profileImage ||
+                                            dummyImage
+                                          }
+                                          alt="Lead Avatar"
                                         />
-                                        <div>
-                                          <h6 className="mb-0">
-                                            {cell.render("Cell")}
-                                          </h6>
-                                          <span className="fs-xs text-secondary people">
-                                            Role
-                                          </span>
-                                        </div>
+                                        <span>
+                                          {row.original.Lead.displayName}
+                                        </span>
                                       </div>
-                                    </>
-                                  ) : cellIndex === 3 ? (
-                                    <>
+                                    </td>
+                                  );
+                                } else if (cell.column.id === "owner") {
+                                  // Render cell for owner with profile image
+                                  return (
+                                    <td {...cell.getCellProps()}>
                                       <div className="d-flex align-items-center gap-2">
                                         <Avatar
-                                          // height="35px"
-                                          // width="35px"
-                                          img={getLeadImage(row.original.owner)}
+                                          img={
+                                            row.original.Owner.profileImage ||
+                                            dummyImage
+                                          }
+                                          alt="Owner Avatar"
                                         />
-                                        <div>
-                                          <h6 className="mb-0">
-                                            {cell.render("Cell")}
-                                          </h6>
-                                          <span className="fs-xs text-secondary people">
-                                            Role
-                                          </span>
-                                        </div>
+                                        <span>
+                                          {row.original.Owner.displayName}
+                                        </span>
                                       </div>
-                                    </>
-                                  ) : (
-                                    cell.render("Cell")
-                                  )}
-                                </td>
-                              ))}
+                                    </td>
+                                  );
+                                } else {
+                                  // Render other cells normally
+                                  return (
+                                    <td
+                                      {...cell.getCellProps()}
+                                      className="cell-style"
+                                    >
+                                      {cell.render("Cell")}
+                                    </td>
+                                  );
+                                }
+                              })}
                             </tr>
                           );
                         })}

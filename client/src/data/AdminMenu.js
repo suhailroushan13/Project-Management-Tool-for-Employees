@@ -9,6 +9,7 @@ const AdminDashboardMenu = [
     link: "/admin/projects",
     icon: "ri-pie-chart-2-line",
   },
+
   {
     label: "Users",
     link: "/admin/users",
@@ -20,13 +21,18 @@ const AdminDashboardMenu = [
     icon: "ri-user-settings-line",
   },
   {
+    label: "Admins",
+    link: "/admin/admins",
+    icon: "ri-admin-line",
+  },
+  {
     label: "Legacy",
     link: "/admin/legacy",
     icon: "ri-file-chart-line",
   },
   {
     label: "Feedback",
-    link: "https://forms.gle/77TomY2wKHGw3o6i7",
+    link: "https://forms.gle/3D1STiSCByeZkrsh8",
     icon: "ri-customer-service-line",
     target: "_blank", // This line opens the link in a new tab
   },

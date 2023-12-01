@@ -5,10 +5,16 @@ import Context from "../Root/Context";
 import { AdminDashboardMenu } from "../data/AdminMenu";
 import { leadsData } from "../data/Leads";
 import admin from "../assets/users/admin.png";
+import axios from "axios";
+import dummyImage from "../assets/users/user.png";
+import config from "../config.json";
 
 const AdminSidebar = () => {
   const context = useContext(Context);
   const userEmail = context.email;
+  const url = config.URL;
+
+  const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
 
   const toggleFooterMenu = (e) => {
     e.preventDefault();
@@ -20,6 +26,35 @@ const AdminSidebar = () => {
     localStorage.clear();
     window.location.href = "/";
   };
+
+  let userData = localStorage.getItem("userData");
+  let stringToObject = JSON.parse(userData);
+  let userID = stringToObject.id;
+  let fullName = stringToObject.fullName;
+  let role = stringToObject.role;
+  let title = stringToObject.title;
+  let displayName = stringToObject.displayName;
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      try {
+        const response = await axios.get(`${url}/api/users/getimage/${userID}`);
+
+        // Check if users array is not empty and set the image URL
+        if (
+          response.data &&
+          response.data.users &&
+          response.data.users.length > 0
+        ) {
+          setImagePreviewUrl(response.data.users[0].profileImage);
+        }
+      } catch (error) {
+        console.error("Error fetching image:", error);
+      }
+    };
+
+    fetchImage();
+  }, [userID]); // Added userID as a dependency to useEffect
 
   return (
     <div className="sidebar">
@@ -34,11 +69,11 @@ const AdminSidebar = () => {
       <div className="sidebar-footer">
         <div className="sidebar-footer-top">
           <div className="sidebar-footer-thumb">
-            <img src={admin} alt={admin ? admin : "Default User"} />
+            <img src={imagePreviewUrl || dummyImage} alt="Fetched Profile" />
           </div>
           <div className="sidebar-footer-body">
-            <h6>{"Admin"}</h6>
-            <p>{"Administrator"}</p>
+            <h6>{displayName || "Admin"}</h6>
+            <p>{title || "Administrator"}</p>
           </div>
           <Link onClick={toggleFooterMenu} to="" className="dropdown-link">
             <i className="ri-arrow-down-s-line"></i>
@@ -46,7 +81,10 @@ const AdminSidebar = () => {
         </div>
         <div className="sidebar-footer-menu">
           <nav className="nav">
-            <Link to="/admin/view">
+            <Link to={`/admin/edit/${userID}`}>
+              <i className="ri-edit-2-line"></i> Edit Profile
+            </Link>
+            <Link to={`/admin/view/${userID}`}>
               <i className="ri-profile-line"></i> View Profile
             </Link>
             <Link to="/" onClick={handleLogout}>

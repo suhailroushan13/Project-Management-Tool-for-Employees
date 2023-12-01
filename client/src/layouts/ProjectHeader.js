@@ -20,18 +20,7 @@ export default function ProjectHeader({ onSkin }) {
       : leadsData.find((lead) => lead.email === userEmail);
   });
 
-  const [userImage, setUserImage] = useState(() => {
-    const savedImage = localStorage.getItem("userImage");
-    return savedImage && savedImage !== "undefined"
-      ? savedImage
-      : user
-      ? user.path
-      : dummyImage;
-  });
-
-  useEffect(() => {
-    localStorage.setItem("userImage", userImage);
-  }, [user, userImage]);
+  useEffect(() => {}, [user]);
 
   const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
     <Link
@@ -62,14 +51,7 @@ export default function ProjectHeader({ onSkin }) {
   };
 
   const handleLogout = () => {
-    // Remove the token from local storage
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("role");
-
-    localStorage.removeItem("userImage");
-
-    // Redirect to the login page
+    localStorage.clear();
     window.location.href = "/";
   };
 
@@ -88,13 +70,13 @@ export default function ProjectHeader({ onSkin }) {
         <Dropdown className="dropdown-profile ms-3 ms-xl-4" align="end">
           <Dropdown.Toggle as={CustomToggle}>
             <div className="avatar online">
-              <img src={userImage} alt={user ? user.name : "Default User"} />
+              <img alt={user ? user.name : "Default User"} />
             </div>
           </Dropdown.Toggle>
           <Dropdown.Menu className="mt-10-f">
             <div className="dropdown-menu-body">
               <div className="avatar avatar-xl online mb-3">
-                <img src={userImage} alt={user ? user.name : "Default User"} />
+                <img alt={user ? user.name : "Default User"} />
               </div>
               <h5 className="mb-1 text-dark fw-semibold">
                 {" "}

@@ -1,0 +1,74 @@
+[
+  {
+    "email": "anand@tworks.in",
+    "password": "anand@tworks.in",
+    "phone": "+919618211621",
+    "firstName": "Anand",
+    "lastName": "Rajagopalan",
+    "role": "Lead"
+  },
+  {
+    "email": "meera@tworks.in",
+    "password": "meera@tworks.in",
+    "phone": "+919618211625",
+    "firstName": "Meera",
+    "lastName": "Mohammad Mohiddin",
+    "role": "Lead"
+  },
+  {
+    "email": "veera@tworks.in",
+    "password": "veera@tworks.in",
+    "phone": "+919618211620",
+    "firstName": "Veera",
+    "lastName": "Chappi",
+    "role": "Lead"
+  },
+  {
+    "email": "sanjay@tworks.in",
+    "password": "sanjay@tworks.in",
+    "phone": "+919618211656",
+    "firstName": "Sanjay",
+    "lastName": "Gajjala Kumar",
+    "role": "Lead"
+  },
+  {
+    "email": "firoz@tworks.in",
+    "password": "firoz@tworks.in",
+    "phone": "+919618211627",
+    "firstName": "Firoz",
+    "lastName": "Ahammad",
+    "role": "Lead"
+  },
+  {
+    "email": "rajshekhar@tworks.in",
+    "password": "rajshekhar@tworks.in",
+    "phone": "+919618211622",
+    "firstName": "Raj",
+    "lastName": "Shekhar",
+    "role": "Lead"
+  },
+  {
+    "email": "suhail@tworks.in",
+    "password": "suhail@tworks.in",
+    "phone": "+919618211626",
+    "firstName": "Suhail",
+    "lastName": "Roushan",
+    "role": "User"
+  },
+  {
+    "email": "rahman@tworks.in",
+    "password": "rahman@tworks.in",
+    "phone": "+919840903819",
+    "firstName": "Abdur",
+    "lastName": "Rahman",
+    "role": "User"
+  },
+  {
+    "email": "nikhila@tworks.in",
+    "password": "nikhila@tworks.in",
+    "phone": "+919390647305",
+    "firstName": "Nikhila",
+    "lastName": "Sai",
+    "role": "User"
+  }
+]

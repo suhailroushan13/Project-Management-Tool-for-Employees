@@ -1,21 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+/* eslint-disable */
 import axios from "axios";
 import Prism from "prismjs";
-import { Card, Col, Container, Row, Table, Badge } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Badge, Card, Col, Container, Row, Table } from "react-bootstrap";
 import { Bar } from "react-chartjs-2";
+import { Link } from "react-router-dom";
+import Loader from "../Root/Loader.js";
+import Shimmer from "../components/Shimmer.js";
 import config from "../config.json";
+import Footer from "../layouts/Footer";
 import UserProjectHeader from "../layouts/UserProjectHeader";
 import UserSidebar from "../layouts/UserSideBar";
-import Footer from "../layouts/Footer";
 // import Loader from "../Root/Loader";
 import "chart.js/auto";
 import ReactApexChart from "react-apexcharts";
 
 function UserDashboard() {
   const [leadData, setLeadData] = useState([]);
+  const [initialLoad, setInitialLoad] = useState(true);
   const [localData, setLocalData] = useState([]);
-
+  const [dataAvailable, setDataAvailable] = useState(false); // Add a flag to track data availability
+  const [error, setError] = useState(null); // Add state to track errors
   const url = config.URL;
 
   const name = JSON.parse(localStorage.getItem("user"))?.name;
@@ -25,13 +30,13 @@ function UserDashboard() {
     fetchData();
     fetchAllData();
   }, []);
-
   const fetchData = async () => {
     try {
       const response = await axios.get(`${url}/api/projects/getleadsdata`);
       setLeadData(response.data);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching lead data:", error);
+      setError(error); // Set error state
     }
   };
 
@@ -42,8 +47,10 @@ function UserDashboard() {
         .filter((item) => item.lead === name)
         .sort((a, b) => b.id - a.id);
       setLocalData(sortedData);
+      setDataAvailable(sortedData.length > 0); // Update the dataAvailable flag
     } catch (error) {
-      console.error("Error fetching data: ", error);
+      console.error("Error fetching all data: ", error);
+      setError(error); // Set error state
     }
   };
 
@@ -130,8 +137,6 @@ function UserDashboard() {
   const notStarted = localData.filter(
     (project) => project.status === "NOT STARTED"
   ).length;
-
-  console.log(Completedcount);
 
   const userValuesArray = Object.values(userStatusCounts);
   const userKeysArray = Object.keys(userStatusCounts);
@@ -220,9 +225,7 @@ function UserDashboard() {
             <li className="breadcrumb-item active" aria-current="page"></li>
           </ol>
 
-          {localData.length === 0 ? (
-            <h1>No Data Available</h1>
-          ) : (
+          {dataAvailable ? (
             <>
               <Col xl="8" className="pb-3">
                 <Row className="g-3">
@@ -396,6 +399,9 @@ function UserDashboard() {
                 </Row>
               </Container>
             </>
+          ) : (
+            // Display this message when data is not available
+            <>{<Loader />}</>
           )}
           <Footer />
         </div>

@@ -32,18 +32,18 @@ import {
   useSortBy,
   usePagination,
 } from "react-table";
-import { leadArray, ownerArray } from "../apps/data/Leadonwer";
+
 import "../assets/css/react-datepicker.min.css";
 import img from "../assets/img/user.png";
 import Avatar from "../components/Avatar";
 import config from "../config.json";
 import Footer from "../layouts/Footer";
+import dummyImage from "../assets/users/user.png";
 import AdminProjectHeader from "../layouts/AdminProjectHeader";
 
 import Select from "react-select";
 import { useTableContext } from "../Context/TableContext";
 
-import { leadsData } from "../data/Leads";
 import user from "../assets/users/user.png";
 
 import "./Project.css";
@@ -65,12 +65,14 @@ const AdminLeadsManagement = () => {
   const { globalFilter } = useTableContext();
 
   const [leadData, setLeadData] = useState({
-    firstName: "",
-    lastName: "",
     fullName: "",
+    displayName: "",
     email: "",
     phone: "",
+    password: "",
+    profileImage: "",
     role: "Lead",
+    title: "",
   });
 
   const showAlert = (message, type) => {
@@ -97,6 +99,7 @@ const AdminLeadsManagement = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [showEmptyFieldAlert, setShowEmptyFieldAlert] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Function to open the delete confirmation modal
   const openDeleteModal = (item) => {
@@ -137,6 +140,16 @@ const AdminLeadsManagement = () => {
   // Handle modal open and close for Edit
   // eslint-disable-next-line
   const openEditModal = () => {
+    setLeadData({
+      fullName: "",
+      email: "",
+      phone: "",
+      role: "Lead",
+      password: "",
+      profileImage: "",
+      role: "",
+      title: "",
+    });
     setShowEditModal(true);
   };
 
@@ -148,11 +161,13 @@ const AdminLeadsManagement = () => {
 
     // Check if any required field is empty
     if (
-      !leadData.firstName ||
-      !leadData.lastName ||
       !leadData.fullName ||
+      !leadData.displayName ||
       !leadData.email ||
-      !leadData.phone
+      !leadData.phone ||
+      !leadData.password ||
+      !leadData.role ||
+      !leadData.title
     ) {
       showAlert("Please fill out all required fields.", "danger");
 
@@ -167,13 +182,14 @@ const AdminLeadsManagement = () => {
       // Clear the taskData object after successful submission
 
       setLeadData({
-        firstName: "",
-        lastName: "",
         fullName: "",
         email: "",
         phone: "",
+        role: "User",
+        password: "",
+        profileImage: "",
         role: "",
-        lastActive: "",
+        title: "",
       });
       fetchData();
     } catch (error) {
@@ -185,29 +201,49 @@ const AdminLeadsManagement = () => {
   const handleSubmitEdit = async (e) => {
     e.preventDefault();
 
-    if (
-      !leadData.firstName ||
-      !leadData.lastName ||
-      !leadData.fullName ||
-      !leadData.email
-    ) {
-      showAlert("Please fill out all required fields.", "danger");
+    // Check if the password field is not empty, indicating a password update
+    if (leadData.password.trim() !== "") {
+      try {
+        await axios.put(`${url}/api/users/update/${editingItem.id}`, {
+          password: leadData.password, // Only send the password for update
+        });
+        showAlert("Password Updated Successfully!", "success");
+      } catch (error) {
+        console.error("Error updating password: ", error);
+        showAlert(`${error.response.data.message}`, "danger");
+      }
+    }
 
+    // Check for changes in other fields (excluding the password)
+    const dataToUpdate = {};
+    for (const key in leadData) {
+      if (key !== "password" && leadData[key] !== editingItem[key]) {
+        dataToUpdate[key] = leadData[key];
+      }
+    }
+
+    if (Object.keys(dataToUpdate).length === 0) {
+      // No changes detected in other fields, and password update handled separately
+      if (leadData.password.trim() !== "") {
+        showAlert("Password Updated", "success");
+      } else {
+        showAlert("No changes detected to update.", "info");
+      }
       return;
     }
 
     try {
-      const response = await axios.put(
+      await axios.put(
         `${url}/api/users/update/${editingItem.id}`,
-        leadData
+        dataToUpdate
       );
-      closeEditModal(); // Close the modal
+      closeEditModal();
       setEditingItem(null);
-      setLeadData(leadData);
-      showAlert("Lead Updated Successfully!", "success");
+      setLeadData(leadData); // Consider resetting this to the initial state if needed
+      showAlert("User Updated Successfully!", "success");
       fetchData();
     } catch (error) {
-      console.error("Error: ", error);
+      console.error("Error updating user: ", error);
       showAlert(`${error.response.data.message}`, "danger");
     }
   };
@@ -263,17 +299,30 @@ const AdminLeadsManagement = () => {
     }));
   };
 
+  const handleSelectChange = (name, selectedOption) => {
+    // Construct an event-like object
+    const event = {
+      target: {
+        name, // Use the passed name
+        value: selectedOption ? selectedOption.value : "", // Handle null/undefined option
+      },
+    };
+
+    // Call the existing handleInputChange function with this event
+    handleInputChange(event);
+  };
+
   const handleEdit = (item) => {
     // Populate the form with the selected item's data for editing
     setLeadData({
       id: item.id,
-      firstName: item.firstName,
-      lastName: item.lastName,
       fullName: item.fullName,
+      displayName: item.displayName,
       email: item.email,
-      phone: item.phone,
+      phone: item.phone ? item.phone : null,
+      password: "", // Set password to an empty string by default
       role: item.role,
-      lastActive: item.lastActive,
+      title: item.title,
     });
     setEditingItem(item);
     setShowEditModal(true);
@@ -289,22 +338,18 @@ const AdminLeadsManagement = () => {
         width: 100,
       },
       {
-        Header: "First Name",
+        Header: "Full Name",
         accessor: "fullName",
         Filter: DropdownFilter,
         filter: multiSelectFilterFn,
-        Cell: ({ value }) => {
-          if (typeof value !== "string") {
-            // Check if value is not a string
-            return null; // or return some default value or placeholder
-          }
-
-          return (
-            <div style={{ textAlign: "left" }}>
-              {value.length > 30 ? value.substring(0, 50) + "..." : value}
-            </div>
-          );
-        },
+        Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
+      },
+      {
+        Header: "Display Name",
+        accessor: "displayName",
+        Filter: DropdownFilter,
+        filter: multiSelectFilterFn,
+        Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
       },
 
       {
@@ -387,25 +432,6 @@ const AdminLeadsManagement = () => {
                 <Edit size={20} color="blue" />
               </OverlayTrigger>
             </span>
-            {/* <span
-              className="comment-icon"
-              onClick={() => {
-                navigate(`/projects/comment/${row.original.id}`, {
-                  state: { selectedProject: row.original },
-                });
-              }}
-            >
-              <OverlayTrigger
-                placement="top"
-                overlay={
-                  <Tooltip>
-                    <strong>Comment</strong>
-                  </Tooltip>
-                }
-              >
-                <MessageSquare size={20} color="blue" />
-              </OverlayTrigger>
-            </span> */}
 
             <span
               className="delete-icon"
@@ -495,15 +521,6 @@ const AdminLeadsManagement = () => {
     (_, index) => index + 1
   ).slice(startIndex, endIndex);
 
-  const imageMap = leadsData.reduce((acc, lead) => {
-    acc[lead.fullName] = lead.path;
-    return acc;
-  }, {});
-
-  const getLeadImage = (fullName) => {
-    return imageMap[fullName] || user; // returns user image as default if firstName not found in imageMap
-  };
-
   return (
     <>
       <AdminProjectHeader></AdminProjectHeader>
@@ -535,9 +552,7 @@ const AdminLeadsManagement = () => {
                 <Modal.Title>Add Lead</Modal.Title>
               </Modal.Header>
               <br></br>
-              {alertMessage && (
-                <Alert variant={alertType}>{alertMessage}</Alert>
-              )}
+
               {showEmptyFieldAlert && (
                 <div className="alert alert-danger">
                   Please fill out all required fields.
@@ -547,27 +562,16 @@ const AdminLeadsManagement = () => {
               <Modal.Body>
                 <Container>
                   <Form>
-                    <Form.Group>
-                      <Form.Label>First Name</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="firstName"
-                        value={leadData.firstName}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Last Name</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="lastName"
-                        value={leadData.lastName}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
+                    <div style={{ textAlign: "center", padding: "10px" }}>
+                      {alertMessage && (
+                        <Alert variant={alertType}>{alertMessage}</Alert>
+                      )}
+                    </div>
 
+                    <br></br>
                     <Form.Group>
                       <Form.Label>Full Name</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Form.Control
                         type="text"
                         name="fullName"
@@ -575,9 +579,21 @@ const AdminLeadsManagement = () => {
                         onChange={handleInputChange}
                       />
                     </Form.Group>
-
+                    <br></br>
+                    <Form.Group>
+                      <Form.Label>Display Name</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Form.Control
+                        type="text"
+                        name="displayName"
+                        value={leadData.displayName}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group>
+                    <br></br>
                     <Form.Group>
                       <Form.Label>Email</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Form.Control
                         type="text"
                         name="email"
@@ -585,44 +601,79 @@ const AdminLeadsManagement = () => {
                         onChange={handleInputChange}
                       />
                     </Form.Group>
-
-                    <Form.Group>
+                    <br></br>
+                    <div className="mb-3">
                       <Form.Label>Password</Form.Label>
-                      <Form.Control
-                        type="password"
-                        name="password"
-                        value={leadData.password}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <div className="input-group">
+                        <Form.Control
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter New Password"
+                          name="password"
+                          value={leadData.password}
+                          onChange={handleInputChange}
+                        />
+                        <div className="input-group-append">
+                          <button
+                            className="btn btn-secondary"
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            aria-label={
+                              showPassword ? "Hide password" : "Show password"
+                            }
+                          >
+                            <i
+                              className={`fa ${
+                                showPassword ? "ri-eye-fill" : "ri-eye-off-fill"
+                              }`}
+                            ></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
 
+                    <br></br>
                     <Form.Group>
                       <Form.Label>Phone</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Form.Control
                         type="text"
                         rows={3}
+                        placeholder="+91961821XXXX"
                         name="phone"
                         value={leadData.phone}
                         onChange={handleInputChange}
                       />
                     </Form.Group>
-
+                    <br></br>
                     <Form.Group>
                       <Form.Label>Role</Form.Label>
-                      <Form.Control
-                        as="select"
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Select
                         name="role"
-                        value={leadData.role}
+                        isSearchable={true}
+                        value={
+                          leadData.role
+                            ? { value: leadData.role, label: leadData.role }
+                            : null
+                        }
+                        onChange={(selectedOption) =>
+                          handleSelectChange("role", selectedOption)
+                        }
+                        options={[{ value: "Lead", label: "Lead" }]}
+                      />
+                    </Form.Group>
+                    <br></br>
+                    <Form.Group>
+                      <Form.Label>Title</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Form.Control
+                        type="text"
+                        name="title"
+                        value={leadData.title}
+                        placeholder="Intern, Software Engineer, Senior Executive, Engineer, Director"
                         onChange={handleInputChange}
-                      >
-                        <option value="Admin">Admin</option>
-                        <option value="Developer">Developer</option>
-                        <option value="Lead">Lead</option>
-                        <option value="Owner">Owner</option>
-                        <option value="Designer">Designer</option>
-                        <option value="Client">Client</option>
-                        <option value="User">User</option>
-                      </Form.Control>
+                      />
                     </Form.Group>
                   </Form>
                 </Container>
@@ -651,30 +702,17 @@ const AdminLeadsManagement = () => {
                   Please fill out all required fields.
                 </div>
               )}
-
+              <div style={{ textAlign: "center", padding: "10px" }}>
+                {alertMessage && (
+                  <Alert variant={alertType}>{alertMessage}</Alert>
+                )}
+              </div>
               <Modal.Body>
                 <Container>
                   <Form>
                     <Form.Group>
-                      <Form.Label>First Name</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="firstName"
-                        value={leadData.firstName}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Last Name</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="lastName"
-                        value={leadData.lastName}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                    <Form.Group>
                       <Form.Label>Full Name</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Form.Control
                         type="text"
                         name="fullName"
@@ -684,7 +722,19 @@ const AdminLeadsManagement = () => {
                     </Form.Group>
 
                     <Form.Group>
+                      <Form.Label>Display Name</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Form.Control
+                        type="text"
+                        name="displayName"
+                        value={leadData.displayName}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group>
+
+                    <Form.Group>
                       <Form.Label>Email</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Form.Control
                         type="text"
                         name="email"
@@ -693,8 +743,47 @@ const AdminLeadsManagement = () => {
                       />
                     </Form.Group>
 
+                    {/* <Form.Group>
+                      <Form.Label>Password</Form.Label>
+                      <Form.Control
+                        type="password"
+                        name="password"
+                        value={leadData.password}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group> */}
+                    <div className="mb-3">
+                      <Form.Label>Password</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <div className="input-group">
+                        <Form.Control
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Update your password"
+                          name="password"
+                          value={leadData.password}
+                          onChange={handleInputChange}
+                        />
+                        <div className="input-group-append">
+                          <button
+                            className="btn btn-secondary"
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            aria-label={
+                              showPassword ? "Hide password" : "Show password"
+                            }
+                          >
+                            <i
+                              className={`fa ${
+                                showPassword ? "ri-eye-fill" : "ri-eye-off-fill"
+                              }`}
+                            ></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                     <Form.Group>
                       <Form.Label>Phone</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Form.Control
                         type="text"
                         rows={3}
@@ -703,23 +792,33 @@ const AdminLeadsManagement = () => {
                         onChange={handleInputChange}
                       />
                     </Form.Group>
-
                     <Form.Group>
                       <Form.Label>Role</Form.Label>
-                      <Form.Control
-                        as="select"
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Select
                         name="role"
-                        value={leadData.role}
+                        isSearchable={true}
+                        value={{ value: leadData.role, label: leadData.role }}
+                        onChange={handleSelectChange}
+                        options={[
+                          { value: "Admin", label: "Admin" },
+                          { value: "Lead", label: "Lead" },
+                          { value: "Owner", label: "Owner" },
+                          { value: "User", label: "User" },
+                        ]}
+                      />
+                    </Form.Group>
+                    <br></br>
+                    <Form.Group>
+                      <Form.Label>Title</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Form.Control
+                        type="text"
+                        name="title"
+                        value={leadData.title}
+                        placeholder="Intern, Software Engineer, Senior Executive, Engineer, Director"
                         onChange={handleInputChange}
-                      >
-                        <option value="Admin">Admin</option>
-                        <option value="Developer">Developer</option>
-                        <option value="Lead">Lead</option>
-                        <option value="Owner">Owner</option>
-                        <option value="Designer">Designer</option>
-                        <option value="Client">Client</option>
-                        <option value="User">User</option>
-                      </Form.Control>
+                      />
                     </Form.Group>
                   </Form>
                 </Container>
@@ -839,13 +938,13 @@ const AdminLeadsManagement = () => {
                             <tr
                               className="table-active"
                               {...row.getRowProps()}
-                              key={row.id} // It's better to use row.id if it's available
+                              key={row.id || rowIndex} // Use row.id if available, otherwise use rowIndex
                             >
                               {row.cells.map((cell, cellIndex) => (
                                 <td
                                   {...cell.getCellProps()}
                                   className="cell-style"
-                                  key={cellIndex} // It's better to use cell.id if it's available
+                                  key={cell.id}
                                 >
                                   {cellIndex === 0 ? (
                                     <span className="sno-style">{sNo}</span>
@@ -853,13 +952,14 @@ const AdminLeadsManagement = () => {
                                     <>
                                       <div className="d-flex align-items-center gap-2">
                                         <Avatar
-                                          img={getLeadImage(
-                                            row.original.fullName
-                                          )}
+                                          img={
+                                            row.original.profileImage
+                                              ? row.original.profileImage
+                                              : dummyImage
+                                          }
                                           // height="35px"
                                           // width="35px"
                                         />
-
                                         <div>
                                           <h6 className="mb-0">
                                             {cell.render("Cell")}

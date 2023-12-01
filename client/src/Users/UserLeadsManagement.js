@@ -32,7 +32,7 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
-import { leadArray, ownerArray } from "../apps/data/Leadonwer";
+import { getLeads, getRest } from "../apps/data/Leadowner";
 import "../assets/css/react-datepicker.min.css";
 import img from "../assets/img/user.png";
 import Avatar from "../components/Avatar";

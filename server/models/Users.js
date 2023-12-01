@@ -2,44 +2,17 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../utils/dbConnect.js";
 import Project from "./Project.js";
 import Legacy from "./Legacy.js";
-
-function timeAgo(pastDate) {
-  if (!pastDate) {
-    return "Never logged in";
-  }
-
-  const differenceInSeconds = Math.floor(
-    (new Date() - new Date(pastDate)) / 1000
-  );
-  const minute = 60;
-  const hour = minute * 60;
-  const day = hour * 24;
-  const week = day * 7;
-
-  if (differenceInSeconds < minute) {
-    return `${differenceInSeconds} seconds ago`;
-  } else if (differenceInSeconds < hour) {
-    return `${Math.floor(differenceInSeconds / minute)} minutes ago`;
-  } else if (differenceInSeconds < day) {
-    return `${Math.floor(differenceInSeconds / hour)} hours ago`;
-  } else if (differenceInSeconds < week) {
-    return `${Math.floor(differenceInSeconds / day)} days ago`;
-  } else {
-    return `${Math.floor(differenceInSeconds / week)} weeks ago`;
-  }
-}
+import timeAgo from "../utils/timeAgo.js";
 
 const User = sequelize.define("users", {
-  firstName: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  lastName: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
   fullName: {
     type: DataTypes.STRING,
+    allowNull: true,
+  },
+  displayName: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    unique: true,
   },
   email: {
     type: DataTypes.STRING,
@@ -53,9 +26,6 @@ const User = sequelize.define("users", {
     type: DataTypes.STRING,
     unique: true,
     allowNull: true,
-    validate: {
-      isNumeric: true,
-    },
   },
   password: {
     type: DataTypes.STRING,
@@ -70,8 +40,7 @@ const User = sequelize.define("users", {
     type: DataTypes.TEXT,
   },
   profileImage: {
-    type: DataTypes.STRING,
-    defaultValue: null,
+    type: DataTypes.STRING, // Changed to TEXT for longer strings
     allowNull: true,
   },
 
@@ -97,4 +66,17 @@ User.hasMany(Legacy, {
   foreignKey: "createdBy",
   as: "legacys",
 });
+
+Legacy.belongsTo(User, {
+  foreignKey: "lead", // The column in Legacy model that holds the reference
+  as: "Lead", // Alias used for include
+  targetKey: "displayName", // The column in User model to match with
+});
+
+Legacy.belongsTo(User, {
+  foreignKey: "owner",
+  as: "Owner",
+  targetKey: "displayName",
+});
+
 export default User;

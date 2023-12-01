@@ -32,7 +32,7 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
-import { leadArray, ownerArray } from "../apps/data/Leadonwer";
+import { getLeads, getRest } from "../apps/data/Leadowner";
 import "../assets/css/react-datepicker.min.css";
 import Avatar from "../components/Avatar";
 import config from "../config.json";
@@ -156,7 +156,6 @@ const UserUsersManagement = () => {
     }
 
     try {
-      // console.log(userData);
 
       await axios.post(`${url}/api/users/add`, userData);
       closeAddModal();
@@ -540,7 +539,7 @@ const UserUsersManagement = () => {
   };
   return (
     <>
-      <UserProjectHeader/>
+      <UserProjectHeader />
       <div className="main main-app p-3 p-lg-4">
         <div className="d-md-flex align-items-center justify-content-between mb-4">
           <div>

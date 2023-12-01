@@ -1,12 +1,12 @@
 import axios from "axios";
 import fs from "fs/promises";
 
-const apiUrl = "https://pms.tworks.in/api/legacy/add";
+const apiUrl = "http://192.168.212.10:5000/api/projects/add";
 
 async function sendData() {
   try {
     const jsonData = await fs.readFile(
-      "/home/suhail/Cloud-Squad/server/setup/db.json",
+      "/home/suhail/newsquad/server/setup/db.json",
       "utf8"
     );
     const projects = JSON.parse(jsonData);

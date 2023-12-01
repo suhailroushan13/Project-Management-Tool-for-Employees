@@ -19,12 +19,14 @@ import { FiSend } from "react-icons/fi";
 import { Link, useLocation, useParams } from "react-router-dom";
 import Context from "../Root/Context";
 import dummyImage from "../assets/users/user.png";
-import { leadsData } from "../data/Leads";
+import config from "../config.json";
+import axios from "axios";
 
 import Footer from "../layouts/Footer";
 import UserProjectHeader from "../layouts/UserProjectHeader";
 import formatDate from "../Root/FormatDate";
 import "../Root/View.css";
+import Table from "react-bootstrap/Table";
 
 import Avatar from "../components/Avatar";
 import HeaderMobile from "../layouts/HeaderMobile";
@@ -34,49 +36,42 @@ let leadId;
 function UserViewProfile() {
   const location = useLocation();
   const { id } = useParams();
+  const url = config.URL;
 
   const context = useContext(Context);
   const userEmail = context.email;
-
   const [user, setUser] = useState(null);
-  const [userImage, setUserImage] = useState(dummyImage);
+
+  const redirectToCustomPage = () => {
+    navigate(`/user/edit/${id}`); // Redirect to your custom page
+  };
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    const savedImage = localStorage.getItem("userImage");
-
-    if (savedUser && savedImage) {
-      setUser(JSON.parse(savedUser));
-      setUserImage(savedImage);
-    } else {
-      const foundUser = leadsData.find((lead) => lead.email === userEmail);
-      if (foundUser) {
-        setUser(foundUser);
-        setUserImage(foundUser.path);
-        localStorage.setItem("user", JSON.stringify(foundUser));
-        localStorage.setItem("userImage", foundUser.path);
+    // Fetch user data by ID
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(`${url}/api/users/get/${id}`);
+        setUser(response.data); // Set user data from the API response
+      } catch (error) {
+        console.error("Error fetching user data", error);
       }
-    }
-  }, [userEmail]);
+    };
 
-  let userData = localStorage.getItem("userData");
-  let stringToObject = JSON.parse(userData);
-  const {
-    firstName,
-    lastName,
-    email,
-    role,
-    phone,
-    lastLogin,
-    createdAt,
-    bio,
-    title,
-    lastActive,
-  } = stringToObject;
+    fetchUser();
+  }, [id, url]);
 
-  let fullName = firstName + " " + lastName;
-
-  console.log(stringToObject);
+  function formatDate(inputDate) {
+    const options = {
+      year: "2-digit",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    };
+    const date = new Date(inputDate);
+    const formattedDate = date.toLocaleDateString("en-IN", options);
+    return formattedDate;
+  }
 
   function formatDate(inputDate) {
     const options = {
@@ -93,7 +88,6 @@ function UserViewProfile() {
 
   const inputDateString = "2023-10-20T04:32:11.000Z";
   const formattedDate = formatDate(inputDateString);
-  console.log(formattedDate); // Output: "22 Aug, 23"
 
   function timeAgo(pastDate) {
     const differenceInSeconds = Math.floor(
@@ -121,60 +115,65 @@ function UserViewProfile() {
     <>
       <UserProjectHeader />
       <HeaderMobile />
-      <div className="main main-app p-3 p-lg-4">
-        <div className="md-flex">
-          <ol className="breadcrumb fs-sm mb-1">
-            <li className="breadcrumb-item">
-              <Link to="#">Dashboard</Link>
-            </li>
-            <li className="breadcrumb-item active" aria-current="page"></li>
-          </ol>
-          <div className="cards">
-            <Card className="neumorphic-card card">
-              <Card.Body className="profile-card-content">
-                <Card.Img
-                  variant="top"
-                  src={userImage}
-                  className="profile-image"
-                  alt="User Image"
-                />
-                <Card.Title className="profile-name">
-                  {fullName || "Employee"}
-                </Card.Title>
-                <Card.Text className="profile-bio">
-                  <b>Bio: </b> {bio || "User"}
-                </Card.Text>
-                <Card.Text className="profile-created-at">
-                  <b>Created At : </b>
-                  {createdAt ? timeAgo(createdAt) : "Unknown"}
-                </Card.Text>
-                <Card.Text className="profile-last-login">
-                  <b>Last Login At : </b>
-                  {lastLogin ? timeAgo(lastLogin) : "Unknown"}
-                </Card.Text>
-                <Card.Text className="profile-role">
-                  <b>Role : </b>
-                  {role || "User"}
-                </Card.Text>
-                <Card.Header className="section-title">
-                  Contact Information
-                </Card.Header>
-                <ul className="contact-info-list">
-                  <li>
-                    <i className="ri-mail-fill"></i>
-                    <span>{email}</span>
-                  </li>
-                  <li>
-                    <i className="ri-phone-fill"></i>
-                    <span>{phone || "XXXXXXXXXXXXX"}</span>
-                  </li>
-                </ul>
-              </Card.Body>
-            </Card>
-            <Footer />
-          </div>
+      <br />
+      <br />
+      <br />
+      <div className="new-admincards">
+        <div className="profile-image-container">
+          <Card.Img
+            variant="top"
+            src={user?.profileImage || dummyImage}
+            className="new-profile-image rounded-circle"
+            alt="User Image"
+          />
         </div>
+        <Table striped bordered hover>
+          <tbody>
+            <tr>
+              <td>Full Name:</td>
+              <td>{user?.fullName || "Employee"}</td>
+            </tr>
+            <tr>
+              <td>Role:</td>
+              <td>{user?.role || ""}</td>
+            </tr>
+            <tr>
+              <td>Title:</td>
+              <td>
+                <span>{user?.title}</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Created At:</td>
+              <td>{user?.createdAt ? timeAgo(user.createdAt) : "Unknown"}</td>
+            </tr>
+            <tr>
+              <td>Last Login At:</td>
+              <td>{user?.lastLogin ? timeAgo(user.lastLogin) : "Unknown"}</td>
+            </tr>
+            <tr>
+              <td>Email:</td>
+              <td>{user?.email}</td>
+            </tr>
+            <tr>
+              <td>Phone:</td>
+              <td>
+                {user?.phone ? (
+                  <span>{user.phone}</span>
+                ) : (
+                  <span
+                    onClick={redirectToCustomPage}
+                    style={{ cursor: "pointer", color: "blue" }}
+                  >
+                    Update Number
+                  </span>
+                )}
+              </td>
+            </tr>
+          </tbody>
+        </Table>
       </div>
+      <Footer />
     </>
   );
 }

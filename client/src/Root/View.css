@@ -1,88 +1,71 @@
-.neumorphic-card {
-  background: #e0e0e0;
-  border-radius: 40px;
+/* Style for the container of the table */
+.new-admincards {
+  margin: 20px auto;
   padding: 20px;
-  box-shadow: 8px 8px 16px #bcbcbc, 8px 8px 16px #ffffff;
-  max-width: 400px;
-  margin: 10px auto;
+  max-width: 600px; /* Adjust the maximum width as needed */
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for the table */
+.table {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.table th,
+.table td {
+  vertical-align: middle;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.table th {
+  background-color: #f5f5f5;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f9f9f9;
+}
+
+.table-bordered {
+  border: 1px solid #ddd;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #e9ecef;
+}
+
+/* Style for links in the table */
+.table a {
+  text-decoration: none;
+  color: blue;
+  cursor: pointer;
+}
+
+/* Style for tooltips */
+.tooltip {
+  opacity: 1 !important;
+}
+
+/* CSS for the profile image container */
+.profile-image-container {
+  height: 50%;
+  width: 50%;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  margin-left: 150px;
+  margin-bottom: 20px; /* Add margin for spacing */
+  padding: 20px; /* Add padding around the image container */
 }
 
-.cards .card {
-  border-radius: 40px !important;
-  margin-left: 20px !important;
-  margin-top: 50px !important;
-}
-.profile-card-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Image Actions Styling */
-.image-actions {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  display: flex;
-  gap: 10px;
-}
-
-.image-upload {
-  display: none; /* Hide the default file input */
-}
-
-.profile-image {
-  margin-top: 40px;
-  width: 280px; /* This is the fixed width */
-  height: 280px; /* This is the fixed height */
-  margin-bottom: 20px;
-  object-fit: cover;
-  border-radius: 50%; /* This will make the image container circular */
-  overflow: hidden; /* This ensures that the image inside respects the circular boundary */
-}
-
-.profile-image img {
-  width: 100%; /* We want the image to fill its container */
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%; /* This ensures the image itself is also circular, especially important if the image doesn't fill the container entirely */
-}
-
-.profile-name {
-  font-size: 24px;
-  margin-bottom: 10px;
-}
-
-.profile-bio,
-.profile-created-at,
-.profile-last-login,
-.profile-role {
-  font-size: 16px;
-  margin-bottom: 10px;
-}
-
-.section-title {
-  font-size: 20px;
-  margin-top: 20px;
-  margin-bottom: 15px;
-}
-
-.contact-info-list {
-  list-style: none;
-  padding: 0;
-}
-
-.contact-info-list li {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.contact-info-list i {
-  margin-right: 10px;
-  font-size: 18px;
-  color: #555;
+/* CSS for the circular profile image */
+.new-profile-image {
+  height: 50%;
+  width: 50%;
+  border-radius: 50%; /* Makes the image circular */
+  margin: 0 auto; /* Center the image horizontally within its container */
 }

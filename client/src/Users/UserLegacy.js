@@ -20,10 +20,10 @@ import {
   ChevronUp,
   Edit,
   Filter,
-  MessageSquare,
   Trash2,
+  Info,
 } from "react-feather";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   useFilters,
   useGlobalFilter,
@@ -32,27 +32,22 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
-import { leadArray, ownerArray } from "../apps/data/Leadonwer";
 import "../assets/css/react-datepicker.min.css";
 import Avatar from "../components/Avatar";
 import config from "../config.json";
 import UserProjectHeader from "../layouts/UserProjectHeader";
 import Footer from "../layouts/Footer";
-
-import user from "../assets/users/user.png";
-
+import dummyImage from "../assets/users/user.png";
 import Select from "react-select";
-import { leadsData } from "../data/Leads";
-
 import { useTableContext } from "../Context/TableContext";
+import { getLeads, getRest } from "../apps/data/Leadowner";
 
-// import "../";
 ///////////////////////////////////////////////////////////
 
 const UserLegacy = () => {
   const url = config.URL;
   const navigate = useNavigate();
-
+  const { id } = useParams();
   const { globalFilter } = useTableContext();
 
   const [localData, setLocalData] = useState([]);
@@ -74,7 +69,29 @@ const UserLegacy = () => {
     priority: "MEDIUM",
     status: "NOT STARTED",
     nextReview: "",
+    createdBy: null,
   });
+
+  const [leadImage, setLeadImage] = useState("");
+  const [ownerImage, setOwnerImage] = useState("");
+
+  useEffect(() => {
+    // Fetch data when the component mounts
+    fetchData().then((data) => {
+      if (data && data.length > 0) {
+        // Check if the first project in the array has the necessary data
+        const firstProject = data[0];
+
+        if (firstProject.Lead && firstProject.Lead.profileImage) {
+          setLeadImage(firstProject.Lead.profileImage); // Set lead image path
+        }
+
+        if (firstProject.Owner && firstProject.Owner.profileImage) {
+          setOwnerImage(firstProject.Owner.profileImage); // Set owner image path
+        }
+      }
+    });
+  }, []);
 
   // eslint-disable-next-line
   const showAlert = (message, type) => {
@@ -96,6 +113,24 @@ const UserLegacy = () => {
       }
     };
   }, [timeoutId]);
+
+  const [leadSelectOptions, setLeadSelectOptions] = useState([]);
+  const [ownerSelectOptions, setOwnerSelectOptions] = useState([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const leads = await getLeads();
+      // console.log(leads);
+
+      const owners = await getRest();
+      // console.log(owners);
+
+      setLeadSelectOptions(leads);
+      setOwnerSelectOptions(owners);
+    }
+
+    fetchData();
+  }, []);
 
   // eslint-disable-next-line
   const [description, setDescription] = useState("");
@@ -164,6 +199,10 @@ const UserLegacy = () => {
     setSelectedOwner("");
   };
 
+  let userData = localStorage.getItem("userData");
+  let stringToObject = JSON.parse(userData);
+  let userID = stringToObject.id;
+  // console.log(userID);
   /////////////////////////// Add Data ///////////////////////////////
   const handleSubmitAdd = async (e) => {
     e.preventDefault();
@@ -182,6 +221,8 @@ const UserLegacy = () => {
     }
 
     try {
+
+      taskData.createdBy = userID;
       await axios.post(`${url}/api/legacy/add`, taskData);
 
       // Clear the taskData object after successful submission
@@ -311,25 +352,49 @@ const UserLegacy = () => {
         accessor: "description",
         Filter: DropdownFilter,
         filter: multiSelectFilterFn,
-        Cell: ({ value }) => (
-          <div style={{ textAlign: "left" }}>
-            {value.length > 30 ? value.substring(0, 50) + "..." : value}
-          </div>
-        ),
+        Cell: ({ value }) => {
+          // Check if value is not null or undefined before accessing its length
+          if (value) {
+            return (
+              <div style={{ textAlign: "left" }}>
+                {value.length > 30 ? value.substring(0, 50) + "..." : value}
+              </div>
+            );
+          } else {
+            // Handle the case where value is null or undefined
+            return <div style={{ textAlign: "left" }}>No Description</div>;
+          }
+        },
       },
       {
         Header: "Lead",
         accessor: "lead",
         Filter: DropdownFilter,
         filter: multiSelectFilterFn,
-        Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
+        Cell: ({ row }) => (
+          <div className="d-flex align-items-center gap-2">
+            <Avatar
+              img={row.original.Lead.profileImage || dummyImage}
+              alt="Lead Avatar"
+            />
+            <span>{row.original.Lead.displayName}</span>
+          </div>
+        ),
       },
       {
         Header: "Owner",
         accessor: "owner",
         Filter: DropdownFilter,
         filter: multiSelectFilterFn,
-        Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
+        Cell: ({ row }) => (
+          <div className="d-flex align-items-center gap-2">
+            <Avatar
+              img={row.original.Owner.profileImage || dummyImage}
+              alt="Owner Avatar"
+            />
+            <span>{row.original.Owner.displayName}</span>
+          </div>
+        ),
       },
       {
         Header: "Due Date",
@@ -479,64 +544,87 @@ const UserLegacy = () => {
           <div style={{ textAlign: "center" }}>{formatDate(value)}</div>
         ),
       },
-      {
-        Header: "Actions",
-        accessor: "editDelete",
-        Cell: ({ row }) => (
-          <div style={{ textAlign: "center" }}>
-            <span
-              className="edit-icon"
-              onClick={() => handleEdit(row.original)}
-            >
-              <OverlayTrigger
-                placement="top"
-                overlay={
-                  <Tooltip>
-                    <strong>Edit</strong>
-                  </Tooltip>
-                }
-              >
-                <Edit size={20} color="blue" />
-              </OverlayTrigger>
-            </span>
-            <span
-              className="comment-icon"
-              onClick={() => {
-                navigate(`/admin/projects/comment/${row.original.id}`, {
-                  state: { selectedProject: row.original },
-                });
-              }}
-            >
-              <OverlayTrigger
-                placement="top"
-                overlay={
-                  <Tooltip>
-                    <strong>Comment</strong>
-                  </Tooltip>
-                }
-              >
-                <MessageSquare size={20} color="blue" />
-              </OverlayTrigger>
-            </span>
+      // {
+      //   Header: "Actions",
+      //   accessor: "editDelete",
+      //   Cell: ({ row }) => (
+      //     <div style={{ textAlign: "center" }}>
+      //      <span
+      //         className="edit-icon"
+      //         onClick={() => handleEdit(row.original)}
+      //       >
+      //         <OverlayTrigger
+      //           placement="top"
+      //           overlay={
+      //             <Tooltip>
+      //               <strong>Edit</strong>
+      //             </Tooltip>
+      //           }
+      //         >
+      //           <Edit size={20} color="blue" />
+      //         </OverlayTrigger>
+      //       </span>
+      //       <span
+      //         className="comment-icon"
+      //         onClick={() => {
+      //           navigate(`/admin/legacy/comment/${row.original.id}`, {
+      //             state: { selectedProject: row.original },
+      //           });
+      //         }}
+      //       >
+      //         <OverlayTrigger
+      //           placement="top"
+      //           overlay={
+      //             <Tooltip>
+      //               <strong>Comment</strong>
+      //             </Tooltip>
+      //           }
+      //         >
+      //           <MessageSquare size={20} color="blue" />
+      //         </OverlayTrigger>
+      //       </span>
 
-            <span
-              className="delete-icon"
-              onClick={() => openDeleteModal(row.original)}
-            >
-              <OverlayTrigger
-                placement="top"
-                overlay={
-                  <Tooltip>
-                    <strong>Delete</strong>
-                  </Tooltip>
-                }
-              >
-                <Trash2 size={20} color="red" />
-              </OverlayTrigger>
-            </span>
-          </div>
-        ),
-      },
+      //       <span
+      //         className="delete-icon"
+      //         onClick={() => openDeleteModal(row.original)}
+      //       >
+      //         <OverlayTrigger
+      //           placement="top"
+      //           overlay={
+      //             <Tooltip>
+      //               <strong>Delete</strong>
+      //             </Tooltip>
+      //           }
+      //         >
+      //           <Trash2 size={20} color="red" />
+      //         </OverlayTrigger>
+      //       </span>
+      //       <span
+      //         className="info-icon"
+      //         onClick={() => {
+      //           navigate(`/user/legacy/info/${row.original.id}`, {
+      //             state: { selectedProject: row.original },
+      //           });
+      //         }}
+      //       >
+      //         <OverlayTrigger
+      //           placement="top"
+      //           overlay={
+      //             <Tooltip>
+      //               <strong>Info</strong>
+      //             </Tooltip>
+      //           }
+      //         >
+      //           <Info
+      //             size={20}
+      //             color="blue"
+      //             style={{ marginLeft: "10px", marginBottom: "8px" }}
+      //           />
+      //         </OverlayTrigger>
+      //       </span>
+      //     </div>
+      //   ),
+      // },
     ],
     // eslint-disable-next-line
     []
@@ -613,25 +701,6 @@ const UserLegacy = () => {
     (_, index) => index + 1
   ).slice(startIndex, endIndex);
 
-  const imageMap = leadsData.reduce((acc, lead) => {
-    acc[lead.name] = lead.path;
-    return acc;
-  }, {});
-
-  const getLeadImage = (firstName) => {
-    return imageMap[firstName] || user; // returns user image as default if firstName not found in imageMap
-  };
-
-  const leadSelectOptions = leadArray.map((option) => ({
-    value: option,
-    label: option,
-  }));
-
-  const ownerSelectOptions = ownerArray.map((option) => ({
-    value: option,
-    label: option,
-  }));
-
   return (
     <>
       <UserProjectHeader></UserProjectHeader>
@@ -646,33 +715,37 @@ const UserLegacy = () => {
             </ol>
           </div>
 
-          {alertMessage && <Alert variant={alertType}>{alertMessage}</Alert>}
-
+          <div style={{ textAlign: "center", padding: "10px" }}>
+            {alertMessage && <Alert variant={alertType}>{alertMessage}</Alert>}
+          </div>
           <div className="d-flex justify-content-center align-items-center mt-3 mt-md-0">
-            <Button
-              variant="primary"
-              className="d-flex align-items-center gap-2"
-              onClick={openAddModal}
-            >
-              <i className="ri-add-line fs-18 lh-1"></i>Add Project
-            </Button>
-
             {/* Add Task Modal */}
             <Modal show={showAddModal} onHide={() => setShowAddModal(false)}>
               <Modal.Header closeButton>
                 <Modal.Title>Add Project</Modal.Title>
               </Modal.Header>
-              {showEmptyFieldAlert && (
-                <div className="alert alert-danger">
-                  Please fill out all required fields.
-                </div>
-              )}
+              <div style={{ textAlign: "center", padding: "10px" }}>
+                {alertMessage && (
+                  <Alert variant={alertType}>{alertMessage}</Alert>
+                )}
+              </div>
 
               <Modal.Body>
                 <Container>
                   <Form>
                     <Form.Group>
-                      <Form.Label>Project Name</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Project Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Form.Control
                         type="text"
                         name="projectName"
@@ -692,9 +765,22 @@ const UserLegacy = () => {
                     </Form.Group>
 
                     <Form.Group>
-                      <Form.Label>Lead Name</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Lead Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Select
-                        options={leadSelectOptions}
+                        options={[...leadSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
                         isSearchable={true}
                         value={leadSelectOptions.find(
                           (option) => option.value === taskData.lead
@@ -710,9 +796,22 @@ const UserLegacy = () => {
                       />
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label>Owner Name</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Owner Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Select
-                        options={ownerSelectOptions}
+                        options={[...ownerSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
                         isSearchable={true}
                         value={ownerSelectOptions.find(
                           (option) => option.value === taskData.owner
@@ -729,7 +828,18 @@ const UserLegacy = () => {
                     </Form.Group>
 
                     <Form.Group>
-                      <Form.Label>Due Date</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Due Date{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Form.Control
                         type="date"
                         name="newEndDate"
@@ -738,7 +848,18 @@ const UserLegacy = () => {
                       />
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label>Priority</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Priority{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Form.Control
                         as="select"
                         name="priority"
@@ -752,7 +873,18 @@ const UserLegacy = () => {
                       </Form.Control>
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label>Status</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Status{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Form.Control
                         as="select"
                         name="status"
@@ -799,17 +931,28 @@ const UserLegacy = () => {
               <Modal.Header closeButton>
                 <Modal.Title>Edit Project</Modal.Title>
               </Modal.Header>
-              {showEmptyFieldAlert && (
-                <div className="alert alert-danger">
-                  Please fill out all required fields.
-                </div>
-              )}
+              <div style={{ textAlign: "center", padding: "10px" }}>
+                {alertMessage && (
+                  <Alert variant={alertType}>{alertMessage}</Alert>
+                )}
+              </div>
 
               <Modal.Body>
                 <Container>
                   <Form>
                     <Form.Group>
-                      <Form.Label>Project Name</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Project Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Form.Control
                         type="text"
                         name="projectName"
@@ -829,40 +972,81 @@ const UserLegacy = () => {
                     </Form.Group>
 
                     <Form.Group>
-                      <Form.Label>Lead Name</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="lead"
-                        value={taskData.lead}
-                        onChange={handleInputChange}
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
                       >
-                        <option value="">Select Lead Name</option>
-                        {leadArray.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </Form.Control>
+                        Lead Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
+                      <Select
+                        options={[...leadSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
+                        isSearchable={true}
+                        value={leadSelectOptions.find(
+                          (option) => option.value === taskData.lead
+                        )}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "lead",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label>Owner Name</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="owner"
-                        value={taskData.owner}
-                        onChange={handleInputChange}
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
                       >
-                        <option value="">Select Owner Name</option>
-                        {ownerArray.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </Form.Control>
+                        Owner Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
+                      <Select
+                        options={[...ownerSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
+                        isSearchable={true}
+                        value={ownerSelectOptions.find(
+                          (option) => option.value === taskData.owner
+                        )}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "owner",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
                     </Form.Group>
 
                     <Form.Group>
-                      <Form.Label>Due Date</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Due Date{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Form.Control
                         type="date"
                         name="newEndDate"
@@ -871,7 +1055,18 @@ const UserLegacy = () => {
                       />
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label>Priority</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Priority{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Form.Control
                         as="select"
                         name="priority"
@@ -885,7 +1080,18 @@ const UserLegacy = () => {
                       </Form.Control>
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label>Status</Form.Label>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Status{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
                       <Form.Control
                         as="select"
                         name="status"
@@ -959,7 +1165,7 @@ const UserLegacy = () => {
                   <div className="table-responsive">
                     <table {...getTableProps()} className="table-style">
                       {/* Thead */}
-                      <thead>
+                      <thead className="custom-thead">
                         {headerGroups.map((headerGroup) => (
                           <tr {...headerGroup.getHeaderGroupProps()}>
                             {headerGroup.headers.map((column, columnIndex) => (
@@ -1023,56 +1229,56 @@ const UserLegacy = () => {
                         {page.map((row) => {
                           prepareRow(row);
                           return (
-                            <tr
-                              className="table-active"
-                              {...row.getRowProps()}
-                              key={row.id}
-                            >
-                              {row.cells.map((cell, cellIndex) => (
-                                <td
-                                  {...cell.getCellProps()}
-                                  className="cell-style"
-                                  key={cell.id}
-                                >
-                                  {cellIndex === 2 ? (
-                                    <>
+                            <tr {...row.getRowProps()}>
+                              {row.cells.map((cell) => {
+                                if (cell.column.id === "lead") {
+                                  // Render cell for lead with profile image
+                                  return (
+                                    <td {...cell.getCellProps()}>
                                       <div className="d-flex align-items-center gap-2">
                                         <Avatar
-                                          img={getLeadImage(row.original.lead)}
+                                          img={
+                                            row.original.Lead.profileImage ||
+                                            dummyImage
+                                          }
+                                          alt="Lead Avatar"
                                         />
-                                        <div>
-                                          <h6 className="mb-0">
-                                            {cell.render("Cell")}
-                                          </h6>
-                                          <span className="fs-xs text-secondary people">
-                                            Role
-                                          </span>
-                                        </div>
+                                        <span>
+                                          {row.original.Lead.displayName}
+                                        </span>
                                       </div>
-                                    </>
-                                  ) : cellIndex === 3 ? (
-                                    <>
+                                    </td>
+                                  );
+                                } else if (cell.column.id === "owner") {
+                                  // Render cell for owner with profile image
+                                  return (
+                                    <td {...cell.getCellProps()}>
                                       <div className="d-flex align-items-center gap-2">
                                         <Avatar
-                                          // height="35px"
-                                          // width="35px"
-                                          img={getLeadImage(row.original.owner)}
+                                          img={
+                                            row.original.Owner.profileImage ||
+                                            dummyImage
+                                          }
+                                          alt="Owner Avatar"
                                         />
-                                        <div>
-                                          <h6 className="mb-0">
-                                            {cell.render("Cell")}
-                                          </h6>
-                                          <span className="fs-xs text-secondary people">
-                                            Role
-                                          </span>
-                                        </div>
+                                        <span>
+                                          {row.original.Owner.displayName}
+                                        </span>
                                       </div>
-                                    </>
-                                  ) : (
-                                    cell.render("Cell")
-                                  )}
-                                </td>
-                              ))}
+                                    </td>
+                                  );
+                                } else {
+                                  // Render other cells normally
+                                  return (
+                                    <td
+                                      {...cell.getCellProps()}
+                                      className="cell-style"
+                                    >
+                                      {cell.render("Cell")}
+                                    </td>
+                                  );
+                                }
+                              })}
                             </tr>
                           );
                         })}
@@ -1185,6 +1391,11 @@ const DropdownFilter = ({ column }) => {
 };
 
 function formatDate(inputDate) {
+  if (!inputDate) {
+    // Handle null or undefined inputDate
+    return "No Date"; // or any other placeholder you'd like to use
+  }
+
   const months = [
     "Jan",
     "Feb",

@@ -29,7 +29,6 @@ window.addEventListener("load", function () {
 
 export default function App() {
   const [email, setEmail] = useState("");
-  console.log(isMobile);
 
   if (isMobile) {
     // Render only the mobile warning component for mobile users
@@ -38,37 +37,31 @@ export default function App() {
 
   return (
     <React.Fragment>
-      <BrowserRouter>
-        <Context.Provider value={{ email, setEmail }}>
-          <TableProvider>
-            <Routes>
-              <Route path="/" element={<Login />} />
-              {protectedRoutes.map((route, index) => {
-                const currentRole = localStorage.getItem("role");
+      <Context.Provider value={{ email, setEmail }}>
+        <TableProvider>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            {protectedRoutes.map((route, index) => {
+              const currentRole = localStorage.getItem("role");
 
-                if (route.roles.includes(currentRole)) {
-                  return (
-                    <Route
-                      key={index}
-                      path={route.path}
-                      element={route.element}
-                    />
-                  );
-                } else {
-                  return (
-                    <Route
-                      key={index}
-                      path={route.path}
-                      element={<NotFound />}
-                    />
-                  );
-                }
-              })}
-              {/* Add other routes as needed */}
-            </Routes>
-          </TableProvider>
-        </Context.Provider>
-      </BrowserRouter>
+              if (route.roles.includes(currentRole)) {
+                return (
+                  <Route
+                    key={index}
+                    path={route.path}
+                    element={route.element}
+                  />
+                );
+              } else {
+                return (
+                  <Route key={index} path={route.path} element={<NotFound />} />
+                );
+              }
+            })}
+            {/* Add other routes as needed */}
+          </Routes>
+        </TableProvider>
+      </Context.Provider>
     </React.Fragment>
   );
 }

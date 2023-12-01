@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../utils/dbConnect.js";
-import { parse, format } from "date-fns";
 import User from "./Users.js";
 
 const Legacy = sequelize.define("legacys", {
@@ -34,9 +33,7 @@ const Legacy = sequelize.define("legacys", {
       "ON HOLD",
       "OVERDUE",
       "IN PROGRESS",
-      "COMPLETED",
-
-      "CANCELED"
+      "COMPLETED"
     ),
     allowNull: true,
   },

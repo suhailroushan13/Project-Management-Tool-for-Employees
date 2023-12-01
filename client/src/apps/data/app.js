@@ -13,7 +13,7 @@ async function sendData() {
 
     // Loop through each project and make a POST request with Axios
     for (const project of projects) {
-      console.log(project);
+      // console.log(project);
     }
   } catch (error) {
     console.error("Error:", error);

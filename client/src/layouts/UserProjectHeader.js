@@ -7,38 +7,67 @@ import Context from "../Root/Context";
 import UserSiderBar from "./UserSideBar";
 import { leadsData } from "../data/Leads";
 import { useTableContext } from "../Context/TableContext";
+import axios from "axios";
+import config from "../config.json";
 
 export default function UserProjectHeader() {
   const context = useContext(Context);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
+
   const userEmail = context.email;
   const { filterInput, setFilterInput, setGlobalFilter } = useTableContext();
+  const url = config.URL;
+  let userData = localStorage.getItem("userData");
+  let stringToObject = JSON.parse(userData);
+  let userID = stringToObject.id;
+  let fullName = stringToObject.fullName;
+  let role = stringToObject.role;
+  let firstName = stringToObject.firstName;
+  let title = stringToObject.title;
+  let profileImage = stringToObject.profileImage;
+  let displayName = stringToObject.displayName;
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      try {
+        const response = await axios.get(`${url}/api/users/getimage/${userID}`);
+
+        // Check if users array is not empty and set the image URL
+        if (
+          response.data &&
+          response.data.users &&
+          response.data.users.length > 0
+        ) {
+          setImagePreviewUrl(response.data.users[0].profileImage || dummyImage);
+        }
+      } catch (error) {
+        console.error("Error fetching image:", error);
+      }
+    };
+
+    fetchImage();
+  }, [userID]); // Added userID as a dependency to useEffect
 
   const [user, setUser] = useState(null);
-  const [userImage, setUserImage] = useState(dummyImage);
+
   const handleFilterChange = (e) => {
     const value = e.target.value || undefined;
     setFilterInput(value);
     setGlobalFilter(value); // This will set the global filter
   };
 
-  let myUser;
-
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
-    const savedImage = localStorage.getItem("userImage");
 
-    if (savedUser && savedImage) {
+    if (savedUser) {
       const parsedUser = JSON.parse(savedUser);
       setUser(parsedUser);
-      setUserImage(savedImage);
       console.log(parsedUser.fullName); // Now it's guaranteed that parsedUser is defined
     } else {
       const foundUser = leadsData.find((lead) => lead.email === userEmail);
       if (foundUser) {
         setUser(foundUser);
-        setUserImage(foundUser.path);
         localStorage.setItem("user", JSON.stringify(foundUser));
-        localStorage.setItem("userImage", foundUser.path);
       }
     }
   }, [userEmail]);
@@ -77,23 +106,32 @@ export default function UserProjectHeader() {
           />
           <i className="ri-search-line"></i>
         </div>
+
         <Dropdown className="dropdown-profile ms-3 ms-xl-4" align="end">
           <Dropdown.Toggle as={CustomToggle}>
             <div className="avatar online">
-              <img src={userImage} alt={user ? user.name : "Default User"} />
+              <img src={imagePreviewUrl || dummyImage} alt="Fetched Profile" />
             </div>
           </Dropdown.Toggle>
           <Dropdown.Menu className="mt-10-f">
             <div className="dropdown-menu-body">
               <div className="avatar avatar-xl online mb-3">
-                <img src={userImage} alt={user ? user.name : ""} />
+                <img
+                  src={imagePreviewUrl || dummyImage}
+                  alt="Fetched Profile"
+                />
               </div>
               <h5 className="mb-1 text-dark fw-semibold">
-                {user ? user.fullName : "Default User"}
+                {" "}
+                {displayName || "Employee"}
               </h5>
-              <p className="fs-sm text-secondary">{user ? user.role : ""}</p>
+              <p className="fs-sm text-secondary"> {title || "Employee"}</p>
+
               <nav className="nav">
-                <Link to="/user/view">
+                <Link to={`/user/edit/${userID}`}>
+                  <i className="ri-edit-2-line"></i> Edit Profile
+                </Link>
+                <Link to={`/user/view/${userID}`}>
                   <i className="ri-profile-line"></i> View Profile
                 </Link>
               </nav>

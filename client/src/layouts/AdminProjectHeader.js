@@ -6,34 +6,54 @@ import admin from "../assets/users/admin.png";
 import Context from "../Root/Context";
 import AdminSiderBar from "./AdminSideBar";
 import { useTableContext } from "../Context/TableContext";
-
-import { leadsData } from "../data/Leads";
+import dummyImage from "../assets/users/user.png";
+import axios from "axios";
+import config from "../config.json";
 
 export default function AdminProjectHeader() {
   const context = useContext(Context);
   const userEmail = context.email;
+  const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
+  const url = config.URL;
+
   const { filterInput, setFilterInput, setGlobalFilter } = useTableContext();
 
-  const [user, setUser] = useState(null);
-  const [userImage, setUserImage] = useState(admin);
+  let userData = localStorage.getItem("userData");
+  let stringToObject = JSON.parse(userData);
+  let userID = stringToObject.id;
+  let fullName = stringToObject.fullName;
+  let role = stringToObject.role;
+  let firstName = stringToObject.firstName;
+  let title = stringToObject.title;
+  let profileImage = stringToObject.profileImage;
+  let displayName = stringToObject.displayName;
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      try {
+        const response = await axios.get(`${url}/api/users/getimage/${userID}`);
+
+        // Check if users array is not empty and set the image URL
+        if (
+          response.data &&
+          response.data.users &&
+          response.data.users.length > 0
+        ) {
+          setImagePreviewUrl(response.data.users[0].profileImage);
+        }
+      } catch (error) {
+        console.error("Error fetching image:", error);
+      }
+    };
+
+    fetchImage();
+  }, [userID]); // Added userID as a dependency to useEffect
 
   const handleFilterChange = (e) => {
     const value = e.target.value || undefined;
     setFilterInput(value);
     setGlobalFilter(value); // This will set the global filter
   };
-
-  useEffect(() => {
-    if (leadsData.length > 0) {
-      const foundUser = leadsData.find((lead) => lead.email === userEmail);
-      if (foundUser) {
-        setUser(foundUser);
-        setUserImage(foundUser.path);
-        localStorage.setItem("user", JSON.stringify(foundUser));
-        localStorage.setItem("userImage", foundUser.path);
-      }
-    }
-  }, [userEmail, leadsData]);
 
   const toggleFooterMenu = (e) => {
     e.preventDefault();
@@ -77,6 +97,8 @@ export default function AdminProjectHeader() {
     window.location.href = "/";
   };
 
+  // Example usage
+
   return (
     <>
       <AdminSiderBar />
@@ -98,25 +120,31 @@ export default function AdminProjectHeader() {
         <Dropdown className="dropdown-profile ms-3 ms-xl-4" align="end">
           <Dropdown.Toggle as={CustomToggle}>
             <div className="avatar online">
-              <img src={admin} alt={user ? user.name : "Default User"} />
+              <img src={imagePreviewUrl || dummyImage} alt="Fetched Profile" />
             </div>
           </Dropdown.Toggle>
           <Dropdown.Menu className="mt-10-f">
             <div className="dropdown-menu-body">
               <div className="avatar avatar-xl online mb-3">
-                <img src={admin} alt={user ? user.name : "Default User"} />
+                <img
+                  src={imagePreviewUrl || dummyImage}
+                  alt="Fetched Profile"
+                />
               </div>
               <h5 className="mb-1 text-dark fw-semibold">
                 {" "}
-                {user ? user.name : "Admin"}
+                {displayName || "Admin"}
               </h5>
               <p className="fs-sm text-secondary">
                 {" "}
-                {user ? user.role : "Administrator"}
+                {title || "Administrator"}
               </p>
 
               <nav className="nav">
-                <Link to="/admin/view">
+                <Link to={`/admin/edit/${userID}`}>
+                  <i className="ri-edit-2-line"></i> Edit Profile
+                </Link>
+                <Link to={`/admin/view/${userID}`}>
                   <i className="ri-profile-line"></i> View Profile
                 </Link>
               </nav>

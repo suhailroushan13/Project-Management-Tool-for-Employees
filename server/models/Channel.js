@@ -124,6 +124,9 @@ Legacy.belongsTo(User, {
   as: "creator",
 });
 
+Project.belongsTo(User, { as: "Lead", foreignKey: "leadId" });
+Project.belongsTo(User, { as: "Owner", foreignKey: "ownerId" });
+
 // Now, set the relationship
 
-export { User, Channel, ChannelMember, Message, Attachment, Tag };
+export { User, Channel, ChannelMember, Message, Attachment, Tag, Project };

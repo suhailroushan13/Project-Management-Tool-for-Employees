@@ -1,8 +1,8 @@
 import express from "express";
-import { Op } from "sequelize"; // Import Op from Sequelize
-// import Legacy from "../../models/Legacy.js";
+import { Op } from "sequelize";
 import Legacy from "../../models/Legacy.js";
-// import { Comment, CommentAttachment } from "../../models/Comment.js";
+import User from "../../models/Users.js";
+import { sequelize } from "../../utils/dbConnect.js";
 import axios from "axios";
 import { syncModels } from "../../utils/dbConnect.js";
 
@@ -10,11 +10,84 @@ const router = express.Router();
 
 router.get("/getall", async (req, res) => {
   try {
-    // const projects = await Legacy.findAll({ include: Comment });
-    const projects = await Legacy.findAll({});
+    // Fetching projects without associated user details initially
+    const projects = await Legacy.findAll();
+    console.log(projects);
 
-    res.status(200).json(projects);
+    for (let project of projects) {
+      let updateFields = {};
+
+      // Find and assign the lead user ID
+      if (project.lead) {
+        const leadUser = await User.findOne({
+          where: { displayName: project.lead },
+        });
+        if (leadUser) {
+          updateFields.leadId = leadUser.id;
+        }
+      }
+
+      // Find and assign the owner user ID
+      if (project.owner) {
+        const ownerUser = await User.findOne({
+          where: { displayName: project.owner },
+        });
+        if (ownerUser) {
+          updateFields.ownerId = ownerUser.id;
+        }
+      }
+
+      // Update the project if there are fields to update
+      if (Object.keys(updateFields).length > 0) {
+        await project.update(updateFields);
+      }
+    }
+
+    // Fetch projects again, now with associated user details
+    const updatedProjects = await Legacy.findAll({
+      include: [
+        {
+          model: User,
+          as: "Lead",
+          attributes: [
+            "id",
+            "fullName",
+            "displayName",
+            "email",
+            "phone",
+            "role",
+            "title",
+            "profileImage",
+            "lastLogin",
+            "createdAt",
+            "updatedAt",
+          ],
+        },
+        {
+          model: User,
+          as: "Owner",
+          attributes: [
+            "id",
+            "fullName",
+            "displayName",
+            "email",
+            "phone",
+            "role",
+            "title",
+            "profileImage",
+            "lastLogin",
+            "createdAt",
+            "updatedAt",
+          ],
+        },
+        // Include other associations as needed
+      ],
+    });
+
+    // Send a single response after processing
+    res.status(200).json(updatedProjects);
   } catch (error) {
+    // Error handling
     if (
       error.name === "SequelizeDatabaseError" &&
       error.parent.code === "ER_NO_SUCH_TABLE"
@@ -26,7 +99,7 @@ router.get("/getall", async (req, res) => {
       console.error(error);
       res.status(500).json({
         success: false,
-        error: "An error occurred while fetching users.",
+        error: "An error occurred while fetching projects.",
       });
     }
   }
@@ -148,8 +221,6 @@ router.post("/add", async (req, res) => {
     };
     projectData.comments = [];
 
-    console.log(projectData);
-
     // Check if a project with the same name already exists in the database
     const existingProject = await Legacy.findOne({
       where: { projectName: projectData.projectName },
@@ -255,7 +326,7 @@ router.delete("/delete/:id", async (req, res) => {
     console.error(error);
     res.status(500).json({
       success: false,
-      error: "An error occurred while deleting the project.",
+      error: "An error occurred while deleting the Legacy.",
     });
   }
 });
@@ -268,12 +339,12 @@ router.delete("/deleteall", async (req, res) => {
     // Return a success message as a response
     res
       .status(200)
-      .json({ success: true, message: "All projects deleted successfully." });
+      .json({ success: true, message: "All Legacy deleted successfully." });
   } catch (error) {
     console.error(error);
     res.status(500).json({
       success: false,
-      error: "An error occurred while deleting all projects.",
+      error: "An error occurred while deleting all Legacy.",
     });
   }
 });
@@ -378,51 +449,57 @@ router.delete("/reset", async (req, res) => {
   try {
     // Drop the comments table
 
-    await CommentAttachment.drop();
+    // await CommentAttachment.drop();
     // await Comment.drop();
     await Legacy.drop();
 
     // Sync the models to recreate the tables
-    await syncModels();
+    // await syncModels();
 
-    res.status(200).send("Projects table dropped successfully.");
+    res.status(200).json({ msg: "Legacy table dropped successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).send("Internal Server Error");
+    res.status(500).json("Internal Server Error");
   }
 });
 
-router.get("/user/:userId", async (req, res) => {
+router.get("/legacy/:legacyId", async (req, res) => {
   try {
-    // Extract the user ID from the request parameters
-    const { userId } = req.params;
+    const { legacyId } = req.params;
 
-    // Find all projects where the createdBy field matches the user ID
-    const projects = await Legacy.findAll({
-      where: { createdBy: userId },
+    // Find the project with the given ID and include associated data
+    const project = await Legacy.findOne({
+      where: { id: legacyId },
+      include: [
+        {
+          model: User,
+          as: "Lead", // Ensure this matches your association alias
+          attributes: { exclude: ["password"] },
+        },
+        {
+          model: User,
+          as: "Owner", // Ensure this matches your association alias
+          attributes: { exclude: ["password"] },
+        },
+      ],
     });
 
-    // If no projects are found, return a 404 status code with a message
-    if (!projects || projects.length === 0) {
+    if (!project) {
       return res.status(404).json({
         success: false,
-        error: "No projects found for the given user ID.",
+        error: "No legacy found for the given project ID.",
       });
     }
 
-    // Respond with the found projects and a success status code (200)
     res.status(200).json({
       success: true,
-      projects,
+      project,
     });
   } catch (error) {
-    // Handle any errors that occur during the process
     console.error(error);
-
-    // Respond with a 500 (Internal Server Error) status code and an error message
     res.status(500).json({
       success: false,
-      error: "An error occurred while retrieving the projects.",
+      error: "An error occurred while retrieving the legacy.",
     });
   }
 });

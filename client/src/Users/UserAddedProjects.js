@@ -29,21 +29,22 @@ import {
 } from "react-feather";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  useTable,
   useFilters,
   useGlobalFilter,
+  usePagination,
   useResizeColumns,
   useSortBy,
-  usePagination,
+  useTable,
 } from "react-table";
-import { leadArray, ownerArray } from "../apps/data/Leadonwer";
+import Loader from "../Root/Loader.js";
+import Prism from "prismjs";
+import Reload from "../Root/Reload.js";
+import { getLeads, getRest } from "../apps/data/Leadowner.js";
 import "../assets/css/react-datepicker.min.css";
 import Avatar from "../components/Avatar";
 import config from "../config.json";
 import Footer from "../layouts/Footer";
 import UserProjectHeader from "../layouts/UserProjectHeader";
-import Loader from "../Root/Loader.js";
-import Reload from "../Root/Reload.js";
 
 import { useTableContext } from "../Context/TableContext";
 
@@ -54,7 +55,6 @@ import ReactApexChart from "react-apexcharts";
 
 import dummyImage from "../assets/users/user.png";
 
-import { leadsData } from "../data/Leads";
 import Select from "react-select";
 
 // import "../";
@@ -65,6 +65,7 @@ const UserAddedProjects = () => {
   const navigate = useNavigate();
 
   const { globalFilter } = useTableContext();
+  const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
 
   const [localData, setLocalData] = useState([]);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -74,7 +75,12 @@ const UserAddedProjects = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
   const [timeoutId, setTimeoutId] = useState(null);
-
+  // eslint-disable-next-line
+  const [description, setDescription] = useState("");
+  // eslint-disable-next-line
+  const [leadOptions, setLeadOptions] = useState([]);
+  // eslint-disable-next-line
+  const [ownerOptions, setOwnerOptions] = useState("");
   // Task Data
   const [taskData, setTaskData] = useState({
     projectName: "",
@@ -85,14 +91,106 @@ const UserAddedProjects = () => {
     priority: "MEDIUM",
     status: "NOT STARTED",
     nextReview: "",
+    createdBy: null,
   });
 
+  const [filterInput, setFilterInput] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [showEmptyFieldAlert, setShowEmptyFieldAlert] = useState(false);
+  const [selectedLead, setSelectedLead] = useState("");
+
+  // Function to open the delete confirmation modal
+  const openDeleteModal = (item) => {
+    setItemToDelete(item);
+    setShowDeleteModal(true);
+  };
+
+  // Function to close the delete confirmation modal
+  const closeDeleteModal = () => {
+    setItemToDelete(null);
+    setShowDeleteModal(false);
+  };
+
+  const [leadImage, setLeadImage] = useState("");
+  const [ownerImage, setOwnerImage] = useState("");
+
+  useEffect(() => {
+    // Fetch data when the component mounts
+    fetchData().then((data) => {
+      if (data && data.length > 0) {
+        // Check if the first project in the array has the necessary data
+        const firstProject = data[0];
+
+        if (firstProject.Lead && firstProject.Lead.profileImage) {
+          setLeadImage(firstProject.Lead.profileImage || dummyImage); // Set lead image path
+        }
+
+        if (firstProject.Owner && firstProject.Owner.profileImage) {
+          setOwnerImage(firstProject.Owner.profileImage || dummyImage); // Set owner image path
+        }
+      }
+    });
+  }, []);
   useEffect(() => {
     Prism.highlightAll();
     fetchData();
     fetchAllData();
   }, []);
 
+  const handleEdit = (item) => {
+    setTaskData({
+      projectName: item.projectName,
+      description: item.description,
+      lead: item.lead,
+      owner: item.owner,
+      newEndDate: item.newEndDate,
+      priority: item.priority,
+      status: item.status,
+      nextReview: item.nextReview,
+      // include other fields as necessary
+    });
+    setEditingItem(item);
+    setShowEditModal(true);
+  };
+
+  const [leadSelectOptions, setLeadSelectOptions] = useState([]);
+  const [ownerSelectOptions, setOwnerSelectOptions] = useState([]);
+  const handleInputChange = (e) => {
+    // Check if the event has a target property (standard inputs)
+    if (e.target) {
+      const { name, value } = e.target;
+      setTaskData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    } else {
+      // Assuming this is from the Select component
+      // The name is manually passed when calling handleInputChange
+      const { name, value } = e;
+      setTaskData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
+  };
+
+  useEffect(() => {
+    async function fetchData() {
+      const leads = await getLeads();
+
+      const owners = await getRest();
+
+      setLeadSelectOptions(leads);
+      setOwnerSelectOptions(owners);
+    }
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    // existing code...
+  }, [leadSelectOptions, ownerSelectOptions]);
   // eslint-disable-next-line
   const showAlert = (message, type) => {
     setAlertMessage(message);
@@ -114,6 +212,100 @@ const UserAddedProjects = () => {
     };
   }, [timeoutId]);
 
+  /////////////////////////// Add Data ///////////////////////////////
+  const handleSubmitAdd = async (e) => {
+    e.preventDefault();
+
+    // Check if any required field is empty
+    if (
+      !taskData.projectName ||
+      !taskData.lead ||
+      !taskData.owner ||
+      !taskData.newEndDate ||
+      !taskData.priority ||
+      !taskData.status
+    ) {
+      showAlert("Please fill out all required fields.", "danger");
+      return;
+    }
+
+    try {
+      taskData.createdBy = userID;
+      await axios.post(`${url}/api/projects/add`, taskData);
+
+      // Clear the taskData object after successful submission
+      setTaskData({
+        projectName: "",
+        lead: "",
+        owner: "",
+        newEndDate: "",
+        priority: "",
+        status: "",
+      });
+
+      closeAddModal();
+
+      showAlert("Project Added Successfully!", "success");
+      fetchData();
+    } catch (error) {
+      console.error("Error: ", error);
+      showAlert(`${error.response.data.error}`, "danger");
+    }
+  };
+
+  const handleSubmitEdit = async (e) => {
+    e.preventDefault();
+
+    if (
+      !taskData.projectName ||
+      !taskData.lead ||
+      !taskData.owner ||
+      !taskData.newEndDate ||
+      !taskData.priority ||
+      !taskData.status
+    ) {
+      showAlert("Please complete the following * fields.", "danger");
+      return;
+    }
+
+    try {
+      await axios.put(`${url}/api/projects/update/${editingItem.id}`, taskData);
+      closeEditModal();
+      setEditingItem(null);
+      setTaskData(taskData);
+      showAlert("Project Updated Successfully!", "success");
+      fetchData();
+    } catch (error) {
+      console.error("Error: ", error);
+      showAlert(`${error.response.data.message}`, "danger");
+    }
+  };
+
+  // ///////////////////////Delete Data //////////////////////////
+
+  const handleDelete = async () => {
+    try {
+      const response = await axios.delete(
+        `${url}/api/projects/delete/${itemToDelete.id}`
+      );
+
+      if (response.data.success) {
+        const updatedData = localData.filter((i) => i !== itemToDelete);
+        setLocalData(updatedData);
+        setShowDeleteModal(false);
+        showAlert("Project Deleted Successfully!", "success");
+      }
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      showAlert(`${error.response.data.message}`, "danger");
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line
+  }, []);
+
   // eslint-disable-next-line
   const [selectedOwner, setSelectedOwner] = useState("");
   const [editingItem, setEditingItem] = useState(null);
@@ -129,28 +321,53 @@ const UserAddedProjects = () => {
   };
 
   // Handle modal open and close for Add
+  const openAddModal = () => {
+    setTaskData({
+      projectName: "",
+      lead: "",
+      owner: "",
+      newEndDate: "",
+      priority: "",
+      status: "",
+    });
+    setShowAddModal(true);
+  };
+
+  const closeAddModal = () => {
+    setShowAddModal(false);
+    // Clear form fields for Add modal (if necessary)
+    setDescription("");
+    setSelectedLead("");
+    setSelectedOwner("");
+    window.location.reload();
+  };
+
+  const openEditModal = () => {
+    setShowEditModal(true);
+  };
+
+  const closeEditModal = () => {
+    setShowEditModal(false);
+    // Clear form fields for Edit modal (if necessary)
+    setDescription("");
+    setSelectedLead("");
+    setSelectedOwner("");
+  };
+
+  // Handle modal open and close for Add
 
   //////// Get Specific User Data /////////////////////////////
 
   let user = localStorage.getItem("userData");
   let stringToObject = JSON.parse(user);
   let userID = stringToObject.id;
-  console.log(userID);
 
   let fetchData = async () => {
-    console.log("Hello S");
-
     try {
-      console.log("Hello");
-
-      const response = await axios.get(`${url}/api/projects/user/${userID}`);
-
-      console.log(response);
+      const response = await axios.get(`${url}/api/projects/project/${userID}`);
 
       // Sort the array in descending order based on the "id" field
       const sortedData = response.data.sort((a, b) => b.id - a.id);
-
-      console.log(sortedData);
 
       setLocalData(sortedData);
     } catch (error) {
@@ -172,25 +389,49 @@ const UserAddedProjects = () => {
         accessor: "description",
         Filter: DropdownFilter,
         filter: multiSelectFilterFn,
-        Cell: ({ value }) => (
-          <div style={{ textAlign: "left" }}>
-            {value.length > 30 ? value.substring(0, 50) + "..." : value}
-          </div>
-        ),
+        Cell: ({ value }) => {
+          // Check if value is not null or undefined before accessing its length
+          if (value) {
+            return (
+              <div style={{ textAlign: "left" }}>
+                {value.length > 30 ? value.substring(0, 50) + "..." : value}
+              </div>
+            );
+          } else {
+            // Handle the case where value is null or undefined
+            return <div style={{ textAlign: "left" }}>No Description</div>;
+          }
+        },
       },
       {
         Header: "Lead",
         accessor: "lead",
         Filter: DropdownFilter,
         filter: multiSelectFilterFn,
-        Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
+        Cell: ({ row }) => (
+          <div className="d-flex align-items-center gap-2">
+            <Avatar
+              img={row.original.Lead.profileImage || dummyImage}
+              alt="Lead Avatar"
+            />
+            <span>{row.original.Lead.displayName}</span>
+          </div>
+        ),
       },
       {
         Header: "Owner",
         accessor: "owner",
         Filter: DropdownFilter,
         filter: multiSelectFilterFn,
-        Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
+        Cell: ({ row }) => (
+          <div className="d-flex align-items-center gap-2">
+            <Avatar
+              img={row.original.Owner.profileImage || dummyImage}
+              alt="Owner Avatar"
+            />
+            <span>{row.original.Owner.displayName}</span>
+          </div>
+        ),
       },
       {
         Header: "Due Date",
@@ -340,68 +581,68 @@ const UserAddedProjects = () => {
           <div style={{ textAlign: "center" }}>{formatDate(value)}</div>
         ),
       },
-      // {
-      //   Header: "Actions",
-      //   accessor: "editDelete",
-      //   Cell: ({ row }) => (
-      //     <div style={{ textAlign: "center" }}>
-      //       <span
-      //         className="edit-icon"
-      //         onClick={() => handleEdit(row.original)}
-      //       >
-      //         <OverlayTrigger
-      //           placement="top"
-      //           overlay={
-      //             <Tooltip>
-      //               <strong>Edit</strong>
-      //             </Tooltip>
-      //           }
-      //         >
-      //           <Edit size={20} color="blue" />
-      //         </OverlayTrigger>
-      //       </span>
+      {
+        Header: "Actions",
+        accessor: "editDelete",
+        Cell: ({ row }) => (
+          <div style={{ textAlign: "center" }}>
+            <span
+              className="edit-icon"
+              onClick={() => handleEdit(row.original)}
+            >
+              <OverlayTrigger
+                placement="top"
+                overlay={
+                  <Tooltip>
+                    <strong>Edit</strong>
+                  </Tooltip>
+                }
+              >
+                <Edit size={20} color="blue" />
+              </OverlayTrigger>
+            </span>
 
-      //       <span
-      //         className="delete-icon"
-      //         onClick={() => openDeleteModal(row.original)}
-      //       >
-      //         <OverlayTrigger
-      //           placement="top"
-      //           overlay={
-      //             <Tooltip>
-      //               <strong>Delete</strong>
-      //             </Tooltip>
-      //           }
-      //         >
-      //           <Trash2 size={20} color="red" />
-      //         </OverlayTrigger>
-      //       </span>
-      //       <span
-      //         className="info-icon"
-      //         onClick={() => {
-      //           navigate(`/user/projects/info/${row.original.id}`, {
-      //             state: { selectedProject: row.original },
-      //           });
-      //         }}
-      //       >
-      //         <OverlayTrigger
-      //           placement="top"
-      //           overlay={
-      //             <Tooltip>
-      //               <strong>Info</strong>
-      //             </Tooltip>
-      //           }
-      //         >
-      //           <Info
-      //             size={20}
-      //             color="blue"
-      //             style={{ marginLeft: "10px", marginBottom: "8px" }}
-      //           />
-      //         </OverlayTrigger>
-      //       </span>
-      //     </div>
-      //   ),
-      // },
+            <span
+              className="delete-icon"
+              onClick={() => openDeleteModal(row.original)}
+            >
+              <OverlayTrigger
+                placement="top"
+                overlay={
+                  <Tooltip>
+                    <strong>Delete</strong>
+                  </Tooltip>
+                }
+              >
+                <Trash2 size={20} color="red" />
+              </OverlayTrigger>
+            </span>
+            <span
+              className="info-icon"
+              onClick={() => {
+                navigate(`/user/projects/info/${row.original.id}`, {
+                  state: { selectedProject: row.original },
+                });
+              }}
+            >
+              <OverlayTrigger
+                placement="top"
+                overlay={
+                  <Tooltip>
+                    <strong>Info</strong>
+                  </Tooltip>
+                }
+              >
+                <Info
+                  size={20}
+                  color="blue"
+                  style={{ marginLeft: "10px", marginBottom: "8px" }}
+                />
+              </OverlayTrigger>
+            </span>
+          </div>
+        ),
+      },
     ],
     // eslint-disable-next-line
     []
@@ -472,25 +713,6 @@ const UserAddedProjects = () => {
     (_, index) => index + 1
   ).slice(startIndex, endIndex);
 
-  const imageMap = leadsData.reduce((acc, lead) => {
-    acc[lead.name] = lead.path;
-    return acc;
-  }, {});
-
-  const getLeadImage = (firstName) => {
-    return imageMap[firstName] || dummyImage; // returns user image as default if firstName not found in imageMap
-  };
-
-  const leadSelectOptions = leadArray.map((option) => ({
-    value: option,
-    label: option,
-  }));
-
-  const ownerSelectOptions = ownerArray.map((option) => ({
-    value: option,
-    label: option,
-  }));
-
   // User DashBoard
   const [leadData, setLeadData] = useState([]);
   // const [localData, setLocalData] = useState([]);
@@ -521,11 +743,8 @@ const UserAddedProjects = () => {
   }
   const fetchAllData = async () => {
     try {
-      console.log();
-
       const response = await axios.get(`${url}/api/projects/user/${userID}`);
       let projects = response.data.projects;
-      console.log(projects);
       setLocalData(projects);
 
       if (!projects.length == 0) {
@@ -630,202 +849,669 @@ const UserAddedProjects = () => {
     "NOT STARTED": "danger",
     OVERDUE: "danger",
   };
-
   return (
     <>
       <UserProjectHeader></UserProjectHeader>
+      <br></br>
+      <br></br>
       <div className="main main-app p-3 p-lg-4">
         <div className="d-md-flex align-items-center justify-content-between mb-4">
           <div>
             <ol className="breadcrumb fs-sm mb-1">
               <li className="breadcrumb-item">
-                <Link to="#">Project Management Tool</Link>
+                <Link to="#">Project Management</Link>
               </li>
               <li className="breadcrumb-item active" aria-current="page"></li>
             </ol>
           </div>
 
-          {alertMessage && <Alert variant={alertType}>{alertMessage}</Alert>}
-
+          <div style={{ textAlign: "center", padding: "10px" }}>
+            {alertMessage && <Alert variant={alertType}>{alertMessage}</Alert>}
+          </div>
           <div className="d-flex justify-content-center align-items-center mt-3 mt-md-0">
-            {/* <Button
+            <Button
               variant="primary"
               className="d-flex align-items-center gap-2"
               onClick={openAddModal}
             >
               <i className="ri-add-line fs-18 lh-1"></i>Add Project
-            </Button> */}
+            </Button>
+
             {/* Add Task Modal */}
+            <Modal show={showAddModal} onHide={() => setShowAddModal(false)}>
+              <Modal.Header closeButton>
+                <Modal.Title>Add Project</Modal.Title>
+              </Modal.Header>
+              <div style={{ textAlign: "center", padding: "10px" }}>
+                {alertMessage && (
+                  <Alert variant={alertType}>{alertMessage}</Alert>
+                )}
+              </div>
+
+              <Modal.Body>
+                <Container>
+                  <Form>
+                    <Form.Group>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Project Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="projectName"
+                        value={taskData.projectName}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group>
+                    <Form.Group>
+                      <Form.Label>Description</Form.Label>
+                      <Form.Control
+                        as="textarea"
+                        rows={3}
+                        name="description"
+                        value={taskData.description}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group>
+
+                    <Form.Group>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Lead Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
+                      <Select
+                        options={[...leadSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
+                        isSearchable={true}
+                        value={leadSelectOptions.find(
+                          (option) => option.value === taskData.lead
+                        )}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "lead",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
+                    </Form.Group>
+                    <Form.Group>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Owner Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
+                      <Select
+                        options={[...ownerSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
+                        isSearchable={true}
+                        value={ownerSelectOptions.find(
+                          (option) => option.value === taskData.owner
+                        )}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "owner",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
+                    </Form.Group>
+
+                    <Form.Group>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Due Date{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
+                      <Form.Control
+                        type="date"
+                        name="newEndDate"
+                        value={taskData.newEndDate}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group>
+                    <Form.Group>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Priority
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
+                      <Select
+                        options={[
+                          { value: "HIGH", label: "HIGH" },
+                          { value: "MEDIUM", label: "MEDIUM" },
+                          { value: "LOW", label: "LOW" },
+                          { value: "NA", label: "NA" },
+                        ]}
+                        isSearchable={true}
+                        value={[
+                          { value: "HIGH", label: "HIGH" },
+                          { value: "MEDIUM", label: "MEDIUM" },
+                          { value: "LOW", label: "LOW" },
+                          { value: "NA", label: "NA" },
+                        ].find((option) => option.value === taskData.priority)}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "priority",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
+                    </Form.Group>
+
+                    <Form.Group>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Status
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
+                      <Select
+                        options={[
+                          { value: "COMPLETED", label: "COMPLETED" },
+                          { value: "IN PROGRESS", label: "IN PROGRESS" },
+                          { value: "NOT STARTED", label: "NOT STARTED" },
+                          { value: "ON HOLD", label: "ON HOLD" },
+                          { value: "OVERDUE", label: "OVERDUE" },
+                        ]}
+                        isSearchable={true}
+                        value={[
+                          { value: "COMPLETED", label: "COMPLETED" },
+                          { value: "IN PROGRESS", label: "IN PROGRESS" },
+                          { value: "NOT STARTED", label: "NOT STARTED" },
+                          { value: "ON HOLD", label: "ON HOLD" },
+                          { value: "OVERDUE", label: "OVERDUE" },
+                        ].find((option) => option.value === taskData.status)}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "status",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
+                    </Form.Group>
+                    <Form.Group>
+                      <Form.Label>Next Review</Form.Label>
+                      <Form.Control
+                        type="date"
+                        name="nextReview"
+                        value={taskData.nextReview}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group>
+                  </Form>
+                </Container>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowAddModal(false)}
+                >
+                  Close
+                </Button>
+                <Button variant="primary" onClick={handleSubmitAdd}>
+                  Add
+                </Button>
+              </Modal.Footer>
+            </Modal>
+
+            {/* Edit Modal */}
+
+            <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+              <Modal.Header closeButton>
+                <Modal.Title>Edit Project</Modal.Title>
+              </Modal.Header>
+              <div style={{ textAlign: "center", padding: "10px" }}>
+                {alertMessage && (
+                  <Alert variant={alertType}>{alertMessage}</Alert>
+                )}
+              </div>
+
+              <Modal.Body>
+                <Container>
+                  <Form>
+                    <Form.Group>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Project Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="projectName"
+                        value={taskData.projectName}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group>
+                    <Form.Group>
+                      <Form.Label>Description</Form.Label>
+                      <Form.Control
+                        as="textarea"
+                        rows={3}
+                        name="description"
+                        value={taskData.description}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group>
+
+                    <Form.Group>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Lead Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
+                      <Select
+                        options={[...leadSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
+                        isSearchable={true}
+                        value={leadSelectOptions.find(
+                          (option) => option.value === taskData.lead
+                        )}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "lead",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
+                    </Form.Group>
+                    <Form.Group>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Owner Name{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
+                      <Select
+                        options={[...ownerSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
+                        isSearchable={true}
+                        value={ownerSelectOptions.find(
+                          (option) => option.value === taskData.owner
+                        )}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "owner",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
+                    </Form.Group>
+
+                    <Form.Group>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Due Date{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
+                      <Form.Control
+                        type="date"
+                        name="newEndDate"
+                        value={taskData.newEndDate}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group>
+                    <Form.Group>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Priority{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
+                      <Form.Control
+                        as="select"
+                        name="priority"
+                        value={taskData.priority}
+                        onChange={handleInputChange}
+                      >
+                        <option value="HIGH">HIGH</option>
+                        <option value="MEDIUM">MEDIUM</option>
+                        <option value="LOW">LOW</option>
+                        <option value="NA">NA</option>
+                      </Form.Control>
+                    </Form.Group>
+                    <Form.Group>
+                      <Form.Label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        Status{" "}
+                        <span style={{ color: "red", marginLeft: "5px" }}>
+                          *
+                        </span>
+                      </Form.Label>
+                      <Form.Control
+                        as="select"
+                        name="status"
+                        value={taskData.status}
+                        onChange={handleInputChange}
+                      >
+                        <option value="COMPLETED">COMPLETED</option>
+                        <option value="IN PROGRESS">IN PROGRESS</option>
+
+                        <option value="NOT STARTED">NOT STARTED</option>
+                        <option value="ON HOLD">ON HOLD</option>
+
+                        <option value="OVERDUE">OVERDUE</option>
+                      </Form.Control>
+                    </Form.Group>
+                    <Form.Group>
+                      <Form.Label>Next Review</Form.Label>
+                      <Form.Control
+                        type="date"
+                        name="nextReview"
+                        value={taskData.nextReview}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group>
+                  </Form>
+                </Container>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowEditModal(false)}
+                >
+                  Close
+                </Button>
+                <Button variant="primary" onClick={handleSubmitEdit}>
+                  Update
+                </Button>
+              </Modal.Footer>
+            </Modal>
+
+            {/* Delete Modal */}
+
+            <Modal show={showDeleteModal} onHide={closeDeleteModal}>
+              <Modal.Header closeButton>
+                <Modal.Title>Confirm Deletion</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                Are you sure you want to delete this item?
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={closeDeleteModal}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() => handleDelete(itemToDelete)}
+                >
+                  Delete
+                </Button>
+              </Modal.Footer>
+            </Modal>
           </div>
         </div>
 
-        <Card className="card-one">
-          <div className="grid-container">
-            {/* Table */}
-            <div className="table-responsive">
-              <table {...getTableProps()} className="table-style">
-                {/* Thead */}
-                <thead>
-                  {headerGroups.map((headerGroup) => (
-                    <tr {...headerGroup.getHeaderGroupProps()}>
-                      {headerGroup.headers.map((column, columnIndex) => (
-                        <th
-                          {...column.getHeaderProps()}
-                          className="header-style text-center"
-                          key={column.id}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <div {...column.getSortByToggleProps()}>
-                              {column.render("Header")}
-                              <span>
-                                {column.isSorted ? (
-                                  column.isSortedDesc ? (
-                                    <ChevronDown size={16} />
-                                  ) : (
-                                    <ChevronUp size={16} />
-                                  )
-                                ) : (
-                                  ""
-                                )}
-                              </span>
-                            </div>
-                            {[2, 3, 4, 5, 6, 7].includes(columnIndex) &&
-                              column.canFilter && (
+        <Row className="g-12">
+          <Col lg="12" md="12" sm="12">
+            <Card className="card-one">
+              <Card.Body className="overflow px-2 pb-3">
+                <div className="grid-container">
+                  {/* Table */}
+                  <div className="table-responsive">
+                    <table {...getTableProps()} className="table-style">
+                      {/* Thead */}
+                      <thead className="custom-thead">
+                        {headerGroups.map((headerGroup) => (
+                          <tr {...headerGroup.getHeaderGroupProps()}>
+                            {headerGroup.headers.map((column, columnIndex) => (
+                              <th
+                                {...column.getHeaderProps()}
+                                className="header-style text-center"
+                                key={column.id}
+                              >
                                 <div
-                                  className="filter-align"
-                                  onClick={() =>
-                                    openFilter === column.id
-                                      ? setOpenFilter(null)
-                                      : setOpenFilter(column.id)
-                                  }
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                  }}
                                 >
-                                  <Filter size={16} />
-                                </div>
-                              )}
-                          </div>
-
-                          {openFilter === column.id && (
-                            <div className="dropdown-filter" ref={dropdownRef}>
-                              {column.render("Filter")}
-                            </div>
-                          )}
-                        </th>
-                      ))}
-                    </tr>
-                  ))}
-                </thead>
-
-                {/* Tbody */}
-
-                <tbody {...getTableBodyProps()}>
-                  {page.map((row) => {
-                    prepareRow(row);
-                    return (
-                      <tr
-                        className="table-active"
-                        {...row.getRowProps()}
-                        key={row.id}
-                      >
-                        {row.cells.map((cell, cellIndex) => (
-                          <td
-                            {...cell.getCellProps()}
-                            className="cell-style"
-                            key={cell.id}
-                          >
-                            {cellIndex === 2 ? (
-                              <>
-                                <div className="d-flex align-items-center gap-2">
-                                  <Avatar
-                                    img={getLeadImage(row.original.lead)}
-                                  />
-                                  <div>
-                                    <h6 className="mb-0">
-                                      {cell.render("Cell")}
-                                    </h6>
-                                    <span className="fs-xs text-secondary people">
-                                      Role
+                                  <div {...column.getSortByToggleProps()}>
+                                    {column.render("Header")}
+                                    <span>
+                                      {column.isSorted ? (
+                                        column.isSortedDesc ? (
+                                          <ChevronDown size={16} />
+                                        ) : (
+                                          <ChevronUp size={16} />
+                                        )
+                                      ) : (
+                                        ""
+                                      )}
                                     </span>
                                   </div>
+                                  {[2, 3, 4, 5, 6, 7].includes(columnIndex) &&
+                                    column.canFilter && (
+                                      <div
+                                        className="filter-align"
+                                        onClick={() =>
+                                          openFilter === column.id
+                                            ? setOpenFilter(null)
+                                            : setOpenFilter(column.id)
+                                        }
+                                      >
+                                        <Filter size={16} />
+                                      </div>
+                                    )}
                                 </div>
-                              </>
-                            ) : cellIndex === 3 ? (
-                              <>
-                                <div className="d-flex align-items-center gap-2">
-                                  <Avatar
-                                    img={
-                                      getLeadImage(row.original.owner) ||
-                                      dummyImage
-                                    }
-                                  />
 
-                                  <div>
-                                    <h6 className="mb-0">
-                                      {cell.render("Cell")}
-                                    </h6>
-                                    <span className="fs-xs text-secondary people">
-                                      Role
-                                    </span>
+                                {openFilter === column.id && (
+                                  <div
+                                    className="dropdown-filter"
+                                    ref={dropdownRef}
+                                  >
+                                    {column.render("Filter")}
                                   </div>
-                                </div>
-                              </>
-                            ) : (
-                              cell.render("Cell")
-                            )}
-                          </td>
+                                )}
+                              </th>
+                            ))}
+                          </tr>
                         ))}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                      </thead>
 
-            <Pagination className="pagination-space pagination-circled mb-0">
-              <Pagination.Item
-                className="pagination-button"
-                disabled={!canPreviousPage}
-                onClick={() => {
-                  if (currentPageGroup > 0) {
-                    previousPage();
-                    setCurrentPageGroup(currentPageGroup - 1); // Decrement the currentPageGroup
-                  }
-                }}
-              >
-                <i className="ri-arrow-left-s-line"></i>
-              </Pagination.Item>
-              <div className="pagination-circle-container">
-                {circleOptions.map((page) => (
-                  <Pagination.Item
-                    key={page} // Add the key prop here
-                    active={pageIndex + 1 === page}
-                    onClick={() => gotoPage(page - 1)}
-                    className={`pagination-circle ${
-                      pageIndex + 1 === page ? "active" : ""
-                    }`}
-                  >
-                    {page}
-                  </Pagination.Item>
-                ))}
-              </div>
-              <Pagination.Item
-                className="pagination-button"
-                disabled={!canNextPage}
-                onClick={() => {
-                  nextPage();
-                  setCurrentPageGroup(currentPageGroup + 1); // Increment the currentPageGroup
-                }}
-              >
-                <i className="ri-arrow-right-s-line"></i>
-              </Pagination.Item>
-            </Pagination>
-          </div>
-        </Card>
+                      {/* Tbody */}
+                      <tbody {...getTableBodyProps()}>
+                        {page.map((row) => {
+                          prepareRow(row);
+                          return (
+                            <tr {...row.getRowProps()}>
+                              {row.cells.map((cell) => {
+                                if (cell.column.id === "lead") {
+                                  // Render cell for lead with profile image
+                                  return (
+                                    <td {...cell.getCellProps()}>
+                                      <div className="d-flex align-items-center gap-2">
+                                        <Avatar
+                                          img={
+                                            row.original.Lead?.profileImage ||
+                                            dummyImage
+                                          }
+                                          alt="Lead Avatar"
+                                        />
+                                        <span>
+                                          {row.original.Lead?.displayName}
+                                        </span>
+                                      </div>
+                                    </td>
+                                  );
+                                } else if (cell.column.id === "owner") {
+                                  // Render cell for owner with profile image
+                                  return (
+                                    <td {...cell.getCellProps()}>
+                                      <div className="d-flex align-items-center gap-2">
+                                        <Avatar
+                                          img={
+                                            row.original.Owner?.profileImage ||
+                                            dummyImage
+                                          }
+                                          alt="Owner Avatar"
+                                        />
+                                        <span>
+                                          {row.original.Owner?.displayName}
+                                        </span>
+                                      </div>
+                                    </td>
+                                  );
+                                } else {
+                                  // Render other cells normally
+                                  return (
+                                    <td
+                                      {...cell.getCellProps()}
+                                      className="cell-style"
+                                    >
+                                      {cell.render("Cell")}
+                                    </td>
+                                  );
+                                }
+                              })}
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <Pagination className="pagination-space pagination-circled mb-0">
+                    <Pagination.Item
+                      className="pagination-button"
+                      disabled={!canPreviousPage}
+                      onClick={() => {
+                        if (currentPageGroup > 0) {
+                          previousPage();
+                          setCurrentPageGroup(currentPageGroup - 1); // Decrement the currentPageGroup
+                        }
+                      }}
+                    >
+                      <i className="ri-arrow-left-s-line"></i>
+                    </Pagination.Item>
+                    <div className="pagination-circle-container">
+                      {circleOptions.map((page) => (
+                        <Pagination.Item
+                          key={page} // Add the key prop here
+                          active={pageIndex + 1 === page}
+                          onClick={() => gotoPage(page - 1)}
+                          className={`pagination-circle ${
+                            pageIndex + 1 === page ? "active" : ""
+                          }`}
+                        >
+                          {page}
+                        </Pagination.Item>
+                      ))}
+                    </div>
+                    <Pagination.Item
+                      className="pagination-button"
+                      disabled={!canNextPage}
+                      onClick={() => {
+                        nextPage();
+                        setCurrentPageGroup(currentPageGroup + 1); // Increment the currentPageGroup
+                      }}
+                    >
+                      <i className="ri-arrow-right-s-line"></i>
+                    </Pagination.Item>
+                  </Pagination>
+                </div>
+                <Footer />
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
       </div>
     </>
   );
@@ -887,6 +1573,11 @@ const DropdownFilter = ({ column }) => {
 };
 
 function formatDate(inputDate) {
+  if (!inputDate) {
+    // Handle null or undefined inputDate
+    return "No Date"; // or any other placeholder you'd like to use
+  }
+
   const months = [
     "Jan",
     "Feb",

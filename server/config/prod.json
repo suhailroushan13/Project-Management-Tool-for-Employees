@@ -1,12 +1,19 @@
 {
-  "URL": "https://pms.tworks.in",
+  "URL": "https://work.tworks.in",
   "PORT": 5000,
   "TOKEN": "TWORKS",
+  "STATUS_PATH": "/home/suhail/Cloud-Squad/server/utils/status.html",
+  "UPLOAD_PATH": "/home/suhail/Cloud-Squad/server/uploads/",
   "SQL": {
     "HOST": "localhost",
     "USERNAME": "suhail",
     "PASSWORD": "suhail",
     "DATABASE": "tworksdb"
+  },
+  "CLOUD": {
+    "NAME": "dksonaea5",
+    "API_KEY": "281916479667611",
+    "API_SECRET_KEY": "sKL9VzpTZqHD-8Hib_KBzec5M9Q"
   },
   "EMAIL_SMTP": {
     "HOST": "smtp.gmail.com",

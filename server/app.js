@@ -23,17 +23,17 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Allow CORS from all origins
-app.use(cors());
+app.use(cors("*"));
 
 app.use(morgan("dev"));
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
 
 // Serve static files from the "build" directory
 app.use(express.static(path.join(__dirname, "build")));
 
 // Serve the status file at the root
 app.get("/", (req, res) => {
-  const statusFilePath = "/home/suhail/newsquad/server/utils/status.html";
+  const statusFilePath = config.get("STATUS_PATH");
   if (fs.existsSync(statusFilePath)) {
     res.status(200).sendFile(statusFilePath);
   } else {
@@ -41,20 +41,22 @@ app.get("/", (req, res) => {
   }
 });
 
+app.use("/uploads", express.static(config.get("UPLOAD_PATH")));
 // API routes
 app.use("/api/login", loginRouter);
 app.use("/api/users", userRouter);
+
 app.use("/api/admins", adminRouter);
 app.use("/api/projects", projectRouter);
 app.use("/api/legacy", legacyRouter);
 app.use("/api/channel", channelRouter);
 
 app.use("/*", (req, res) => {
-   res.redirect("https://pms.tworks.in");
+  res.redirect("https://work.tworks.in");
   // res.json({ msg: "Invalid Route Please Check Spelling Suhail" });
 });
 
-await syncDatabase();
+// await syncDatabase();
 
 app.listen(PORT, () => {
   console.log(`Server Started AT ${PORT}`);

@@ -1,7 +1,5 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../utils/dbConnect.js";
-import { parse, format } from "date-fns";
-import User from "./Users.js";
 
 const Project = sequelize.define("projects", {
   projectName: {
@@ -10,8 +8,10 @@ const Project = sequelize.define("projects", {
   description: {
     type: DataTypes.TEXT,
     allowNull: true,
+    validate: {
+      len: [0, 1000], // Validate the description field's length (0 to 1000 characters)
+    },
   },
-
   lead: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -20,6 +20,7 @@ const Project = sequelize.define("projects", {
     type: DataTypes.STRING,
     allowNull: true,
   },
+
   newEndDate: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -34,9 +35,7 @@ const Project = sequelize.define("projects", {
       "ON HOLD",
       "OVERDUE",
       "IN PROGRESS",
-      "COMPLETED",
-
-      "CANCELED"
+      "COMPLETED"
     ),
     allowNull: true,
   },
@@ -51,8 +50,9 @@ const Project = sequelize.define("projects", {
       model: "users", // Use the table name here as a string
       key: "id",
     },
-    allowNull: true,
   },
 });
+
+// In your Project model
 
 export default Project;

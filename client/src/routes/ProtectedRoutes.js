@@ -1,29 +1,27 @@
 import React from "react";
 /* eslint-disable */
-// import UserProjectMangement from "../Users/UserProjectMangement";
 
 /////////////////////// Admins //////////////////////////////
-import AdminProjectManagement from "../Admin/AdminProjectManagement";
-import AdminUsersManagement from "../Admin/AdminUsersManagement";
-import AdminLeadsManagement from "../Admin/AdminLeadsManagement";
+import AdminAdminManagement from "../Admin/AdminAdminManagement";
 import AdminComment from "../Admin/AdminComment";
 import AdminDashboard from "../Admin/AdminDashboard";
-import AdminLegacy from "../Admin/AdminLegacy";
-import AdminAddedProjects from "../Admin/AdminAddedProjects";
-import AdminViewProfile from "../Admin/AdminViewProfile";
+import AdminEditProfile from "../Admin/AdminEditProfile";
 import AdminFeedback from "../Admin/AdminFeeback";
+import AdminLeadsManagement from "../Admin/AdminLeadsManagement";
+import AdminLegacy from "../Admin/AdminLegacy";
+import AdminProjectManagement from "../Admin/AdminProjectManagement";
+import AdminUsersManagement from "../Admin/AdminUsersManagement";
+import AdminViewProfile from "../Admin/AdminViewProfile";
 
-import UserProjectManagement from "../Users/UserProjectManagement";
-// import UserUsersManagement from "../User/UserUsersManagement";
-// import UserLeadsManagement from "../User/UserLeadsManagement";
-import UserComment from "../Users/UserComment";
-import UserDashboard from "../Users/UserDashboard";
-import UserProjectInfo from "../Users/UserProjectInfo";
-import UserViewProfile from "../Users/UserViewProfile";
-import UserAllProjects from "../Users/UserAllProjects";
 import UserAddedProjects from "../Users/UserAddedProjects";
+import UserAllProjects from "../Users/UserAllProjects";
+import UserComment from "../Users/UserComment";
+import { default as UserDashboard } from "../Users/UserDashboard";
+import UserEditProfile from "../Users/UserEditProfile";
 import UserFeedback from "../Users/UserFeedback";
 import UserLegacy from "../Users/UserLegacy";
+import UserProjectInfo from "../Users/UserProjectInfo";
+import UserViewProfile from "../Users/UserViewProfile";
 
 const protectedRoutes = [
   {
@@ -47,13 +45,23 @@ const protectedRoutes = [
     roles: ["Admin"],
   },
   {
+    path: "/admin/admins",
+    element: <AdminAdminManagement />,
+    roles: ["Admin"],
+  },
+  {
     path: "/admin/projects/comment/:id",
     element: <AdminComment />,
     roles: ["Admin"],
   },
   {
-    path: "/admin/view",
+    path: "/admin/view/:id",
     element: <AdminViewProfile />,
+    roles: ["Admin"],
+  },
+  {
+    path: "/admin/edit/:id",
+    element: <AdminEditProfile />,
     roles: ["Admin"],
   },
   {
@@ -66,14 +74,10 @@ const protectedRoutes = [
     element: <AdminFeedback />,
     roles: ["Admin"],
   },
-  {
-    path: "/admin/watchlist",
-    element: <AdminAddedProjects />,
-    roles: ["Admin"],
-  },
+
   {
     path: "/user/dashboard",
-    element: <UserProjectManagement />,
+    element: <UserDashboard />,
     roles: ["User", "Lead"],
   },
 
@@ -94,8 +98,13 @@ const protectedRoutes = [
     roles: ["User", "Lead"],
   },
   {
-    path: "/user/view",
+    path: "/user/view/:id",
     element: <UserViewProfile />,
+    roles: ["User", "Lead"],
+  },
+  {
+    path: "/user/edit/:id",
+    element: <UserEditProfile />,
     roles: ["User", "Lead"],
   },
   {

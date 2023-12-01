@@ -40,7 +40,6 @@ import img16 from "../assets/img/img16.jpg";
 import img17 from "../assets/img/img17.jpg";
 import img19 from "../assets/img/img19.jpg";
 
-
 import { leadsData } from "../data/Leads";
 
 import "./Com.css"; // Update this to your CSS file name
@@ -68,22 +67,18 @@ function AdminComment({ projectData }) {
   const userEmail = context.email;
 
   const [user, setUser] = useState(null);
-  const [userImage, setUserImage] = useState(dummyImage);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
-    const savedImage = localStorage.getItem("userImage");
 
-    if (savedUser && savedImage) {
+    if (savedUser) {
       setUser(JSON.parse(savedUser));
-      setUserImage(savedImage);
     } else {
       const foundUser = leadsData.find((lead) => lead.email === userEmail);
       if (foundUser) {
         setUser(foundUser);
-        setUserImage(foundUser.path);
+
         localStorage.setItem("user", JSON.stringify(foundUser));
-        localStorage.setItem("userImage", foundUser.path);
       }
     }
   }, [userEmail]);

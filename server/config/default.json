@@ -1,5 +1,5 @@
 {
-  "URL": "https://pms.tworks.in",
+  "URL": "https://work.tworks.in",
   "PORT": 5000,
   "TOKEN": "TWORKS",
   "SQL": {
@@ -7,6 +7,11 @@
     "USERNAME": "suhail",
     "PASSWORD": "suhail",
     "DATABASE": "tworksdb"
+  },
+  "CLOUD": {
+    "NAME": "dksonaea5",
+    "API_KEY": "281916479667611",
+    "API_SECRET_KEY": "sKL9VzpTZqHD-8Hib_KBzec5M9Q"
   },
   "EMAIL_SMTP": {
     "HOST": "smtp.gmail.com",

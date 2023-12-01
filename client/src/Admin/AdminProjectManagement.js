@@ -15,15 +15,9 @@ import {
   Row,
   Tooltip,
 } from "react-bootstrap";
-import {
-  ChevronDown,
-  ChevronUp,
-  Edit,
-  Filter,
-  MessageSquare,
-  Trash2,
-} from "react-feather";
-import { Link, useNavigate } from "react-router-dom";
+import { ChevronDown, ChevronUp, Edit, Filter, Trash2 } from "react-feather";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import Select from "react-select";
 import {
   useFilters,
   useGlobalFilter,
@@ -32,17 +26,16 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
-import { leadArray, ownerArray } from "../apps/data/Leadonwer";
+import { getLeads, getRest } from "../apps/data/Leadowner";
 import "../assets/css/react-datepicker.min.css";
+import {
+  default as dummyImage,
+  default as user,
+} from "../assets/users/user.png";
 import Avatar from "../components/Avatar";
 import config from "../config.json";
 import AdminProjectHeader from "../layouts/AdminProjectHeader";
 import Footer from "../layouts/Footer";
-
-import user from "../assets/users/user.png";
-
-import Select from "react-select";
-import { leadsData } from "../data/Leads";
 
 import { useTableContext } from "../Context/TableContext";
 
@@ -52,8 +45,10 @@ import { useTableContext } from "../Context/TableContext";
 const AdminProjectManagement = () => {
   const url = config.URL;
   const navigate = useNavigate();
+  const { id } = useParams();
 
   const { globalFilter } = useTableContext();
+  const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
 
   const [localData, setLocalData] = useState([]);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -75,6 +70,27 @@ const AdminProjectManagement = () => {
     status: "NOT STARTED",
     nextReview: "",
   });
+
+  const [leadImage, setLeadImage] = useState("");
+  const [ownerImage, setOwnerImage] = useState("");
+
+  useEffect(() => {
+    // Fetch data when the component mounts
+    fetchData().then((data) => {
+      if (data && data.length > 0) {
+        // Check if the first project in the array has the necessary data
+        const firstProject = data[0];
+
+        if (firstProject.Lead && firstProject.Lead.profileImage) {
+          setLeadImage(firstProject.Lead.profileImage); // Set lead image path
+        }
+
+        if (firstProject.Owner && firstProject.Owner.profileImage) {
+          setOwnerImage(firstProject.Owner.profileImage); // Set owner image path
+        }
+      }
+    });
+  }, []);
 
   // eslint-disable-next-line
   const showAlert = (message, type) => {
@@ -100,9 +116,27 @@ const AdminProjectManagement = () => {
   // eslint-disable-next-line
   const [description, setDescription] = useState("");
   // eslint-disable-next-line
-  const [leadOptions, setLeadOptions] = useState([]);
-  // eslint-disable-next-line
-  const [ownerOptions, setOwnerOptions] = useState("");
+
+  const [leadSelectOptions, setLeadSelectOptions] = useState([]);
+  const [ownerSelectOptions, setOwnerSelectOptions] = useState([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const leads = await getLeads();
+
+      const owners = await getRest();
+
+      setLeadSelectOptions(leads);
+      setOwnerSelectOptions(owners);
+    }
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    // existing code...
+  }, [leadSelectOptions, ownerSelectOptions]);
+
   // eslint-disable-next-line
   const [selectedLead, setSelectedLead] = useState("");
   // eslint-disable-next-line
@@ -110,6 +144,10 @@ const AdminProjectManagement = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [showEmptyFieldAlert, setShowEmptyFieldAlert] = useState(false);
+  const [images, setImages] = useState({});
+
+  // Access your images like this:
+  // images['leadImage1.jpg']
 
   // Function to open the delete confirmation modal
   const openDeleteModal = (item) => {
@@ -139,6 +177,14 @@ const AdminProjectManagement = () => {
 
   // Handle modal open and close for Add
   const openAddModal = () => {
+    setTaskData({
+      projectName: "",
+      lead: "",
+      owner: "",
+      newEndDate: "",
+      priority: "",
+      status: "",
+    });
     setShowAddModal(true);
   };
 
@@ -263,7 +309,6 @@ const AdminProjectManagement = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(`${url}/api/projects/getall`);
-      // Sort the array in descending order based on the "id" field
       const sortedData = response.data.sort((a, b) => b.id - a.id);
 
       setLocalData(sortedData);
@@ -280,14 +325,33 @@ const AdminProjectManagement = () => {
     }));
   };
 
+  // const handleEdit = (item) => {
+  //   // Populate the form with the selected item's data for editing
+  //   setTaskData({
+  //     id: item.id,
+  //     projectName: item.projectName,
+  //     description: item.description,
+  //     lead: item.lead, // Set to the ID of the lead
+  //     owner: item.owner, // Set to the ID of the owner
+  //     newEndDate: item.newEndDate,
+  //     priority: item.priority,
+  //     status: item.status,
+  //     nextReview: item.nextReview,
+  //   });
+  //   setEditingItem(item);
+  //   setShowEditModal(true);
+  // };
+
   const handleEdit = (item) => {
-    // Populate the form with the selected item's data for editing
+    // Assuming 'item' has fields like 'leadId' and 'ownerId' which store the IDs
     setTaskData({
       id: item.id,
       projectName: item.projectName,
       description: item.description,
-      lead: item.lead,
-      owner: item.owner,
+      // lead: item.lead, // Set to the ID of the lead
+      // owner: item.owner, // Set to the ID of the owner
+      lead: item.leadId, // Assuming 'item.leadId' is the ID of the lead
+      owner: item.ownerId,
       newEndDate: item.newEndDate,
       priority: item.priority,
       status: item.status,
@@ -311,25 +375,49 @@ const AdminProjectManagement = () => {
         accessor: "description",
         Filter: DropdownFilter,
         filter: multiSelectFilterFn,
-        Cell: ({ value }) => (
-          <div style={{ textAlign: "left" }}>
-            {value.length > 30 ? value.substring(0, 50) + "..." : value}
-          </div>
-        ),
+        Cell: ({ value }) => {
+          // Check if value is not null or undefined before accessing its length
+          if (value) {
+            return (
+              <div style={{ textAlign: "left" }}>
+                {value.length > 30 ? value.substring(0, 50) + "..." : value}
+              </div>
+            );
+          } else {
+            // Handle the case where value is null or undefined
+            return <div style={{ textAlign: "left" }}>No Description</div>;
+          }
+        },
       },
       {
         Header: "Lead",
         accessor: "lead",
         Filter: DropdownFilter,
         filter: multiSelectFilterFn,
-        Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
+        Cell: ({ row }) => (
+          <div className="d-flex align-items-center gap-2">
+            <Avatar
+              img={row.original.Lead.profileImage || dummyImage}
+              alt="Lead Avatar"
+            />
+            <span>{row.original.Lead.displayName}</span>
+          </div>
+        ),
       },
       {
         Header: "Owner",
         accessor: "owner",
         Filter: DropdownFilter,
         filter: multiSelectFilterFn,
-        Cell: ({ value }) => <div style={{ textAlign: "center" }}>{value}</div>,
+        Cell: ({ row }) => (
+          <div className="d-flex align-items-center gap-2">
+            <Avatar
+              img={row.original.Owner.profileImage || dummyImage}
+              alt="Owner Avatar"
+            />
+            <span>{row.original.Owner.displayName}</span>
+          </div>
+        ),
       },
       {
         Header: "Due Date",
@@ -499,25 +587,6 @@ const AdminProjectManagement = () => {
                 <Edit size={20} color="blue" />
               </OverlayTrigger>
             </span>
-            <span
-              className="comment-icon"
-              onClick={() => {
-                navigate(`/admin/projects/comment/${row.original.id}`, {
-                  state: { selectedProject: row.original },
-                });
-              }}
-            >
-              <OverlayTrigger
-                placement="top"
-                overlay={
-                  <Tooltip>
-                    <strong>Comment</strong>
-                  </Tooltip>
-                }
-              >
-                <MessageSquare size={20} color="blue" />
-              </OverlayTrigger>
-            </span>
 
             <span
               className="delete-icon"
@@ -613,25 +682,6 @@ const AdminProjectManagement = () => {
     (_, index) => index + 1
   ).slice(startIndex, endIndex);
 
-  const imageMap = leadsData.reduce((acc, lead) => {
-    acc[lead.name] = lead.path;
-    return acc;
-  }, {});
-
-  const getLeadImage = (firstName) => {
-    return imageMap[firstName] || user; // returns user image as default if firstName not found in imageMap
-  };
-
-  const leadSelectOptions = leadArray.map((option) => ({
-    value: option,
-    label: option,
-  }));
-
-  const ownerSelectOptions = ownerArray.map((option) => ({
-    value: option,
-    label: option,
-  }));
-
   return (
     <>
       <AdminProjectHeader></AdminProjectHeader>
@@ -722,7 +772,9 @@ const AdminProjectManagement = () => {
                         </span>
                       </Form.Label>
                       <Select
-                        options={leadSelectOptions}
+                        options={[...leadSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
                         isSearchable={true}
                         value={leadSelectOptions.find(
                           (option) => option.value === taskData.lead
@@ -750,8 +802,11 @@ const AdminProjectManagement = () => {
                           *
                         </span>
                       </Form.Label>
+
                       <Select
-                        options={ownerSelectOptions}
+                        options={[...ownerSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
                         isSearchable={true}
                         value={ownerSelectOptions.find(
                           (option) => option.value === taskData.owner
@@ -766,7 +821,6 @@ const AdminProjectManagement = () => {
                         }
                       />
                     </Form.Group>
-
                     <Form.Group>
                       <Form.Label
                         style={{
@@ -795,23 +849,36 @@ const AdminProjectManagement = () => {
                           marginTop: "10px",
                         }}
                       >
-                        Priority{" "}
+                        Priority
                         <span style={{ color: "red", marginLeft: "5px" }}>
                           *
                         </span>
                       </Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="priority"
-                        value={taskData.priority}
-                        onChange={handleInputChange}
-                      >
-                        <option value="HIGH">HIGH</option>
-                        <option value="MEDIUM">MEDIUM</option>
-                        <option value="LOW">LOW</option>
-                        <option value="NA">NA</option>
-                      </Form.Control>
+                      <Select
+                        options={[
+                          { value: "HIGH", label: "HIGH" },
+                          { value: "MEDIUM", label: "MEDIUM" },
+                          { value: "LOW", label: "LOW" },
+                          { value: "NA", label: "NA" },
+                        ]}
+                        isSearchable={true}
+                        value={[
+                          { value: "HIGH", label: "HIGH" },
+                          { value: "MEDIUM", label: "MEDIUM" },
+                          { value: "LOW", label: "LOW" },
+                          { value: "NA", label: "NA" },
+                        ].find((option) => option.value === taskData.priority)}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "priority",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
                     </Form.Group>
+
                     <Form.Group>
                       <Form.Label
                         style={{
@@ -820,26 +887,38 @@ const AdminProjectManagement = () => {
                           marginTop: "10px",
                         }}
                       >
-                        Status{" "}
+                        Status
                         <span style={{ color: "red", marginLeft: "5px" }}>
                           *
                         </span>
                       </Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="status"
-                        value={taskData.status}
-                        onChange={handleInputChange}
-                      >
-                        <option value="COMPLETED">COMPLETED</option>
-                        <option value="IN PROGRESS">IN PROGRESS</option>
-
-                        <option value="NOT STARTED">NOT STARTED</option>
-                        <option value="ON HOLD">ON HOLD</option>
-
-                        <option value="OVERDUE">OVERDUE</option>
-                      </Form.Control>
+                      <Select
+                        options={[
+                          { value: "COMPLETED", label: "COMPLETED" },
+                          { value: "IN PROGRESS", label: "IN PROGRESS" },
+                          { value: "NOT STARTED", label: "NOT STARTED" },
+                          { value: "ON HOLD", label: "ON HOLD" },
+                          { value: "OVERDUE", label: "OVERDUE" },
+                        ]}
+                        isSearchable={true}
+                        value={[
+                          { value: "COMPLETED", label: "COMPLETED" },
+                          { value: "IN PROGRESS", label: "IN PROGRESS" },
+                          { value: "NOT STARTED", label: "NOT STARTED" },
+                          { value: "ON HOLD", label: "ON HOLD" },
+                          { value: "OVERDUE", label: "OVERDUE" },
+                        ].find((option) => option.value === taskData.status)}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "status",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
                     </Form.Group>
+
                     <Form.Group>
                       <Form.Label>Next Review</Form.Label>
                       <Form.Control
@@ -885,10 +964,9 @@ const AdminProjectManagement = () => {
                         style={{
                           display: "flex",
                           alignItems: "center",
-                          marginTop: "10px",
                         }}
                       >
-                        Project Name{" "}
+                        Project Name
                         <span style={{ color: "red", marginLeft: "5px" }}>
                           *
                         </span>
@@ -925,7 +1003,9 @@ const AdminProjectManagement = () => {
                         </span>
                       </Form.Label>
                       <Select
-                        options={leadSelectOptions}
+                        options={[...leadSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
                         isSearchable={true}
                         value={leadSelectOptions.find(
                           (option) => option.value === taskData.lead
@@ -954,7 +1034,9 @@ const AdminProjectManagement = () => {
                         </span>
                       </Form.Label>
                       <Select
-                        options={ownerSelectOptions}
+                        options={[...ownerSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
                         isSearchable={true}
                         value={ownerSelectOptions.find(
                           (option) => option.value === taskData.owner
@@ -998,23 +1080,36 @@ const AdminProjectManagement = () => {
                           marginTop: "10px",
                         }}
                       >
-                        Priority{" "}
+                        Priority
                         <span style={{ color: "red", marginLeft: "5px" }}>
                           *
                         </span>
                       </Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="priority"
-                        value={taskData.priority}
-                        onChange={handleInputChange}
-                      >
-                        <option value="HIGH">HIGH</option>
-                        <option value="MEDIUM">MEDIUM</option>
-                        <option value="LOW">LOW</option>
-                        <option value="NA">NA</option>
-                      </Form.Control>
+                      <Select
+                        options={[
+                          { value: "HIGH", label: "HIGH" },
+                          { value: "MEDIUM", label: "MEDIUM" },
+                          { value: "LOW", label: "LOW" },
+                          { value: "NA", label: "NA" },
+                        ]}
+                        isSearchable={true}
+                        value={[
+                          { value: "HIGH", label: "HIGH" },
+                          { value: "MEDIUM", label: "MEDIUM" },
+                          { value: "LOW", label: "LOW" },
+                          { value: "NA", label: "NA" },
+                        ].find((option) => option.value === taskData.priority)}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "priority",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
                     </Form.Group>
+
                     <Form.Group>
                       <Form.Label
                         style={{
@@ -1023,26 +1118,38 @@ const AdminProjectManagement = () => {
                           marginTop: "10px",
                         }}
                       >
-                        Status{" "}
+                        Status
                         <span style={{ color: "red", marginLeft: "5px" }}>
                           *
                         </span>
                       </Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="status"
-                        value={taskData.status}
-                        onChange={handleInputChange}
-                      >
-                        <option value="COMPLETED">COMPLETED</option>
-                        <option value="IN PROGRESS">IN PROGRESS</option>
-
-                        <option value="NOT STARTED">NOT STARTED</option>
-                        <option value="ON HOLD">ON HOLD</option>
-
-                        <option value="OVERDUE">OVERDUE</option>
-                      </Form.Control>
+                      <Select
+                        options={[
+                          { value: "COMPLETED", label: "COMPLETED" },
+                          { value: "IN PROGRESS", label: "IN PROGRESS" },
+                          { value: "NOT STARTED", label: "NOT STARTED" },
+                          { value: "ON HOLD", label: "ON HOLD" },
+                          { value: "OVERDUE", label: "OVERDUE" },
+                        ]}
+                        isSearchable={true}
+                        value={[
+                          { value: "COMPLETED", label: "COMPLETED" },
+                          { value: "IN PROGRESS", label: "IN PROGRESS" },
+                          { value: "NOT STARTED", label: "NOT STARTED" },
+                          { value: "ON HOLD", label: "ON HOLD" },
+                          { value: "OVERDUE", label: "OVERDUE" },
+                        ].find((option) => option.value === taskData.status)}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "status",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
                     </Form.Group>
+
                     <Form.Group>
                       <Form.Label>Next Review</Form.Label>
                       <Form.Control
@@ -1101,7 +1208,7 @@ const AdminProjectManagement = () => {
                   <div className="table-responsive">
                     <table {...getTableProps()} className="table-style">
                       {/* Thead */}
-                      <thead>
+                      <thead className="custom-thead">
                         {headerGroups.map((headerGroup) => (
                           <tr {...headerGroup.getHeaderGroupProps()}>
                             {headerGroup.headers.map((column, columnIndex) => (
@@ -1159,62 +1266,61 @@ const AdminProjectManagement = () => {
                           </tr>
                         ))}
                       </thead>
-
                       {/* Tbody */}
                       <tbody {...getTableBodyProps()}>
                         {page.map((row) => {
                           prepareRow(row);
                           return (
-                            <tr
-                              className="table-active"
-                              {...row.getRowProps()}
-                              key={row.id}
-                            >
-                              {row.cells.map((cell, cellIndex) => (
-                                <td
-                                  {...cell.getCellProps()}
-                                  className="cell-style"
-                                  key={cell.id}
-                                >
-                                  {cellIndex === 2 ? (
-                                    <>
+                            <tr {...row.getRowProps()}>
+                              {row.cells.map((cell) => {
+                                if (cell.column.id === "lead") {
+                                  // Render cell for lead with profile image
+                                  return (
+                                    <td {...cell.getCellProps()}>
                                       <div className="d-flex align-items-center gap-2">
                                         <Avatar
-                                          img={getLeadImage(row.original.lead)}
+                                          img={
+                                            row.original.Lead.profileImage ||
+                                            dummyImage
+                                          }
+                                          alt="Lead Avatar"
                                         />
-                                        <div>
-                                          <h6 className="mb-0">
-                                            {cell.render("Cell")}
-                                          </h6>
-                                          <span className="fs-xs text-secondary people">
-                                            Role
-                                          </span>
-                                        </div>
+                                        <span>
+                                          {row.original.Lead.displayName}
+                                        </span>
                                       </div>
-                                    </>
-                                  ) : cellIndex === 3 ? (
-                                    <>
+                                    </td>
+                                  );
+                                } else if (cell.column.id === "owner") {
+                                  // Render cell for owner with profile image
+                                  return (
+                                    <td {...cell.getCellProps()}>
                                       <div className="d-flex align-items-center gap-2">
                                         <Avatar
-                                          // height="35px"
-                                          // width="35px"
-                                          img={getLeadImage(row.original.owner)}
+                                          img={
+                                            row.original.Owner.profileImage ||
+                                            dummyImage
+                                          }
+                                          alt="Owner Avatar"
                                         />
-                                        <div>
-                                          <h6 className="mb-0">
-                                            {cell.render("Cell")}
-                                          </h6>
-                                          <span className="fs-xs text-secondary people">
-                                            Role
-                                          </span>
-                                        </div>
+                                        <span>
+                                          {row.original.Owner.displayName}
+                                        </span>
                                       </div>
-                                    </>
-                                  ) : (
-                                    cell.render("Cell")
-                                  )}
-                                </td>
-                              ))}
+                                    </td>
+                                  );
+                                } else {
+                                  // Render other cells normally
+                                  return (
+                                    <td
+                                      {...cell.getCellProps()}
+                                      className="cell-style"
+                                    >
+                                      {cell.render("Cell")}
+                                    </td>
+                                  );
+                                }
+                              })}
                             </tr>
                           );
                         })}
@@ -1325,8 +1431,12 @@ const DropdownFilter = ({ column }) => {
     </div>
   );
 };
-
 function formatDate(inputDate) {
+  if (!inputDate) {
+    // Handle null or undefined inputDate
+    return "No Date"; // or any other placeholder you'd like to use
+  }
+
   const months = [
     "Jan",
     "Feb",

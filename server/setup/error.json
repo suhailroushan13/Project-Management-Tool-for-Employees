@@ -32,22 +32,5 @@
     "attentionRequired": "",
     "comments": "Embedded challenge in progress Second week of September",
     "nextReview": "2023-08-09"
-  },
-  {
-    "projectName": "RIDP",
-    "category": "Program",
-    "description": "Futher secondary research for finalising RIDP program",
-    "client": "Internal",
-    "lead": "Firoz",
-    "owner": "KPMG",
-    "actualStartDate": "2023-07-21",
-    "actualEndDate": "2023-08-04",
-    "newStartDate": "2023-07-21",
-    "newEndDate": "2023-08-17",
-    "priority": "HIGH",
-    "status": "IN PROGRESS",
-    "attentionRequired": "No",
-    "comments": "Futher secondary research for finalising RIDP program. KK, Sreya to set up a date for review.",
-    "nextReview": "2023-08-17"
   }
 ]

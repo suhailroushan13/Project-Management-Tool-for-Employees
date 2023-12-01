@@ -47,7 +47,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(`${url}/api/login`, payload);
-      console.log(response.data.role);
+      // console.log(response.data.role);
 
       let role = response.data.role;
 

@@ -15,14 +15,7 @@ import {
   Row,
   Tooltip,
 } from "react-bootstrap";
-import {
-  ChevronDown,
-  ChevronUp,
-  Edit,
-  Filter,
-  MessageSquare,
-  Trash2,
-} from "react-feather";
+import { ChevronDown, ChevronUp, Edit, Filter, Trash2 } from "react-feather";
 import { Link, useNavigate } from "react-router-dom";
 import {
   useTable,
@@ -33,45 +26,41 @@ import {
   usePagination,
 } from "react-table";
 
-import { leadArray, ownerArray } from "../apps/data/Leadonwer";
 import "../assets/css/react-datepicker.min.css";
 import Avatar from "../components/Avatar";
 import config from "../config.json";
 import AdminProjectHeader from "../layouts/AdminProjectHeader";
 import Footer from "../layouts/Footer";
-
+import dummyImage from "../assets/users/user.png";
+import Select from "react-select";
 import user from "../assets/users/user.png";
-import { leadsData } from "../data/Leads";
 
 import { useTableContext } from "../Context/TableContext";
 import "./Project.css";
 ///////////////////////////////////////////////////////////
 
-const UsersManagement = () => {
+const AdminUsersManagement = () => {
   const url = config.URL;
   const navigate = useNavigate();
 
   const { globalFilter } = useTableContext();
-
   const [localData, setLocalData] = useState([]);
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-
-  // const [currentPageGroup, setCurrentPageGroup] = React.useState(0);
   const [currentPage, setCurrentPage] = useState(0); // Initialize currentPage with 0
-
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
   const [timeoutId, setTimeoutId] = useState(null);
 
   const [userData, setUserData] = useState({
-    firstName: "",
     fullName: "",
-    lastName: "",
+    displayName: "",
     email: "",
     phone: "",
+    password: "",
+    profileImage: "",
     role: "User",
+    title: "",
   });
 
   // eslint-disable-next-line
@@ -116,6 +105,8 @@ const UsersManagement = () => {
   // eslint-disable-next-line
   const [selectedOwner, setSelectedOwner] = useState("");
   const [editingItem, setEditingItem] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+
   // Define and initialize the missing variables
   const dropdownRef = useRef(null);
 
@@ -129,6 +120,16 @@ const UsersManagement = () => {
 
   // Handle modal open and close for Add
   const openAddModal = () => {
+    setUserData({
+      fullName: "",
+      email: "",
+      phone: "",
+      role: "User",
+      password: "",
+      profileImage: "",
+      role: "",
+      title: "",
+    });
     setShowAddModal(true);
   };
 
@@ -147,61 +148,82 @@ const UsersManagement = () => {
     setShowEditModal(false);
     // Clear form fields for Edit modal (if necessary)
   };
-
-  // //////////////////////Add Data  /////////////////////////////////
   const handleSubmitAdd = async (e) => {
     e.preventDefault();
 
     // Check if any required field is empty
     if (
-      !userData.firstName ||
-      !userData.lastName ||
       !userData.fullName ||
+      !userData.displayName ||
       !userData.email ||
       !userData.phone ||
-      !userData.password
+      !userData.password ||
+      !userData.role ||
+      !userData.title
     ) {
       showAlert("Please fill out all required fields.", "danger");
       return;
     }
 
-    try {
-      // console.log(userData);
+    // Log the userData to check if all values are as expected
 
-      await axios.post(`${url}/api/users/add`, userData);
+    // Single Axios call to send user data
+    try {
+      const response = await axios.post(`${url}/api/users/add`, userData);
+
       closeAddModal();
       setUserData({
-        firstName: "",
-        lastName: "",
         fullName: "",
         email: "",
         phone: "",
+        role: "User",
+        password: "",
+        profileImage: "",
         role: "",
+        title: "",
       });
       showAlert("User Added Successfully!", "success");
       fetchData();
     } catch (error) {
-      console.error("Error: ", error);
       showAlert(`${error.response.data.message}`, "danger");
     }
   };
-  // ////////////////////////////Edit Data //////////////////////////
+
+  /////////////Edit Data /////////////////////////////////////////
+
   const handleSubmitEdit = async (e) => {
     e.preventDefault();
 
-    if (
-      !userData.firstName ||
-      !userData.lastName ||
-      !userData.fullName ||
-      !userData.email
-    ) {
-      showAlert("Please fill out all required fields.", "danger");
-      return;
+    // Check if the password field is not empty, indicating a password update
+    if (userData.password.trim() !== "") {
+      try {
+        await axios.put(`${url}/api/users/update/${editingItem.id}`, {
+          password: userData.password, // Only send the password for update
+        });
+        showAlert("Password Updated Successfully!", "success");
+      } catch (error) {
+        console.error("Error updating password: ", error);
+        showAlert(`${error.response.data.message}`, "danger");
+      }
     }
 
-    // Create a copy of userData without the password field
-    const dataToUpdate = { ...userData };
-    delete dataToUpdate.password; // Ensure password isn't sent in the update
+    // Check for changes in other fields (excluding the password)
+    const dataToUpdate = {};
+    for (const key in userData) {
+      if (key !== "password" && userData[key] !== editingItem[key]) {
+        dataToUpdate[key] = userData[key];
+      }
+    }
+
+    if (Object.keys(dataToUpdate).length === 0) {
+      // No changes detected in other fields, and password update handled separately
+      if (userData.password.trim() !== "") {
+        showAlert("Password Updated", "success");
+      } else {
+        showAlert("No changes detected to update.", "info");
+      }
+      return;
+    }
 
     try {
       await axios.put(
@@ -210,11 +232,11 @@ const UsersManagement = () => {
       );
       closeEditModal();
       setEditingItem(null);
-      setUserData(dataToUpdate); // If you want to reset the form, consider setting this to initial state
+      setUserData(userData); // Consider resetting this to the initial state if needed
       showAlert("User Updated Successfully!", "success");
       fetchData();
     } catch (error) {
-      console.error("Error: ", error);
+      console.error("Error updating user: ", error);
       showAlert(`${error.response.data.message}`, "danger");
     }
   };
@@ -245,28 +267,6 @@ const UsersManagement = () => {
     // eslint-disable-next-line
   }, []);
 
-  function timeAgo(pastDate) {
-    const differenceInSeconds = Math.floor(
-      (new Date() - new Date(pastDate)) / 1000
-    );
-    const minute = 60;
-    const hour = minute * 60;
-    const day = hour * 24;
-    const week = day * 7;
-
-    if (differenceInSeconds < minute) {
-      return `${differenceInSeconds} seconds ago`;
-    } else if (differenceInSeconds < hour) {
-      return `${Math.floor(differenceInSeconds / minute)} minutes ago`;
-    } else if (differenceInSeconds < day) {
-      return `${Math.floor(differenceInSeconds / hour)} hours ago`;
-    } else if (differenceInSeconds < week) {
-      return `${Math.floor(differenceInSeconds / day)} days ago`;
-    } else {
-      return `${Math.floor(differenceInSeconds / week)} weeks ago`;
-    }
-  }
-
   const fetchData = async () => {
     try {
       const response = await axios.get(`${url}/api/users/getall`);
@@ -287,16 +287,30 @@ const UsersManagement = () => {
     }));
   };
 
+  const handleSelectChange = (name, selectedOption) => {
+    // Construct an event-like object
+    const event = {
+      target: {
+        name, // Use the passed name
+        value: selectedOption ? selectedOption.value : "", // Handle null/undefined option
+      },
+    };
+
+    // Call the existing handleInputChange function with this event
+    handleInputChange(event);
+  };
+
   const handleEdit = (item) => {
     // Populate the form with the selected item's data for editing
     setUserData({
       id: item.id,
-      firstName: item.firstName,
-      lastName: item.lastName,
       fullName: item.fullName,
+      displayName: item.displayName,
       email: item.email,
       phone: item.phone ? item.phone : null,
+      password: "", // Set password to an empty string by default
       role: item.role,
+      title: item.title,
     });
     setEditingItem(item);
     setShowEditModal(true);
@@ -309,25 +323,20 @@ const UsersManagement = () => {
         accessor: "id",
         Filter: DropdownFilter,
         filter: multiSelectFilterFn,
-        width: 100,
       },
       {
         Header: "Full Name",
         accessor: "fullName",
         Filter: DropdownFilter,
         filter: multiSelectFilterFn,
-        Cell: ({ value }) => {
-          if (typeof value !== "string") {
-            // Check if value is not a string
-            return null; // or return some default value or placeholder
-          }
-
-          return (
-            <div style={{ textAlign: "left" }}>
-              {value.length > 30 ? value.substring(0, 50) + "..." : value}
-            </div>
-          );
-        },
+        Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
+      },
+      {
+        Header: "Display Name",
+        accessor: "displayName",
+        Filter: DropdownFilter,
+        filter: multiSelectFilterFn,
+        Cell: ({ value }) => <div style={{ textAlign: "left" }}>{value}</div>,
       },
 
       {
@@ -378,7 +387,7 @@ const UsersManagement = () => {
                 </div>
               </>
             ) : (
-              <div style={{ cursor: "pointer" }}></div>
+              <div style={{ cursor: "pointer" }}> Add Number</div>
             )}
           </div>
         ),
@@ -587,15 +596,6 @@ const UsersManagement = () => {
     handlePageChange(prevPageIndex);
   };
 
-  const imageMap = leadsData.reduce((acc, lead) => {
-    acc[lead.fullName] = lead.path;
-    return acc;
-  }, {});
-
-  const getLeadImage = (fullName) => {
-    return imageMap[fullName] || user; // returns user image as default if firstName not found in imageMap
-  };
-
   return (
     <>
       <AdminProjectHeader />
@@ -635,26 +635,16 @@ const UsersManagement = () => {
               <Modal.Body>
                 <Container>
                   <Form>
-                    <Form.Group>
-                      <Form.Label>First Name</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="firstName"
-                        value={userData.firstName}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Last Name</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="lastName"
-                        value={userData.lastName}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
+                    <div style={{ textAlign: "center", padding: "10px" }}>
+                      {alertMessage && (
+                        <Alert variant={alertType}>{alertMessage}</Alert>
+                      )}
+                    </div>
+
+                    <br></br>
                     <Form.Group>
                       <Form.Label>Full Name</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Form.Control
                         type="text"
                         name="fullName"
@@ -662,9 +652,21 @@ const UsersManagement = () => {
                         onChange={handleInputChange}
                       />
                     </Form.Group>
-
+                    <br></br>
+                    <Form.Group>
+                      <Form.Label>Display Name</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Form.Control
+                        type="text"
+                        name="displayName"
+                        value={userData.displayName}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group>
+                    <br></br>
                     <Form.Group>
                       <Form.Label>Email</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Form.Control
                         type="text"
                         name="email"
@@ -672,40 +674,84 @@ const UsersManagement = () => {
                         onChange={handleInputChange}
                       />
                     </Form.Group>
-
-                    <Form.Group>
+                    <br></br>
+                    <div className="mb-3">
                       <Form.Label>Password</Form.Label>
-                      <Form.Control
-                        type="password"
-                        name="password"
-                        value={userData.password}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <div className="input-group">
+                        <Form.Control
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter New Password"
+                          name="password"
+                          value={userData.password}
+                          onChange={handleInputChange}
+                        />
+                        <div className="input-group-append">
+                          <button
+                            className="btn btn-secondary"
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            aria-label={
+                              showPassword ? "Hide password" : "Show password"
+                            }
+                          >
+                            <i
+                              className={`fa ${
+                                showPassword ? "ri-eye-fill" : "ri-eye-off-fill"
+                              }`}
+                            ></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
 
+                    <br></br>
                     <Form.Group>
                       <Form.Label>Phone</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Form.Control
                         type="text"
                         rows={3}
+                        placeholder="+91961821XXXX"
                         name="phone"
                         value={userData.phone}
                         onChange={handleInputChange}
                       />
                     </Form.Group>
+                    <br></br>
                     <Form.Group>
                       <Form.Label>Role</Form.Label>
-                      <Form.Control
-                        as="select"
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Select
                         name="role"
-                        value={userData.role}
+                        isSearchable={true}
+                        value={
+                          userData.role
+                            ? { value: userData.role, label: userData.role }
+                            : null
+                        }
+                        onChange={(selectedOption) =>
+                          handleSelectChange("role", selectedOption)
+                        }
+                        options={[
+                          { value: "Admin", label: "Admin" },
+                          { value: "Lead", label: "Lead" },
+                          { value: "Owner", label: "Owner" },
+                          { value: "User", label: "User" },
+                        ]}
+                      />
+                    </Form.Group>
+                    <br></br>
+                    <Form.Group>
+                      <Form.Label>Title</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Form.Control
+                        type="text"
+                        name="title"
+                        value={userData.title}
+                        placeholder="Intern, Software Engineer, Senior Executive, Engineer, Director"
                         onChange={handleInputChange}
-                      >
-                        <option value="Admin">Admin</option>
-                        <option value="Lead">Lead</option>
-                        <option value="Owner">Owner</option>
-                        <option value="User">User</option>
-                      </Form.Control>
+                      />
                     </Form.Group>
                   </Form>
                 </Container>
@@ -734,34 +780,17 @@ const UsersManagement = () => {
                   Please fill out all required fields.
                 </div>
               )}
-              {alertMessage && (
-                <Alert variant={alertType}>{alertMessage}</Alert>
-              )}
-
+              <div style={{ textAlign: "center", padding: "10px" }}>
+                {alertMessage && (
+                  <Alert variant={alertType}>{alertMessage}</Alert>
+                )}
+              </div>
               <Modal.Body>
                 <Container>
                   <Form>
                     <Form.Group>
-                      <Form.Label>First Name</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="firstName"
-                        value={userData.firstName}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>Last Name</Form.Label>
-                      <Form.Control
-                        type="text"
-                        rows={3}
-                        name="lastName"
-                        value={userData.lastName}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                    <Form.Group>
                       <Form.Label>Full Name</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Form.Control
                         type="text"
                         name="fullName"
@@ -771,7 +800,19 @@ const UsersManagement = () => {
                     </Form.Group>
 
                     <Form.Group>
+                      <Form.Label>Display Name</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Form.Control
+                        type="text"
+                        name="displayName"
+                        value={userData.displayName}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group>
+
+                    <Form.Group>
                       <Form.Label>Email</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Form.Control
                         type="text"
                         name="email"
@@ -780,8 +821,47 @@ const UsersManagement = () => {
                       />
                     </Form.Group>
 
+                    {/* <Form.Group>
+                      <Form.Label>Password</Form.Label>
+                      <Form.Control
+                        type="password"
+                        name="password"
+                        value={userData.password}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Group> */}
+                    <div className="mb-3">
+                      <Form.Label>Password</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <div className="input-group">
+                        <Form.Control
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Update your password"
+                          name="password"
+                          value={userData.password}
+                          onChange={handleInputChange}
+                        />
+                        <div className="input-group-append">
+                          <button
+                            className="btn btn-secondary"
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            aria-label={
+                              showPassword ? "Hide password" : "Show password"
+                            }
+                          >
+                            <i
+                              className={`fa ${
+                                showPassword ? "ri-eye-fill" : "ri-eye-off-fill"
+                              }`}
+                            ></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                     <Form.Group>
                       <Form.Label>Phone</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Form.Control
                         type="text"
                         rows={3}
@@ -792,17 +872,31 @@ const UsersManagement = () => {
                     </Form.Group>
                     <Form.Group>
                       <Form.Label>Role</Form.Label>
-                      <Form.Control
-                        as="select"
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Select
                         name="role"
-                        value={userData.role}
+                        isSearchable={true}
+                        value={{ value: userData.role, label: userData.role }}
+                        onChange={handleSelectChange}
+                        options={[
+                          { value: "Admin", label: "Admin" },
+                          { value: "Lead", label: "Lead" },
+                          { value: "Owner", label: "Owner" },
+                          { value: "User", label: "User" },
+                        ]}
+                      />
+                    </Form.Group>
+                    <br></br>
+                    <Form.Group>
+                      <Form.Label>Title</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Form.Control
+                        type="text"
+                        name="title"
+                        value={userData.title}
+                        placeholder="Intern, Software Engineer, Senior Executive, Engineer, Director"
                         onChange={handleInputChange}
-                      >
-                        <option value="Admin">Admin</option>
-                        <option value="Lead">Lead</option>
-                        <option value="Owner">Owner</option>
-                        <option value="User">User</option>
-                      </Form.Control>
+                      />
                     </Form.Group>
                   </Form>
                 </Container>
@@ -884,7 +978,7 @@ const UsersManagement = () => {
                                       )}
                                     </span>
                                   </div>
-                                  {[4].includes(columnIndex) &&
+                                  {[5].includes(columnIndex) &&
                                     column.canFilter && (
                                       <div
                                         className="filter-align"
@@ -929,7 +1023,7 @@ const UsersManagement = () => {
                                 <td
                                   {...cell.getCellProps()}
                                   className="cell-style"
-                                  key={cell.id}
+                                  key={`${row.id}-${cellIndex}`} // Combining row and cell index for a unique key
                                 >
                                   {cellIndex === 0 ? (
                                     <span className="sno-style">{sNo}</span>
@@ -937,9 +1031,11 @@ const UsersManagement = () => {
                                     <>
                                       <div className="d-flex align-items-center gap-2">
                                         <Avatar
-                                          img={getLeadImage(
-                                            row.original.fullName
-                                          )}
+                                          img={
+                                            row.original.profileImage
+                                              ? row.original.profileImage
+                                              : dummyImage
+                                          }
                                           // height="35px"
                                           // width="35px"
                                         />
@@ -1008,7 +1104,7 @@ const UsersManagement = () => {
   );
 };
 
-export default UsersManagement;
+export default AdminUsersManagement;
 
 const DropdownFilter = ({ column }) => {
   const { filterValue = [], setFilter, preFilteredRows, id } = column;
@@ -1062,3 +1158,52 @@ const DropdownFilter = ({ column }) => {
     </div>
   );
 };
+
+// const CustomLastLoginColumn = ({ value }) => {
+//   const calculateTimeAgo = (timestamp) => {
+//     if (!timestamp) {
+//       return "Never logged in";
+//     }
+
+//     const now = new Date();
+//     const timeDiff = now - new Date(timestamp);
+//     const seconds = Math.floor(timeDiff / 1000);
+//     const minutes = Math.floor(seconds / 60);
+//     const hours = Math.floor(minutes / 60);
+//     const days = Math.floor(hours / 24);
+
+//     if (days > 0) {
+//       return `${days} day${days > 1 ? "s" : ""} ago`;
+//     } else if (hours > 0) {
+//       return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+//     } else if (minutes > 0) {
+//       return `${minutes} min${minutes > 1 ? "s" : ""} ago`;
+//     } else {
+//       return `${seconds} second${seconds > 1 ? "s" : ""} ago`;
+//     }
+//   };
+
+//   const timeSinceLastLogin = calculateTimeAgo(value);
+
+//   let cellContent;
+//   let cellStyle = {};
+
+//   if (timeSinceLastLogin === "Never logged in") {
+//     cellContent = "Never logged in";
+//   } else if (
+//     timeSinceLastLogin.includes("seconds ago") || // Corrected to match plural form
+//     timeSinceLastLogin.includes("mins ago") // Corrected to match plural form
+//   ) {
+//     // Less than 5 minutes, show green Online
+//     cellContent = "🟢 Online";
+//   } else if (timeSinceLastLogin.includes("hour ago")) {
+//     // Less than an hour, show yellow time ago
+//     cellContent = "🟡 " + timeSinceLastLogin;
+//   } else {
+//     // More than an hour, show red Offline
+//     cellContent = "🔴 Offline";
+//     cellStyle = { color: "black" };
+//   }
+
+//   return <div style={{ textAlign: "center", ...cellStyle }}>{cellContent}</div>;
+// };

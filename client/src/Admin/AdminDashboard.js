@@ -1,15 +1,15 @@
+/* eslint-disable */
 import axios from "axios";
 import Prism from "prismjs";
 import React, { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import { Card, Col, Container, Row, Table } from "react-bootstrap";
+import { Card, Col, Container, Row } from "react-bootstrap";
 import { Bar } from "react-chartjs-2";
 import { Link } from "react-router-dom";
 import config from "../config.json";
 import Footer from "../layouts/Footer";
 import AdminProjectHeader from "../layouts/AdminProjectHeader";
 // import "./Dashboard.css";
-import Loader from "../Root/Loader"; // Correct path
 
 import "chart.js/auto";
 
@@ -45,12 +45,12 @@ function AdminDashboard() {
     });
   }, []);
 
-  console.log(leadData);
+  // console.log(leadData);
 
   const fetchAllData = async () => {
     try {
       const response = await axios.get(`${url}/api/projects/getall`);
-      console.log(response.data);
+      // console.log(response.data);
       // Sort the array in descending order based on the "id" field
       const sortedData = response.data.sort((a, b) => b.id - a.id);
 
@@ -89,7 +89,7 @@ function AdminDashboard() {
   });
 
   // setCompletedProjectsCount(Completedcount);
-  console.log(Completedcount);
+  // console.log(Completedcount);
 
   // console.log(localData);
 
@@ -117,7 +117,6 @@ function AdminDashboard() {
   }
 
   const segregated = segregateStatusByLead(localData);
-  console.log(segregated);
 
   const extractArrays = (obj) => {
     const result = {};
@@ -162,10 +161,10 @@ function AdminDashboard() {
 
   // Define a constant width for all the options
   const chartWidth = 200;
-  const chartHeight = 200;
+  const chartHeight = 100;
 
   const legendFontStyle = {
-    fontFamily: '"Open Sans", sans-serif', // Use Open Sans as the primary font, fallback to sans-serif if it's not available
+    fontFamily: '"Open Sans"', // Use Open Sans as the primary font, fallback to sans-serif if it's not available
     fontSize: "16px", // A legible font size for legends
     fontWeight: "normal", // You can use 'normal' or 'bold' based on your preference
   };
@@ -330,6 +329,10 @@ function AdminDashboard() {
         title: {
           display: true,
           text: "Leads", // Replace with your desired label for the X-axis
+          font: {
+            family: "Open Sans", // Replace with your custom font family
+            size: 16, // Replace with your desired font size
+          },
         },
       },
       y: {
@@ -338,10 +341,16 @@ function AdminDashboard() {
         title: {
           display: true,
           text: "Projects", // Replace with your desired label for the Y-axis
+          font: {
+            family: "Open Sans", // Replace with your custom font family
+            size: 16, // Replace with your desired font size
+          },
         },
       },
     },
   };
+
+  const hasData = dataBar.labels.length > 0; // You can adjust this condition based on your data structure
 
   return (
     <>
@@ -355,57 +364,53 @@ function AdminDashboard() {
             <li className="breadcrumb-item active" aria-current="page"></li>
           </ol>
           <Col xl="12" className="col-12 pb-3">
-            <Row className="g-6 g-md-3 g-lg-2 justify-content-between">
-              {renderCard(localData.length, "ri-file-list-line", "Total")}
-              {renderCard(Completedcount, "ri-check-double-line", "Completed")}
-              {renderCard(onHoldCount, "ri-information-line", "On Hold")}
-              {renderCard(notStarted, "ri-draft-fill", "Not Started")}
-              {renderCard(inProgress, "ri-restart-line", "In Progress")}
+            <Row className="g-6 g-md-3 g-lg-2 ">
+              {localData.length > 0 &&
+                renderCard(localData.length, "ri-file-list-line", "Total")}
+              {Completedcount > 0 &&
+                renderCard(Completedcount, "ri-check-double-line", "Completed")}
+              {onHoldCount > 0 &&
+                renderCard(onHoldCount, "ri-information-line", "On Hold")}
+              {notStarted > 0 &&
+                renderCard(notStarted, "ri-draft-fill", "Not Started")}
+              {inProgress > 0 &&
+                renderCard(inProgress, "ri-restart-line", "In Progress")}
             </Row>
           </Col>
-          <div className="card border p-3 project-box">
-            <h2>Total Projects Alive</h2>
-            {/* <Table striped hover responsive className="mb-0">
-              <thead>
-                <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">Leads</th>
-                  <th scope="col">Pending Projects</th>
-                </tr>
-              </thead>
-              <tbody>
-                {leadData.map(([lead, tasks], index) => (
-                  <tr key={index}>
-                    <th scope="row">{index + 1}</th>
-                    <td>{lead}</td>
-                    <td>{tasks}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table> */}
-            <br />
-            <Card className="card">
-              <Card.Body>
-                <Bar
-                  data={dataBar}
-                  options={optionBar}
-                  height={400}
-                  width={170}
-                  className="ht-400"
-                />
-              </Card.Body>
-            </Card>
-          </div>
+
+          {hasData && (
+            <>
+              <h2>Total Projects Alive</h2>
+              <Card className="card">
+                <Card.Body>
+                  <Bar
+                    data={dataBar}
+                    options={optionBar}
+                    height={200}
+                    width={200}
+                    className="ht-400"
+                  />
+                </Card.Body>
+              </Card>
+            </>
+          )}
           <Container>
             <Row>
-              {renderPieChart("Anand", AnandValuesArray, AnandOpt)}
-              {renderPieChart("Meera", MeeraValuesArray, MeeraOpt)}
-              {renderPieChart("Sanjay", SanjayValuesArray, SanjayOpt)}
-              {renderPieChart("Veera", VeeraValuesArray, VeeraOpt)}
-              {renderPieChart("Raj", RajValuesArray, RajOpt)}
-              {renderPieChart("Firoz", FirozValuesArray, FirozOpt)}
+              {AnandValuesArray.length > 0 &&
+                renderPieChart("Anand", AnandValuesArray, AnandOpt)}
+              {MeeraValuesArray.length > 0 &&
+                renderPieChart("Meera", MeeraValuesArray, MeeraOpt)}
+              {SanjayValuesArray.length > 0 &&
+                renderPieChart("Sanjay", SanjayValuesArray, SanjayOpt)}
+              {VeeraValuesArray.length > 0 &&
+                renderPieChart("Veera", VeeraValuesArray, VeeraOpt)}
+              {RajValuesArray.length > 0 &&
+                renderPieChart("Raj", RajValuesArray, RajOpt)}
+              {FirozValuesArray.length > 0 &&
+                renderPieChart("Firoz", FirozValuesArray, FirozOpt)}
             </Row>
           </Container>
+
           <Footer />
         </div>
       </div>

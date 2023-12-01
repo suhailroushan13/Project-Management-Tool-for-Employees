@@ -67,7 +67,7 @@
       "react-app/jest"
     ]
   },
-  "proxy": "https://pms.tworks.in",
+  "proxy": "https://work.tworks.in",
   "browserslist": {
     "production": [
       ">0.2%",

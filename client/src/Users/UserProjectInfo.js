@@ -26,7 +26,6 @@ function UserProjectInfo({ projectData }) {
     location.state?.selectedProject ||
     projectData?.find((project) => String(project.id) === String(id));
 
-  console.log(selectedProject);
 
   const lead = selectedProject && selectedProject.lead;
   const owner = selectedProject && selectedProject.owner;

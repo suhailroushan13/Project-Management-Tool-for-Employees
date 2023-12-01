@@ -8,32 +8,26 @@ import { leadsData } from "../data/Leads";
 import dummyImage from "../assets/users/user.png";
 import axios from "axios";
 
+import config from "../config.json";
+
 const UserSidebar = () => {
   const context = useContext(Context);
   const userEmail = context.email;
+  const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
+  const url = config.URL;
 
   const [user, setUser] = useState(null);
-  const [userImage, setUserImage] = useState(dummyImage);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
-    const savedImage = localStorage.getItem("userImage");
 
-    if (savedUser && savedImage) {
-      setUser(JSON.parse(savedUser));
-      setUserImage(savedImage);
+    const foundUser = leadsData.find((lead) => lead.email === userEmail);
+    let findUser = JSON.parse(savedUser);
+    if (foundUser) {
+      setUser(foundUser);
+      localStorage.setItem("user", JSON.stringify(foundUser));
     } else {
-      const foundUser = leadsData.find((lead) => lead.email === userEmail);
-      let findUser = JSON.parse(savedUser);
-      if (foundUser) {
-        setUser(foundUser);
-        setUserImage(foundUser.path);
-        localStorage.setItem("user", JSON.stringify(foundUser));
-        localStorage.setItem("userImage", foundUser.path);
-      } else {
-        setUser(findUser.fullName);
-        setUserImage(dummyImage);
-      }
+      setUser(findUser.fullName);
     }
   }, [userEmail]);
 
@@ -48,6 +42,35 @@ const UserSidebar = () => {
     window.location.href = "/";
   };
 
+  let userData = localStorage.getItem("userData");
+  let stringToObject = JSON.parse(userData);
+  let userID = stringToObject.id;
+  let fullName = stringToObject.fullName;
+  let role = stringToObject.role;
+  let title = stringToObject.title;
+  let displayName = stringToObject.displayName;
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      try {
+        const response = await axios.get(`${url}/api/users/getimage/${userID}`);
+
+        // Check if users array is not empty and set the image URL
+        if (
+          response.data &&
+          response.data.users &&
+          response.data.users.length > 0
+        ) {
+          setImagePreviewUrl(response.data.users[0].profileImage || dummyImage);
+        }
+      } catch (error) {
+        console.error("Error fetching image:", error);
+      }
+    };
+
+    fetchImage();
+  }, [userID]); // Added userID as a dependency to useEffect
+
   return (
     <div className="sidebar">
       <div className="sidebar-header">
@@ -61,11 +84,11 @@ const UserSidebar = () => {
       <div className="sidebar-footer">
         <div className="sidebar-footer-top">
           <div className="sidebar-footer-thumb">
-            <img src={userImage} alt={user ? user.name : "Default User"} />
+            <img src={imagePreviewUrl || dummyImage} alt="Fetched Profile" />
           </div>
           <div className="sidebar-footer-body">
-            <h6>{user ? user.name : ""}</h6>
-            <p>{user ? user.role : ""}</p>
+            <h6>{displayName || "Employee"}</h6>
+            <p>{title || "Employee"}</p>
           </div>
           <Link onClick={toggleFooterMenu} to="" className="dropdown-link">
             <i className="ri-arrow-down-s-line"></i>
@@ -73,12 +96,12 @@ const UserSidebar = () => {
         </div>
         <div className="sidebar-footer-menu">
           <nav className="nav">
-            <Link to="/user/view">
+            <Link to={`/user/edit/${userID}`}>
+              <i className="ri-edit-2-line"></i> Edit Profile
+            </Link>
+            <Link to={`/user/view/${userID}`}>
               <i className="ri-profile-line"></i> View Profile
             </Link>
-          </nav>
-          <hr />
-          <nav className="nav">
             <Link to="/" onClick={handleLogout}>
               <i className="ri-logout-box-r-line"></i> Log Out
             </Link>

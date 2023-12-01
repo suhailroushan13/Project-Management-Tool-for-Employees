@@ -1,764 +1,685 @@
 [
   {
-    "firstName": "Admin",
-    "lastName": "T-WORKS",
     "fullName": "Admin T-WORKS",
     "email": "admin@tworks.in",
     "password": "admin@tworks.in",
     "role": "Admin",
-    "title": "Administrator"
+    "title": "Administrator",
+    "displayName": "Admin"
   },
   {
-    "firstName": "Anand",
-    "lastName": "Rajagaopalan",
     "fullName": "Anand Rajagaopalan",
     "email": "anand@tworks.in",
+    "phone": "+919849365735",
     "password": "anand@tworks.in",
     "role": "Lead",
-    "title": "Vice President, Operations"
+    "title": "Vice President, Operations",
+    "displayName": "Anand"
   },
   {
-    "firstName": "Sanjay Kumar",
-    "lastName": "Gajjala",
     "fullName": "Sanjay Gajjala",
     "email": "sanjay@tworks.in",
     "phone": "+919989926313",
     "password": "sanjay@tworks.in",
     "role": "Lead",
-    "title": "Sr.Director - Product Engineering"
+    "title": "Sr.Director - Product Engineering",
+    "displayName": "Sanjay"
   },
   {
-    "firstName": "Varun",
-    "lastName": "Sivaram",
     "fullName": "Varun Sivaram",
     "email": "varun@tworks.in",
     "password": "varun@tworks.in",
     "role": "User",
-    "title": "Architect - Prototype Infrastructure"
+    "title": "Architect - Prototype Infrastructure",
+    "displayName": "Varun"
   },
   {
-    "firstName": "Firoz",
-    "lastName": "Ahammad",
     "fullName": "Firoz Ahammad",
     "email": "firoz@tworks.in",
     "password": "firoz@tworks.in",
     "role": "Lead",
-    "title": "Director- Technical"
+    "phone": "+919700169649",
+    "title": "Director- Technical",
+    "displayName": "Firoz"
   },
   {
-    "firstName": "Sharat Chander",
-    "lastName": "Reddy",
     "fullName": "Sharat Chander Reddy",
     "email": "sharat@tworks.in",
     "password": "sharat@tworks.in",
     "role": "User",
-    "title": "Senior Product Manager"
+    "title": "Senior Product Manager",
+    "displayName": "Sharat"
   },
   {
-    "firstName": "Simran Singh",
-    "lastName": "Wasu",
     "fullName": "Simran Singh Wasu",
     "email": "simran@tworks.in",
     "password": "simran@tworks.in",
     "role": "User",
-    "title": "Product Manager"
+    "title": "Product Manager",
+    "displayName": "Simran"
   },
   {
-    "firstName": "Abdur",
-    "lastName": "Rahman S",
     "fullName": "Abdur Rahman S",
     "email": "rahman@tworks.in",
     "password": "rahman@tworks.in",
     "role": "User",
-    "title": "Lead Software Engineer"
+    "title": "Lead Software Engineer",
+    "displayName": "Rahman"
   },
   {
-    "firstName": "Madhav",
-    "lastName": "Tennati",
     "fullName": "Madhav Tennati",
     "email": "madhav@tworks.in",
     "password": "madhav@tworks.in",
     "role": "User",
-    "title": "Chief Product Architect"
+    "title": "Chief Product Architect",
+    "displayName": "Madhav"
   },
   {
-    "firstName": "Niharika",
-    "lastName": "Dama",
     "fullName": "Niharika Dama",
     "email": "niharika@tworks.in",
     "password": "niharika@tworks.in",
     "role": "User",
-    "title": "Senior Executive -Finance & Accounting"
+    "title": "Senior Executive -Finance & Accounting",
+    "displayName": "Niharika"
   },
   {
-    "firstName": "Sheik",
-    "lastName": "Khadeer",
     "fullName": "Sheik Khadeer",
     "email": "Khadeer@tworks.in",
     "password": "Khadeer@tworks.in",
     "role": "User",
-    "title": "Senior Engineer - Mechanical"
+    "title": "Senior Engineer - Mechanical",
+    "displayName": "Khadeer"
   },
   {
-    "firstName": "Syed",
-    "lastName": "Shanawaz",
     "fullName": "Syed Shanawaz",
     "email": "syed@tworks.in",
     "password": "syed@tworks.in",
     "role": "User",
-    "title": "Assistant Manager - Procurement"
+    "title": "Assistant Manager - Procurement",
+    "displayName": "Syed"
   },
   {
-    "firstName": "Likhitha",
-    "lastName": "Maashetty",
     "fullName": "Likhitha Maashetty",
     "email": "likhitha@tworks.in",
     "password": "likhitha@tworks.in",
     "role": "User",
-    "title": "Senior Executive- Human Resources"
+    "title": "Senior Executive- Human Resources",
+    "displayName": "Likhitha"
   },
   {
-    "firstName": "Anirudh",
-    "lastName": "Koteshwaran",
     "fullName": "Anirudh Koteshwaran",
     "email": "Anirudh@tworks.in",
     "password": "Anirudh@tworks.in",
     "role": "User",
-    "title": "Furniture & Spatial Designer"
+    "title": "Furniture & Spatial Designer",
+    "displayName": "Anirudh"
   },
   {
-    "firstName": "Absar",
-    "lastName": "Ul Haq Syed",
     "fullName": "Absar Ul Haq Syed ",
     "email": "absar@tworks.in",
     "password": "absar@tworks.in",
     "role": "User",
-    "title": "Prototyping Design Engineer"
+    "title": "Prototyping Design Engineer",
+    "displayName": "Absar"
   },
   {
-    "firstName": "Raj",
-    "lastName": "Shekhar",
     "fullName": "Raj Shekhar Vadlamani",
     "email": "rajshekhar@tworks.in",
     "password": "rajshekhar@tworks.in",
     "role": "Lead",
-    "title": "Finance Controller - Finance & Accounting"
+    "phone": "+919849994650",
+    "title": "Finance Controller - Finance & Accounting",
+    "displayName": "Raj"
   },
   {
-    "firstName": "Mohammed Talha",
-    "lastName": " Adil",
     "fullName": "Mohammed Talha Adil",
     "email": "adil@tworks.in",
     "password": "adil@tworks.in",
     "role": "User",
-    "title": "Lead Prototyping Engineer"
+    "title": "Lead Prototyping Engineer",
+    "displayName": "Adil"
   },
   {
-    "firstName": "Lakshman",
-    "lastName": "Batthula",
     "fullName": "Lakshman Batthula",
     "email": "lakshman@tworks.in",
     "password": "lakshman@tworks.in",
     "role": "User",
-    "title": "PCB Layout Design Engineer"
+    "title": "PCB Layout Design Engineer",
+    "displayName": "Lakshman"
   },
   {
-    "firstName": "Anurag",
-    "lastName": "Velury",
     "fullName": "Anurag Velury",
     "email": "anurag@tworks.in",
     "password": "anurag@tworks.in",
     "role": "User",
-    "title": "Lead - Growth & Partnerships"
+    "title": "Lead - Growth & Partnerships",
+    "displayName": "Anurag"
   },
   {
-    "firstName": "Tejaswini",
-    "lastName": "Kidambi",
     "fullName": "Tejaswini Kidambi",
     "email": "tejaswini@tworks.in",
     "password": "tejaswini@tworks.in",
     "role": "User",
-    "title": "Business Development Manager"
+    "title": "Business Development Manager",
+    "displayName": "Tejaswini"
   },
   {
-    "firstName": "Santhosh",
-    "lastName": "Koppu",
-    "fullName": "Santhosh Koppu",
+    "fullName": "Koppu Santhosh",
     "email": "santhosh@tworks.in",
     "password": "santhosh@tworks.in",
     "role": "User",
-    "title": "Senior Engineer - Facility Maintainance Engineer"
+    "title": "Senior Engineer - Facility Maintainance Engineer",
+    "displayName": "Santosh"
   },
   {
-    "firstName": "Mohammad Meera",
-    "lastName": "Mohiddin",
     "fullName": "Mohammad Meera Mohiddin",
     "email": "meera@tworks.in",
+    "phone": "+918185014342",
     "password": "meera@tworks.in",
     "role": "Lead",
-    "title": "Assoclate Director - Plant Maintenance & Facilities"
+    "title": "Assoclate Director - Plant Maintenance & Facilities",
+    "displayName": "Meera"
   },
   {
-    "firstName": "Shuja Ahmed",
-    "lastName": "Khan Suri",
     "fullName": "Shuja Ahmed Khan Suri",
     "email": "shuja@tworks.in",
     "password": "shuja@tworks.in",
     "role": "User",
-    "title": "Assistant Manager - Aeronautical "
+    "title": "Assistant Manager - Aeronautical ",
+    "displayName": "Shuja"
   },
   {
-    "firstName": "Mythili",
-    "lastName": "Addepalli",
     "fullName": "Mythili Addepalli",
     "email": "mythili@tworks.in",
     "password": "mythili@tworks.in",
     "role": "User",
-    "title": "Lead - Finance & Accounting"
+    "title": "Lead - Finance & Accounting",
+    "displayName": "Mythili"
   },
   {
-    "firstName": "Damodar",
-    "lastName": "Darshan Kolla",
     "fullName": "Damodar Darshan Kolla",
     "email": "darshan@tworks.in",
     "password": "darshan@tworks.in",
     "role": "User",
-    "title": "Associate -Engineer Electronics"
+    "title": "Associate -Engineer Electronics",
+    "displayName": "Darshan"
   },
   {
-    "firstName": "Manish",
-    "lastName": "Gunasekaran",
     "fullName": "Manish Gunasekaran",
     "email": "manishgunasekaran@tworks.in",
     "password": "manishgunasekaran@tworks.in",
     "role": "User",
-    "title": "Senior Prototype Design Engineer"
+    "title": "Senior Prototype Design Engineer",
+    "displayName": "Manish"
   },
   {
-    "firstName": "Padmini",
-    "lastName": "Vuppala",
     "fullName": "Padmini Vuppala",
     "email": "vuppalapadmini@tworks.in",
     "password": "vuppalapadmini@tworks.in",
     "role": "User",
-    "title": "Admin Assistant Manager"
+    "title": "Admin Assistant Manager",
+    "displayName": "Padmini"
   },
   {
-    "firstName": "Yoshita",
-    "lastName": "Lakshmi Pinjala",
     "fullName": "Yoshita Lakshmi Pinjala",
     "email": "yoshita@tworks.in",
     "password": "yoshita@tworks.in",
     "role": "User",
-    "title": "Lead - Contextual & Spatial Designer"
+    "title": "Lead - Contextual & Spatial Designer",
+    "displayName": "Yoshita"
   },
   {
-    "firstName": "Rahil",
-    "lastName": "Hasan",
     "fullName": "Rahil Hasan",
     "email": "rahilhasan@tworks.in",
     "password": "rahilhasan@tworks.in",
     "role": "User",
-    "title": "Designer"
+    "title": "Designer",
+    "displayName": "Rahil"
   },
   {
-    "firstName": "Yashwanth",
-    "lastName": "Vudathu",
     "fullName": "Yashwanth Vudathu",
     "email": "yashwanthvudathu@tworks.in",
     "password": "yashwanthvudathu@tworks.in",
     "role": "User",
-    "title": "Rapid Prototyping Specialist"
+    "title": "Rapid Prototyping Specialist",
+    "displayName": "Yashwanth"
   },
   {
-    "firstName": "Riddi Rao",
-    "lastName": "Cherla",
     "fullName": "Riddi Rao Cherla",
     "email": "riddi@tworks.in",
     "password": "riddi@tworks.in",
     "role": "User",
-    "title": "Prototype Design Engineer"
+    "title": "Prototype Design Engineer",
+    "displayName": "Riddi"
   },
   {
-    "firstName": "Gopi",
-    "lastName": "Krishna Gontiyala",
     "fullName": "Gopi Krishna Gontiyala",
     "email": "gopikrishna@tworks.in",
     "password": "gopikrishna@tworks.in",
     "role": "User",
-    "title": "Procurement Specialist"
+    "title": "Procurement Specialist",
+    "displayName": "Gopi"
   },
   {
-    "firstName": "Naomi",
-    "lastName": "Kundu",
     "fullName": "Naomi Kundu",
     "email": "naomi@tworks.in",
     "password": "naomi@tworks.in",
     "role": "User",
-    "title": "Pottery Studio Manager"
+    "title": "Pottery Studio Manager",
+    "displayName": "Naomi"
   },
   {
-    "firstName": "Ankush",
-    "lastName": "Goyal",
     "fullName": "Ankush Goyal",
     "email": "ankush@tworks.in",
     "password": "ankush@tworks.in",
     "role": "User",
-    "title": "Senior Electronics Engineer"
+    "title": "Senior Electronics Engineer",
+    "displayName": "Ankush"
   },
   {
-    "firstName": "Gaduthuri John",
-    "lastName": "Nitin Joshee",
     "fullName": "Gaduthuri John Nitin Joshee",
     "email": "j.nitin@tworks.in",
     "password": "j.nitin@tworks.in",
     "role": "User",
-    "title": "Associate Engineer- Rapid Prototyping"
+    "title": "Associate Engineer- Rapid Prototyping",
+    "displayName": "Nitin"
   },
   {
-    "firstName": "Veerabhadra",
-    "lastName": "Rao chappi",
     "fullName": "Veerabhadra Rao chappi",
     "email": "veera@tworks.in",
     "password": "veera@tworks.in",
     "role": "Lead",
-    "title": "Director - Partnership People and Culture"
+    "phone": "+919866661553",
+    "title": "Director - Partnership People and Culture",
+    "displayName": "Veera"
   },
   {
-    "firstName": "Nehal",
-    "lastName": "Sarangkar",
     "fullName": "Nehal Sarangkar",
     "email": "nehal@tworks.in",
     "password": "nehal@tworks.in",
     "role": "User",
-    "title": "Senior - Prototype Design Engineer"
+    "title": "Senior - Prototype Design Engineer",
+    "displayName": "Nehal"
   },
   {
-    "firstName": "Akankasha",
-    "lastName": "Joharapurkar",
     "fullName": "Akankasha Joharapurkar",
     "email": "akanksha@tworks.in",
     "password": "akanksha@tworks.in",
     "role": "User",
-    "title": "Senior - Industrial Designer"
+    "title": "Senior - Industrial Designer",
+    "displayName": "Akankasha"
   },
   {
-    "firstName": "Masrath",
-    "lastName": "Sultana",
     "fullName": "Masrath Sultana",
     "email": "masrathsultana@tworks.in",
     "phone": "+918465079938",
     "password": "masrathsultana@tworks.in",
     "role": "User",
-    "title": "Associate Prototype Design Engineer"
+    "title": "Associate Prototype Design Engineer",
+    "displayName": "Masrath"
   },
   {
-    "firstName": "Rahul",
-    "lastName": "Reddy Amireddy",
     "fullName": "Rahul Reddy Amireddy",
     "email": "rahul@tworks.in",
     "password": "rahul@tworks.in",
     "role": "User",
-    "title": "Associate Engineer"
+    "title": "Associate Engineer",
+    "displayName": "Rahul"
   },
   {
-    "firstName": "Nirmit",
-    "lastName": "Naha",
     "fullName": "Nirmit Naha",
     "email": "nirmit@tworks.in",
     "password": "nirmit@tworks.in",
     "role": "User",
-    "title": "Associate Prototype Design Engineer"
+    "title": "Associate Prototype Design Engineer",
+    "displayName": "Nirmit"
   },
   {
-    "firstName": "Swetha",
-    "lastName": "Maniyoor",
     "fullName": "Swetha Maniyoor",
     "email": "maniyoorswetha@tworks.in",
     "password": "maniyoorswetha@tworks.in",
     "role": "User",
-    "title": "Graphic designer"
+    "title": "Graphic designer",
+    "displayName": "Swetha"
   },
   {
-    "firstName": "Raj Kumar",
-    "lastName": "Sharma",
     "fullName": "Raj Kumar Sharma",
     "email": "rajkumar.s@tworks.in",
     "password": "rajkumar.s@tworks.in",
     "role": "User",
-    "title": "Apprentice"
+    "title": "Apprentice",
+    "displayName": "Raj Kumar"
   },
   {
-    "firstName": "Suhas",
-    "lastName": "Patlolla",
     "fullName": "Patlolla Suhas",
     "email": "suhaspatlolla@tworks.in",
     "password": "suhaspatlolla@tworks.in",
     "role": "User",
-    "title": "Associe - Engineer Electronics"
+    "title": "Associe - Engineer Electronics",
+    "displayName": "Suhas"
   },
   {
-    "firstName": "Oorja",
-    "lastName": "Shettigari ",
     "fullName": "Oorja Shettigari",
     "email": "oorja@tworks.in",
     "password": "oorja@tworks.in",
     "role": "User",
-    "title": "Associate- Textile Designer"
+    "title": "Associate- Textile Designer",
+    "displayName": "Oorja"
   },
   {
-    "firstName": "Kaithi",
-    "lastName": "Poojith Raj  Patel",
     "fullName": "Kaithi Poojith Raj Patel",
     "email": "poojith@tworks.in",
     "password": "poojith@tworks.in",
     "role": "User",
-    "title": "3D Printing Apprentice"
+    "title": "3D Printing Apprentice",
+    "displayName": "Poojith"
   },
   {
-    "firstName": "Aluru V Siva",
-    "lastName": "Charana Datta",
     "fullName": "Aluru V Siva Charana Datta ",
     "email": "shivacharan@tworks.in",
     "password": "shivacharan@tworks.in",
     "role": "User",
-    "title": "Associate - Prototype Design Engineer"
+    "title": "Associate - Prototype Design Engineer",
+    "displayName": "Siva"
   },
   {
-    "firstName": "Ravariya",
-    "lastName": "Ashleshaben Jagdishbhai",
     "fullName": "Ravariya Ashleshaben Jagdishbhai",
     "email": "ravi@tworks.in",
     "password": "ravi@tworks.in",
     "role": "User",
-    "title": "Associate- Ceramic Craft"
+    "title": "Associate- Ceramic Craft",
+    "displayName": "Ravariya"
   },
   {
-    "firstName": "Nikhila",
-    "lastName": "Atkuri Sai",
     "fullName": "Atkuri Sai Nikhila",
     "email": "sainikhila@tworks.in",
     "phone": "+919390647305",
     "password": "sainikhila@tworks.in",
     "role": "User",
-    "title": "Associate- Full Stack Developer"
+    "title": "Associate- Full Stack Developer",
+    "displayName": "Nikhila"
   },
   {
-    "firstName": "Avala Dhanush",
-    "lastName": "Reddy",
     "fullName": "Avala Dhanush Reddy ",
     "email": "dhanush@tworks.in",
     "password": "dhanush@tworks.in",
     "role": "User",
-    "title": "Associate - Prototype Design Engineer"
+    "title": "Associate - Prototype Design Engineer",
+    "displayName": "Dhanush"
   },
   {
-    "firstName": "Shreyans",
-    "lastName": "Harsora",
     "fullName": "Shreyans Harsora",
     "email": "shreyans@tworks.in",
     "password": "shreyans@tworks.in",
     "role": "User",
-    "title": "Associate - Product Designer"
+    "title": "Associate - Product Designer",
+    "displayName": "Shreyans"
   },
   {
-    "firstName": "Jatin",
-    "lastName": "Arrvapalli",
     "fullName": "Jatin Arrvapalli",
     "email": "jatin@tworks.in",
     "password": "jatin@tworks.in",
     "role": "User",
-    "title": "External Consultant"
+    "title": "External Consultant",
+    "displayName": "Jatin"
   },
   {
-    "firstName": "Chetan",
-    "lastName": "",
     "fullName": "Chetan",
     "email": "chetan@tworks.in",
     "password": "chetan@tworks.in",
     "role": "User",
-    "title": "External Consultant"
+    "title": "External Consultant",
+    "displayName": "Chetan"
   },
   {
-    "firstName": "Ashok",
-    "lastName": "Gorre",
     "fullName": "Ashok Gorre",
     "email": "ashok@tworks.in",
     "password": "ashok@tworks.in",
     "role": "User",
-    "title": "Junior Fellow"
+    "title": "Junior Fellow",
+    "displayName": "Ashok"
   },
   {
-    "firstName": "Rajendra",
-    "lastName": "Gaddam",
     "fullName": "Rajendra Prasad Gaddam",
     "email": "rajendra@tworks.in",
     "password": "rajendra@tworks.in",
     "role": "User",
-    "title": "Junior Fellow"
+    "title": "Junior Fellow",
+    "displayName": "Rajendra"
   },
   {
-    "firstName": "Shekar",
-    "lastName": "Kollanolla",
     "fullName": "Shekar Kollanolla",
     "email": "k.shekar@tworks.in",
     "phone": "+919441019793",
     "password": "k.shekar@tworks.in",
     "role": "User",
-    "title": "Senior Fellow"
+    "title": "Senior Fellow",
+    "displayName": "Shekar"
   },
   {
-    "firstName": "Suresh",
-    "lastName": " Chandra Narisetty",
     "fullName": "Suresh Chandra Narisetty",
     "email": "sureshchandra@tworks.in",
     "password": "sureshchandra@tworks.in",
     "role": "User",
-    "title": "Senior fellow"
+    "title": "Senior Fellow",
+    "displayName": "Suresh"
   },
   {
-    "firstName": "Sri",
-    "lastName": "Harsha  Kanumalla",
     "fullName": "Sri Harsha Kanumalla",
     "email": "sriharsha@tworks.in",
     "password": "sriharsha@tworks.in",
     "role": "User",
-    "title": "Fellow"
+    "title": "Fellow",
+    "displayName": "Harsha"
   },
   {
-    "firstName": "Sandeep",
-    "lastName": "Yasa",
     "fullName": "Sandeep Yasa",
     "email": "sandeep@tworks.in",
     "phone": "+919985803004",
     "password": "sandeep@tworks.in",
     "role": "User",
-    "title": "Senior fellow"
+    "title": "Senior Fellow",
+    "displayName": "Sandeep"
   },
   {
-    "firstName": "Feroz",
-    "lastName": "Zaheer",
     "fullName": "Feroz Zaheer",
     "email": "zaheer@tworks.in",
     "password": "zaheer@tworks.in",
     "role": "User",
-    "title": "Senior Fellow"
+    "title": "Senior Fellow",
+    "displayName": "Feroz"
   },
   {
-    "firstName": "Takbir",
-    "lastName": "Fatima",
     "fullName": "Takbir Fatima",
     "email": "takbir@tworks.in",
     "password": "takbir@tworks.in",
     "role": "User",
-    "title": "Senior Fellow"
+    "title": "Senior Fellow",
+    "displayName": "Takbir"
   },
   {
-    "firstName": "Kannoju",
-    "lastName": "Naveen",
     "fullName": "Kannoju Naveen",
     "email": "naveen@tworks.in",
     "password": "naveen@tworks.in",
     "role": "User",
-    "title": "Junior Fellow"
+    "title": "Junior Fellow",
+    "displayName": "Naveen"
   },
   {
-    "firstName": "Mohd",
-    "lastName": "Imran",
     "fullName": "Mohd Imran",
     "email": "mohdimran@tworks.in",
     "password": "mohdimran@tworks.in",
     "role": "User",
-    "title": "Intern"
+    "title": "Intern",
+    "displayName": "Imran"
   },
   {
-    "firstName": "Vedarsh",
-    "lastName": "Vedarsh Reddy",
     "fullName": "Muniratnam Vedarsh Reddy",
     "email": "vedarshreddy@tworks.in",
     "password": "vedarshreddy@tworks.in",
     "role": "User",
-    "title": "Product Development Intern"
+    "title": "Product Development Intern",
+    "displayName": "Vedarsh"
   },
   {
-    "firstName": "Ramasagaram",
-    "lastName": "Rahul Chary",
     "fullName": "Ramasagaram Rahul Chary",
     "email": "rahulramasagaram@tworks.in",
     "password": "rahulramasagaram@tworks.in",
     "role": "User",
-    "title": "Mechanical Intern"
+    "title": "Mechanical Intern",
+    "displayName": "Rahul Chary"
   },
   {
-    "firstName": "Gunda",
-    "lastName": "Sai Aakanksha",
     "fullName": "Gunda Sai Aakanksha",
     "email": "saiaakanksha@tworks.in",
     "password": "saiaakanksha@tworks.in",
     "role": "User",
-    "title": "Electronics Intern"
+    "title": "Electronics Intern",
+    "displayName": "Sai Aakanksha"
   },
   {
-    "firstName": "Aaluri",
-    "lastName": "Reddy",
-    "fullName": "Aaluri Reddy",
+    "fullName": "Aaluri Praveen Reddy",
     "email": "praveen@tworks.in",
     "password": "praveen@tworks.in",
     "role": "User",
-    "title": "Mechanical Intern"
+    "title": "Mechanical Intern",
+    "displayName": "Praveen Reddy"
   },
   {
-    "firstName": "Adhityan",
-    "lastName": "Ravichandran",
     "fullName": "Adhityan Ravichandran",
     "email": "adhityan@tworks.in",
     "password": "adhityan@tworks.in",
     "role": "User",
-    "title": "Design Intern"
+    "title": "Design Intern",
+    "displayName": "Adhityan"
   },
   {
-    "firstName": "Abdul",
-    "lastName": "Wahab",
     "fullName": "Abdul Wahab",
     "email": "abdul.w@tworks.in",
     "password": "abdul.w@tworks.in",
     "role": "User",
-    "title": "UAV Intern"
+    "title": "UAV Intern",
+    "displayName": "Wahab"
   },
   {
-    "firstName": "Manoj Kumar",
-    "lastName": "Reddy",
     "fullName": "C. Manoj Kumar Reddy",
     "email": "manoj.k@tworks.in",
     "password": "manoj.k@tworks.in",
     "role": "User",
-    "title": "UAV Intern"
+    "title": "UAV Intern",
+    "displayName": "Manoj"
   },
   {
-    "firstName": "Barkavi",
-    "lastName": "S",
     "fullName": "Barkavi S",
     "email": "barkavi@tworks.in",
     "password": "barkavi@tworks.in",
     "role": "User",
-    "title": "Design intern "
+    "title": "Design intern ",
+    "displayName": "Barkavi"
   },
   {
-    "firstName": "Potla Bharath",
-    "lastName": "Sai",
     "fullName": "Potla Bharath Sai",
     "email": "bharat@tworks.in",
     "password": "bharat@tworks.in",
     "role": "User",
-    "title": "Photography Intern"
+    "title": "Photography Intern",
+    "displayName": "Bharath"
   },
   {
-    "firstName": "Mir Omar",
-    "lastName": "Ali khan",
     "fullName": "Mir Omar Ali khan",
     "email": "mir@tworks.in",
     "password": "mir@tworks.in",
     "role": "User",
-    "title": "Woodworking Intern"
+    "title": "Woodworking Intern",
+    "displayName": "Omar"
   },
   {
-    "firstName": "Sai Priyatham",
-    "lastName": "Sriramou",
     "fullName": "Sai Priyatham Sriramou",
     "email": "sai@tworks.in",
     "password": "sai@tworks.in",
     "role": "User",
-    "title": "Mechanical Intern"
+    "title": "Mechanical Intern",
+    "displayName": "Priyatham"
   },
   {
-    "firstName": "Chiruvolu Vishnu",
-    "lastName": "Teja",
     "fullName": "Chiruvolu Vishnu Teja",
     "email": "chiruvolu@tworks.in",
     "password": "chiruvolu@tworks.in",
     "role": "User",
-    "title": "Electronics Intern"
+    "title": "Electronics Intern",
+    "displayName": "Vishnu"
   },
   {
-    "firstName": "Guguloth Ram",
-    "lastName": "Prasad Naik",
     "fullName": "Guguloth Ram Prasad Naik",
     "email": "prasad@tworks.in",
     "password": "prasad@tworks.in",
     "role": "User",
-    "title": "Product Design Intern"
+    "title": "Product Design Intern",
+    "displayName": "Ram Prasad"
   },
   {
-    "firstName": "Pawan",
-    "lastName": "Teja",
     "fullName": "Pawan Teja",
     "email": "pawan@tworks.in",
     "password": "pawan@tworks.in",
     "role": "User",
-    "title": "Electronics Intern"
+    "title": "Electronics Intern",
+    "displayName": "Pawan"
   },
   {
-    "firstName": "Mohammed Suhail",
-    "lastName": " Roushan Ali",
     "fullName": "Mohammed Suhail Roushan Ali",
     "email": "suhail@tworks.in",
     "phone": "+919618211626",
     "password": "suhail@tworks.in",
     "role": "User",
-    "title": "Software Intern"
+    "title": "Software Intern",
+    "displayName": "Suhail"
   },
   {
-    "firstName": "Hiral",
-    "lastName": "Shah",
     "fullName": "Hiral Shah",
     "email": "hiral@tworks.in",
     "password": "hiral@tworks.in",
     "role": "User",
-    "title": "Apprentice"
+    "title": "Apprentice",
+    "displayName": "Hiral"
   },
   {
-    "firstName": "Karampudi",
-    "lastName": "Pranav",
     "fullName": "Karampudi Pranav",
     "email": "karampudi@tworks.in",
     "password": "karampudi@tworks.in",
     "role": "User",
-    "title": "Mechanical Intern"
+    "title": "Mechanical Intern",
+    "displayName": "Pranav"
   },
   {
-    "firstName": "Nidhi",
-    "lastName": "Jain",
     "fullName": "Nidhi Jain",
     "email": "nidhi@tworks.in",
     "password": "nidhi@tworks.in",
     "role": "User",
-    "title": "UAV Intern"
+    "title": "UAV Intern",
+    "displayName": "Nidhi"
   },
   {
-    "firstName": "Vedala Radha",
-    "lastName": "Soundarya Sundar Ananth",
     "fullName": "Vedala Radha Soundarya Sundar Ananth",
     "email": "vedala@tworks.in",
     "password": "vedala@tworks.in",
     "role": "User",
-    "title": "Electronics Intern"
+    "title": "Electronics Intern",
+    "displayName": "Vedala Radha"
   },
   {
-    "firstName": "Karthikraj",
-    "lastName": "S",
     "fullName": "S Karthikraj",
     "email": "karthik@tworks.in",
     "password": "karthik@tworks.in",
     "role": "User",
-    "title": "Electronics Intern"
+    "title": "Electronics Intern",
+    "displayName": "Karthikraj"
   },
   {
-    "firstName": "Korandlaa",
-    "lastName": "Laasyasri",
     "fullName": "Korandla Laasyasri",
-    "email": "korandlaa@tworks.in",
-    "password": "korandlaa@tworks.in",
+    "email": "korandla@tworks.in",
+    "password": "korandla@tworks.in",
     "role": "User",
-    "title": "Operations Intern"
+    "title": "Operations Intern",
+    "displayName": "Korandla"
   }
 ]

@@ -33,6 +33,6 @@ const syncModels = async () => {
   }
 };
 
-syncModels();
+// syncModels();
 // Export the Sequelize instance and the synchronization function
 export { db as sequelize, syncModels };

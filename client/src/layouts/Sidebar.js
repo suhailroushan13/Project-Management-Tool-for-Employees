@@ -23,19 +23,9 @@ const Sidebar = () => {
       : leadsData.find((lead) => lead.email === userEmail);
   });
 
-  const [userImage, setUserImage] = useState(() => {
-    const savedImage = localStorage.getItem("userImage");
-    return savedImage && savedImage !== "undefined"
-      ? savedImage
-      : user
-      ? user.path
-      : dummyImage;
-  });
-
   useEffect(() => {
     localStorage.setItem("user", JSON.stringify(user));
-    localStorage.setItem("userImage", userImage);
-  }, [user, userImage]);
+  }, [user]);
 
   const toggleFooterMenu = (e) => {
     e.preventDefault();
@@ -44,11 +34,7 @@ const Sidebar = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("userImage");
-    localStorage.removeItem("role");
-
+    localStorage.clear();
     window.location.href = "/";
   };
 
@@ -65,7 +51,7 @@ const Sidebar = () => {
       <div className="sidebar-footer">
         <div className="sidebar-footer-top">
           <div className="sidebar-footer-thumb">
-            <img src={userImage} alt={user ? user.name : "Default User"} />
+            <img alt={user ? user.name : "Default User"} />
           </div>
           <div className="sidebar-footer-body">
             <h6>{user ? user.name : "Admin"}</h6>

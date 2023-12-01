@@ -29,21 +29,25 @@ import {
 } from "react-feather";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  useTable,
   useFilters,
   useGlobalFilter,
+  usePagination,
   useResizeColumns,
   useSortBy,
-  usePagination,
+  useTable,
 } from "react-table";
-import { leadArray, ownerArray } from "../apps/data/Leadonwer";
+import Loader from "../Root/Loader.js";
+import Reload from "../Root/Reload.js";
+import { getLeads, getRest } from "../apps/data/Leadowner";
 import "../assets/css/react-datepicker.min.css";
+import {
+  default as dummyImage,
+  default as user,
+} from "../assets/users/user.png";
 import Avatar from "../components/Avatar";
 import config from "../config.json";
 import Footer from "../layouts/Footer";
 import UserProjectHeader from "../layouts/UserProjectHeader";
-import Loader from "../Root/Loader.js";
-import Reload from "../Root/Reload.js";
 
 import { useTableContext } from "../Context/TableContext";
 
@@ -52,15 +56,12 @@ import { useTableContext } from "../Context/TableContext";
 import "chart.js/auto";
 import ReactApexChart from "react-apexcharts";
 
-import dummyImage from "../assets/users/user.png";
-
-import { leadsData } from "../data/Leads";
 import Select from "react-select";
 
 // import "../";
 ///////////////////////////////////////////////////////////
 
-const UserProjectManagement = () => {
+const UserDashboard = () => {
   const url = config.URL;
   const navigate = useNavigate();
 
@@ -115,6 +116,26 @@ const UserProjectManagement = () => {
     };
   }, [timeoutId]);
 
+  const [leadSelectOptions, setLeadSelectOptions] = useState([]);
+  const [ownerSelectOptions, setOwnerSelectOptions] = useState([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const leads = await getLeads();
+
+      const owners = await getRest();
+
+      setLeadSelectOptions(leads);
+      setOwnerSelectOptions(owners);
+    }
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    // existing code...
+  }, [leadSelectOptions, ownerSelectOptions]);
+
   // eslint-disable-next-line
   const [description, setDescription] = useState("");
   // eslint-disable-next-line
@@ -157,6 +178,14 @@ const UserProjectManagement = () => {
 
   // Handle modal open and close for Add
   const openAddModal = () => {
+    setTaskData({
+      projectName: "",
+      lead: "",
+      owner: "",
+      newEndDate: "",
+      priority: "",
+      status: "",
+    });
     setShowAddModal(true);
   };
 
@@ -185,7 +214,6 @@ const UserProjectManagement = () => {
   let userData = localStorage.getItem("userData");
   let stringToObject = JSON.parse(userData);
   let userID = stringToObject.id;
-  console.log(userID);
 
   /////////////////////////// Add Data ///////////////////////////////
   const handleSubmitAdd = async (e) => {
@@ -205,10 +233,8 @@ const UserProjectManagement = () => {
     }
 
     try {
-      console.log(userID);
 
       taskData.createdBy = userID;
-      console.log(taskData);
 
       await axios.post(`${url}/api/projects/add`, taskData);
 
@@ -292,13 +318,11 @@ const UserProjectManagement = () => {
 
   let fetchData = async () => {
     try {
-      console.log(userName);
 
       const response = await axios.get(
         `${url}/api/projects/getbylead/${userName}`
       );
 
-      console.log(response);
 
       // Sort the array in descending order based on the "id" field
       const sortedData = response.data.sort((a, b) => b.id - a.id);
@@ -318,13 +342,15 @@ const UserProjectManagement = () => {
   };
 
   const handleEdit = (item) => {
-    // Populate the form with the selected item's data for editing
+    // Assuming 'item' has fields like 'leadId' and 'ownerId' which store the IDs
     setTaskData({
       id: item.id,
       projectName: item.projectName,
       description: item.description,
-      lead: item.lead,
-      owner: item.owner,
+      // lead: item.lead, // Set to the ID of the lead
+      // owner: item.owner, // Set to the ID of the owner
+      lead: item.leadId, // Assuming 'item.leadId' is the ID of the lead
+      owner: item.ownerId,
       newEndDate: item.newEndDate,
       priority: item.priority,
       status: item.status,
@@ -667,24 +693,35 @@ const UserProjectManagement = () => {
     (_, index) => index + 1
   ).slice(startIndex, endIndex);
 
-  const imageMap = leadsData.reduce((acc, lead) => {
-    acc[lead.name] = lead.path;
-    return acc;
-  }, {});
+  async function loadAndProcessLeadsAndOwners() {
+    try {
+      // Fetch leads and owners data concurrently
+      const [leads, owners] = await Promise.all([getLeads(), getRest()]);
 
-  const getLeadImage = (firstName) => {
-    return imageMap[firstName] || dummyImage; // returns user image as default if firstName not found in imageMap
-  };
+      // Process the leads data
+      const leadSelectOptions = leads.map((lead) => ({
+        value: lead.value, // assuming you want to use the transformed value
+        label: lead.label,
+      }));
 
-  const leadSelectOptions = leadArray.map((option) => ({
-    value: option,
-    label: option,
-  }));
+      // Process the owners data
+      // Assuming owners data can be processed in a similar way
+      const ownerSelectOptions = owners.map((owner) => ({
+        value: owner.value, // modify as per the structure of owner data
+        label: owner.label,
+      }));
 
-  const ownerSelectOptions = ownerArray.map((option) => ({
-    value: option,
-    label: option,
-  }));
+      // Now you can use both leadSelectOptions and ownerSelectOptions for your requirements
+      return { leadSelectOptions, ownerSelectOptions };
+    } catch (error) {
+      console.error(
+        "Error while loading and processing leads and owners:",
+        error
+      );
+    }
+  }
+
+  loadAndProcessLeadsAndOwners();
 
   // User DashBoard
   const [leadData, setLeadData] = useState([]);
@@ -824,7 +861,6 @@ const UserProjectManagement = () => {
     (project) => project.status === "NOT STARTED"
   ).length;
 
-  console.log(Completedcount);
 
   const userValuesArray = Object.values(userStatusCounts);
   const userKeysArray = Object.keys(userStatusCounts);
@@ -859,6 +895,8 @@ const UserProjectManagement = () => {
   const chartLabels = Object.keys(statusCounts);
   const chartData = Object.values(statusCounts);
   const maxCount = Math.ceil(localData.length / 10) * 10;
+
+  const hasData = dataBar.labels.length > 0;
 
   const optionBar = {
     maintainAspectRatio: false,
@@ -915,7 +953,9 @@ const UserProjectManagement = () => {
             </ol>
           </div>
 
-          {alertMessage && <Alert variant={alertType}>{alertMessage}</Alert>}
+          <div style={{ textAlign: "center", padding: "10px" }}>
+            {alertMessage && <Alert variant={alertType}>{alertMessage}</Alert>}
+          </div>
 
           <div className="d-flex justify-content-center align-items-center mt-3 mt-md-0">
             {/* Add Task Modal */}
@@ -949,6 +989,7 @@ const UserProjectManagement = () => {
                   <Form>
                     <Form.Group>
                       <Form.Label>Project Name</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Form.Control
                         type="text"
                         name="projectName"
@@ -969,8 +1010,11 @@ const UserProjectManagement = () => {
 
                     <Form.Group>
                       <Form.Label>Lead Name</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Select
-                        options={leadSelectOptions}
+                        options={[...leadSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
                         isSearchable={true}
                         value={leadSelectOptions.find(
                           (option) => option.value === taskData.lead
@@ -987,8 +1031,11 @@ const UserProjectManagement = () => {
                     </Form.Group>
                     <Form.Group>
                       <Form.Label>Owner Name</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Select
-                        options={ownerSelectOptions}
+                        options={[...ownerSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
                         isSearchable={true}
                         value={ownerSelectOptions.find(
                           (option) => option.value === taskData.owner
@@ -1006,6 +1053,7 @@ const UserProjectManagement = () => {
 
                     <Form.Group>
                       <Form.Label>Due Date</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Form.Control
                         type="date"
                         name="newEndDate"
@@ -1015,34 +1063,59 @@ const UserProjectManagement = () => {
                     </Form.Group>
                     <Form.Group>
                       <Form.Label>Priority</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="priority"
-                        value={taskData.priority}
-                        onChange={handleInputChange}
-                      >
-                        <option value="HIGH">HIGH</option>
-                        <option value="MEDIUM">MEDIUM</option>
-                        <option value="LOW">LOW</option>
-                        <option value="NA">NA</option>
-                      </Form.Control>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Select
+                        options={[
+                          { value: "HIGH", label: "HIGH" },
+                          { value: "MEDIUM", label: "MEDIUM" },
+                          { value: "LOW", label: "LOW" },
+                          { value: "NA", label: "NA" },
+                        ]}
+                        isSearchable={true}
+                        value={[
+                          { value: "HIGH", label: "HIGH" },
+                          { value: "MEDIUM", label: "MEDIUM" },
+                          { value: "LOW", label: "LOW" },
+                          { value: "NA", label: "NA" },
+                        ].find((option) => option.value === taskData.priority)}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "priority",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
                     </Form.Group>
                     <Form.Group>
                       <Form.Label>Status</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="status"
-                        value={taskData.status}
-                        onChange={handleInputChange}
-                      >
-                        <option value="COMPLETED">COMPLETED</option>
-                        <option value="IN PROGRESS">IN PROGRESS</option>
-
-                        <option value="NOT STARTED">NOT STARTED</option>
-                        <option value="ON HOLD">ON HOLD</option>
-
-                        <option value="OVERDUE">OVERDUE</option>
-                      </Form.Control>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Select
+                        options={[
+                          { value: "COMPLETED", label: "COMPLETED" },
+                          { value: "IN PROGRESS", label: "IN PROGRESS" },
+                          { value: "NOT STARTED", label: "NOT STARTED" },
+                          { value: "ON HOLD", label: "ON HOLD" },
+                          { value: "OVERDUE", label: "OVERDUE" },
+                        ]}
+                        isSearchable={true}
+                        value={[
+                          { value: "COMPLETED", label: "COMPLETED" },
+                          { value: "IN PROGRESS", label: "IN PROGRESS" },
+                          { value: "NOT STARTED", label: "NOT STARTED" },
+                          { value: "ON HOLD", label: "ON HOLD" },
+                          { value: "OVERDUE", label: "OVERDUE" },
+                        ].find((option) => option.value === taskData.status)}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "status",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
                     </Form.Group>
                     <Form.Group>
                       <Form.Label>Next Review</Form.Label>
@@ -1075,17 +1148,18 @@ const UserProjectManagement = () => {
               <Modal.Header closeButton>
                 <Modal.Title>Edit Project</Modal.Title>
               </Modal.Header>
-              {showEmptyFieldAlert && (
-                <div className="alert alert-danger">
-                  Please fill out all required fields.
-                </div>
-              )}
 
+              <div style={{ textAlign: "center", padding: "10px" }}>
+                {alertMessage && (
+                  <Alert variant={alertType}>{alertMessage}</Alert>
+                )}
+              </div>
               <Modal.Body>
                 <Container>
                   <Form>
                     <Form.Group>
                       <Form.Label>Project Name</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Form.Control
                         type="text"
                         name="projectName"
@@ -1106,39 +1180,50 @@ const UserProjectManagement = () => {
 
                     <Form.Group>
                       <Form.Label>Lead Name</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="lead"
-                        value={taskData.lead}
-                        onChange={handleInputChange}
-                      >
-                        <option value="">Select Lead Name</option>
-                        {leadArray.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </Form.Control>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Select
+                        options={[...leadSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
+                        isSearchable={true}
+                        value={leadSelectOptions.find(
+                          (option) => option.value === taskData.lead
+                        )}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "lead",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
                     </Form.Group>
                     <Form.Group>
                       <Form.Label>Owner Name</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="owner"
-                        value={taskData.owner}
-                        onChange={handleInputChange}
-                      >
-                        <option value="">Select Owner Name</option>
-                        {ownerArray.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </Form.Control>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Select
+                        options={[...ownerSelectOptions].sort((a, b) =>
+                          a.label.localeCompare(b.label)
+                        )}
+                        isSearchable={true}
+                        value={ownerSelectOptions.find(
+                          (option) => option.value === taskData.owner
+                        )}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "owner",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
                     </Form.Group>
 
                     <Form.Group>
                       <Form.Label>Due Date</Form.Label>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
                       <Form.Control
                         type="date"
                         name="newEndDate"
@@ -1148,34 +1233,59 @@ const UserProjectManagement = () => {
                     </Form.Group>
                     <Form.Group>
                       <Form.Label>Priority</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="priority"
-                        value={taskData.priority}
-                        onChange={handleInputChange}
-                      >
-                        <option value="HIGH">HIGH</option>
-                        <option value="MEDIUM">MEDIUM</option>
-                        <option value="LOW">LOW</option>
-                        <option value="NA">NA</option>
-                      </Form.Control>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Select
+                        options={[
+                          { value: "HIGH", label: "HIGH" },
+                          { value: "MEDIUM", label: "MEDIUM" },
+                          { value: "LOW", label: "LOW" },
+                          { value: "NA", label: "NA" },
+                        ]}
+                        isSearchable={true}
+                        value={[
+                          { value: "HIGH", label: "HIGH" },
+                          { value: "MEDIUM", label: "MEDIUM" },
+                          { value: "LOW", label: "LOW" },
+                          { value: "NA", label: "NA" },
+                        ].find((option) => option.value === taskData.priority)}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "priority",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
                     </Form.Group>
                     <Form.Group>
                       <Form.Label>Status</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="status"
-                        value={taskData.status}
-                        onChange={handleInputChange}
-                      >
-                        <option value="COMPLETED">COMPLETED</option>
-                        <option value="IN PROGRESS">IN PROGRESS</option>
-
-                        <option value="NOT STARTED">NOT STARTED</option>
-                        <option value="ON HOLD">ON HOLD</option>
-
-                        <option value="OVERDUE">OVERDUE</option>
-                      </Form.Control>
+                      <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                      <Select
+                        options={[
+                          { value: "COMPLETED", label: "COMPLETED" },
+                          { value: "IN PROGRESS", label: "IN PROGRESS" },
+                          { value: "NOT STARTED", label: "NOT STARTED" },
+                          { value: "ON HOLD", label: "ON HOLD" },
+                          { value: "OVERDUE", label: "OVERDUE" },
+                        ]}
+                        isSearchable={true}
+                        value={[
+                          { value: "COMPLETED", label: "COMPLETED" },
+                          { value: "IN PROGRESS", label: "IN PROGRESS" },
+                          { value: "NOT STARTED", label: "NOT STARTED" },
+                          { value: "ON HOLD", label: "ON HOLD" },
+                          { value: "OVERDUE", label: "OVERDUE" },
+                        ].find((option) => option.value === taskData.status)}
+                        onChange={(selectedOption) =>
+                          handleInputChange({
+                            target: {
+                              name: "status",
+                              value: selectedOption.value,
+                            },
+                          })
+                        }
+                      />
                     </Form.Group>
                     <Form.Group>
                       <Form.Label>Next Review</Form.Label>
@@ -1225,110 +1335,37 @@ const UserProjectManagement = () => {
             </Modal>
           </div>
         </div>
-        <Card.Body className="overflow px-2 pb-3">
-          <Row className="g-3">
-            {/* Total Projects Card */}
-            <Col xl={2} lg={2} md={6} sm={12}>
-              <Card className="card-one w-100">
-                <Card.Body className="p-3">
-                  <div className="d-block fs-40 lh-1 text-primary mb-1">
-                    <i className="ri-file-list-line"></i>
-                  </div>
-                  <h1 className="card-value mb-0 ls--1 fs-36">
-                    {localData.length}
-                  </h1>
-                  <label className="d-block mb-1 mt-1 fw-medium text-dark">
-                    Total
-                  </label>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* Completed Projects Card */}
-            <Col xl={2} lg={4} md={6} sm={12}>
-              <Card className="card-one w-100">
-                <Card.Body className="p-3">
-                  <div className="d-block fs-40 lh-1 text-ui-02 mb-1">
-                    <i className="ri-check-double-line"></i>
-                  </div>
-                  <h1 className="card-value mb-0 fs-36 ls--1">
-                    {Completedcount}
-                  </h1>
-                  <label
-                    className="d-block mb-1 fw-medium text-dark"
-                    style={{ fontSize: "14px" }}
-                  >
-                    Completed
-                  </label>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* On Hold Projects Card */}
-            <Col xl={2} lg={4} md={6} sm={12}>
-              <Card className="card-one w-100">
-                <Card.Body className="p-3">
-                  <div className="d-block fs-36 lh-1 text-secondary mb-1">
-                    <i className="ri-information-line"></i>
-                  </div>
-                  <h1 className="card-value mb-0 fs-36 ls--1">{onHoldCount}</h1>
-                  <label className="d-block mb-1 fw-medium text-dark">
-                    On Hold
-                  </label>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* Not Started Card */}
-            <Col xl={2} lg={4} md={6} sm={12}>
-              <Card className="card-one w-100">
-                <Card.Body className="p-3">
-                  <div className="d-block fs-40 lh-1 text-ui-02 mb-1">
-                    <i className="ri-draft-fill"></i>
-                  </div>
-                  <h1 className="card-value mb-0 fs-36 ls--1">{notStarted}</h1>
-                  <label className="d-block mb-1 fw-medium text-dark">
-                    Not Started
-                  </label>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* In Progress Card */}
-            <Col xl={2} lg={4} md={6} sm={12}>
-              <Card className="card-one w-100">
-                <Card.Body className="p-3">
-                  <div className="d-block fs-40 lh-1 text-ui-02 mb-1">
-                    <i className="ri-restart-line"></i>
-                  </div>
-                  <h1 className="card-value mb-0 fs-36 ls--1">{inProgress}</h1>
-                  <label
-                    className="d-block mb-1 fw-medium text-dark"
-                    style={{ fontSize: "16px" }}
-                  >
-                    In Progress
-                  </label>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* Pie Chart */}
-            <Col xl={2} lg={12}>
-              <Card className="card">
-                <Card.Body>
-                  <ReactApexChart
-                    series={UserValuesArray}
-                    options={UserOpt}
-                    type="pie"
-                    height={200}
-                  />
-                </Card.Body>
-              </Card>
-            </Col>
-
-            {/* Bar Chart */}
+        <Col xl="12" className="col-12 pb-3">
+          <Row className="g-6 g-md-3 g-lg-2 ">
+            {localData.length > 0 &&
+              renderCard(localData.length, "ri-file-list-line", "Total")}
+            {Completedcount > 0 &&
+              renderCard(Completedcount, "ri-check-double-line", "Completed")}
+            {onHoldCount > 0 &&
+              renderCard(onHoldCount, "ri-information-line", "On Hold")}
+            {notStarted > 0 &&
+              renderCard(notStarted, "ri-draft-fill", "Not Started")}
+            {inProgress > 0 &&
+              renderCard(inProgress, "ri-restart-line", "In Progress")}
           </Row>
-        </Card.Body>
+        </Col>
+
+        {hasData && (
+          <>
+            <h2>Total Projects Alive</h2>
+            <Card className="card">
+              <Card.Body>
+                <Bar
+                  data={dataBar}
+                  options={optionBar}
+                  height={200}
+                  width={200}
+                  className="ht-400"
+                />
+              </Card.Body>
+            </Card>
+          </>
+        )}
 
         <Card className="card-one">
           <div className="grid-container">
@@ -1502,7 +1539,7 @@ const UserProjectManagement = () => {
   );
 };
 
-export default UserProjectManagement;
+export default UserDashboard;
 
 const DropdownFilter = ({ column }) => {
   const { filterValue = [], setFilter, preFilteredRows, id } = column;

@@ -1,0 +1,47 @@
+[
+  {
+    "username": "ananad",
+    "email": "ananad@tworks.in",
+    "password": "ananad@tworks.in",
+    "phone": "+919618211626",
+    "firstName": "Anand",
+    "lastName": "Rajagopalan",
+    "role": "lead"
+  },
+  {
+    "username": "meera",
+    "email": "meera@tworks.in",
+    "password": "meera@tworks.in",
+    "phone": "+919618211627",
+    "firstName": "Mohammad Mohiddin",
+    "lastName": "Meera",
+    "role": "lead"
+  },
+  {
+    "username": "veera",
+    "email": "veera@tworks.in",
+    "password": "veera@tworks.in",
+    "phone": "+919618211628",
+    "firstName": "Veera",
+    "lastName": "Chappi",
+    "role": "lead"
+  },
+  {
+    "username": "sanjay",
+    "email": "sanjay@tworks.in",
+    "password": "sanjay@tworks.in",
+    "phone": "+919618211629",
+    "firstName": "Sanjay",
+    "lastName": "Gajjala Kumar",
+    "role": "lead"
+  },
+  {
+    "username": "firoz",
+    "email": "firoz@tworks.in",
+    "password": "firoz@tworks.in",
+    "phone": "+919618211620",
+    "firstName": "Firoz",
+    "lastName": "Ahammad",
+    "role": "lead"
+  }
+]

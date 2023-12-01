@@ -37,7 +37,7 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
-import { leadArray, ownerArray, owners } from "../apps/data/Leadonwer";
+import { leadArray, ownerArray, owners } from "../apps/data/Leadowner";
 import img from "../assets/img/user.png";
 import Avatar from "../components/Avatar";
 import config from "../config.json";
@@ -128,9 +128,6 @@ function formatDate(inputDate) {
 }
 
 ///////////////////////////////////////////////////////////
-
-
-
 
 ///////////////////////////////////////////////////////////
 const ProjectManagement = () => {

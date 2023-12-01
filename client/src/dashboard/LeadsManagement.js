@@ -32,7 +32,7 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
-import { leadArray, ownerArray } from "../apps/data/Leadonwer";
+import { getLeads, getRest } from "../apps/data/Leadowner";
 import "../assets/css/react-datepicker.min.css";
 import img from "../assets/img/user.png";
 import Avatar from "../components/Avatar";
@@ -459,15 +459,6 @@ const LeadsManagement = () => {
     { length: pageCount },
     (_, index) => index + 1
   ).slice(startIndex, endIndex);
-
-  const imageMap = leadsData.reduce((acc, lead) => {
-    acc[lead.name] = lead.path;
-    return acc;
-  }, {});
-
-  const getLeadImage = (firstName) => {
-    return imageMap[firstName] || user; // returns user image as default if firstName not found in imageMap
-  };
 
   const roleSelectOptions = [
     { value: "Admin", label: "Admin" },

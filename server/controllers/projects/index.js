@@ -1,20 +1,92 @@
 import express from "express";
 import { Op } from "sequelize"; // Import Op from Sequelize
 import Project from "../../models/Project.js";
-import User from "../../models/Users.js"
+import User from "../../models/Users.js";
+import { sequelize } from "../../utils/dbConnect.js";
 // import { Comment, CommentAttachment } from "../../models/Comment.js";
 import axios from "axios";
 import { syncModels } from "../../utils/dbConnect.js";
 
 const router = express.Router();
-
 router.get("/getall", async (req, res) => {
   try {
-    // const projects = await Project.findAll({ include: Comment });
-    const projects = await Project.findAll({});
+    // Fetching projects without associated user details initially
+    const projects = await Project.findAll();
 
-    res.status(200).json(projects);
+    for (let project of projects) {
+      let updateFields = {};
+
+      // Find and assign the lead user ID
+      if (project.lead) {
+        const leadUser = await User.findOne({
+          where: { displayName: project.lead },
+        });
+        if (leadUser) {
+          updateFields.leadId = leadUser.id;
+        }
+      }
+
+      // Find and assign the owner user ID
+      if (project.owner) {
+        const ownerUser = await User.findOne({
+          where: { displayName: project.owner },
+        });
+        if (ownerUser) {
+          updateFields.ownerId = ownerUser.id;
+        }
+      }
+
+      // Update the project if there are fields to update
+      if (Object.keys(updateFields).length > 0) {
+        await project.update(updateFields);
+      }
+    }
+
+    // Fetch projects again, now with associated user details
+    const updatedProjects = await Project.findAll({
+      include: [
+        {
+          model: User,
+          as: "Lead",
+          attributes: [
+            "id",
+            "fullName",
+            "displayName",
+            "email",
+            "phone",
+            "role",
+            "title",
+            "profileImage",
+            "lastLogin",
+            "createdAt",
+            "updatedAt",
+          ],
+        },
+        {
+          model: User,
+          as: "Owner",
+          attributes: [
+            "id",
+            "fullName",
+            "displayName",
+            "email",
+            "phone",
+            "role",
+            "title",
+            "profileImage",
+            "lastLogin",
+            "createdAt",
+            "updatedAt",
+          ],
+        },
+        // Include other associations as needed
+      ],
+    });
+
+    // Send a single response after processing
+    res.status(200).json(updatedProjects);
   } catch (error) {
+    // Error handling
     if (
       error.name === "SequelizeDatabaseError" &&
       error.parent.code === "ER_NO_SUCH_TABLE"
@@ -26,7 +98,7 @@ router.get("/getall", async (req, res) => {
       console.error(error);
       res.status(500).json({
         success: false,
-        error: "An error occurred while fetching users.",
+        error: "An error occurred while fetching projects.",
       });
     }
   }
@@ -147,8 +219,6 @@ router.post("/add", async (req, res) => {
       createdBy,
     };
     projectData.comments = [];
-
-    console.log(projectData);
 
     // Check if a project with the same name already exists in the database
     const existingProject = await Project.findOne({
@@ -378,7 +448,7 @@ router.delete("/reset", async (req, res) => {
   try {
     // Drop the comments table
 
-    await CommentAttachment.drop();
+    // await CommentAttachment.drop();
     // await Comment.drop();
     await Project.drop();
 
@@ -392,18 +462,86 @@ router.delete("/reset", async (req, res) => {
   }
 });
 
+router.get("/project/:projectId", async (req, res) => {
+  try {
+    const { projectId } = req.params;
+
+    // Find the project with the given ID and include associated data
+    const project = await Project.findOne({
+      where: { id: projectId },
+      include: [
+        {
+          model: User,
+          as: "Lead", // Ensure this matches your association alias
+          attributes: { exclude: ["password"] },
+        },
+        {
+          model: User,
+          as: "Owner", // Ensure this matches your association alias
+          attributes: { exclude: ["password"] },
+        },
+      ],
+    });
+
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        error: "No project found for the given project ID.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      project,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      error: "An error occurred while retrieving the project.",
+    });
+  }
+});
 router.get("/user/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // Find all projects for the given user ID and include the User data
     const projects = await Project.findAll({
       where: { createdBy: userId },
       include: [
         {
-          model: User, // Make sure this matches the name of your imported User model
-          as: "creator", // This alias should match the alias you set up in your association
-          attributes: { exclude: ["password"] }, // Exclude sensitive information like password
+          model: User,
+          as: "Lead",
+          attributes: [
+            "id",
+            "fullName",
+            "displayName",
+            "email",
+            "phone",
+            "role",
+            "title",
+            "profileImage",
+            "lastLogin",
+            "createdAt",
+            "updatedAt",
+          ],
+        },
+        {
+          model: User,
+          as: "Owner",
+          attributes: [
+            "id",
+            "fullName",
+            "displayName",
+            "email",
+            "phone",
+            "role",
+            "title",
+            "profileImage",
+            "lastLogin",
+            "createdAt",
+            "updatedAt",
+          ],
         },
       ],
     });

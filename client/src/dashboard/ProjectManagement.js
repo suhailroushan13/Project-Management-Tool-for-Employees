@@ -32,7 +32,7 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
-import { leadArray, ownerArray } from "../apps/data/Leadonwer";
+import { getLeads, getRest } from "../apps/data/Leadowner";
 import "../assets/css/react-datepicker.min.css";
 import Avatar from "../components/Avatar";
 import config from "../config.json";
@@ -616,15 +616,35 @@ const ProjectManagement = () => {
     return imageMap[firstName] || user; // returns user image as default if firstName not found in imageMap
   };
 
-  const leadSelectOptions = leadArray.map((option) => ({
-    value: option,
-    label: option,
-  }));
+  async function loadAndProcessLeadsAndOwners() {
+    try {
+      // Fetch leads and owners data concurrently
+      const [leads, owners] = await Promise.all([getLeads(), getRest()]);
 
-  const ownerSelectOptions = ownerArray.map((option) => ({
-    value: option,
-    label: option,
-  }));
+      // Process the leads data
+      const leadSelectOptions = leads.map((lead) => ({
+        value: lead.value, // assuming you want to use the transformed value
+        label: lead.label,
+      }));
+
+      // Process the owners data
+      // Assuming owners data can be processed in a similar way
+      const ownerSelectOptions = owners.map((owner) => ({
+        value: owner.value, // modify as per the structure of owner data
+        label: owner.label,
+      }));
+
+      // Now you can use both leadSelectOptions and ownerSelectOptions for your requirements
+      return { leadSelectOptions, ownerSelectOptions };
+    } catch (error) {
+      console.error(
+        "Error while loading and processing leads and owners:",
+        error
+      );
+    }
+  }
+
+  loadAndProcessLeadsAndOwners();
 
   return (
     <>

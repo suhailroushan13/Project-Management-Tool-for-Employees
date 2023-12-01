@@ -6,7 +6,7 @@ function Loader() {
   const [hasReloaded, setHasReloaded] = useState(false); // Track whether the page has been reloaded
 
   useEffect(() => {
-    const refreshInterval = 5000; // 2 seconds in milliseconds
+    const refreshInterval = 1000; // 2 seconds in milliseconds
 
     const intervalId = setInterval(() => {
       // Reload the page if it hasn't been reloaded already
@@ -32,29 +32,62 @@ function Loader() {
     <>
       <ContentLoader
         speed={2}
-        width={400}
-        height={150}
-        viewBox="0 0 400 150"
+        width={720} // Total width to accommodate 6 cards (120 * 6)
+        height={196} // Height of each card
+        viewBox="0 0 720 196" // Adjusted viewBox
         backgroundColor="#f3f3f3"
         foregroundColor="#ecebeb"
       >
-        {/* Avatar */}
-        <circle cx="50" cy="50" r="40" />
+        {/* Loop to create 6 cards */}
+        {[...Array(6).keys()].map((i) => (
+          <React.Fragment key={i}>
+            {/* Each card */}
+            <rect
+              x={10 + 120 * i}
+              y="10"
+              rx="4"
+              ry="4"
+              width="100"
+              height="176"
+            />
 
-        {/* User name and details */}
-        <rect x="100" y="30" rx="4" ry="4" width="200" height="15" />
-        <rect x="100" y="55" rx="3" ry="3" width="150" height="10" />
-
-        {/* Divider */}
-        <rect x="0" y="100" rx="0" ry="0" width="400" height="1" />
-
-        {/* Activity or status */}
-        <rect x="10" y="120" rx="3" ry="3" width="50" height="15" />
-        <rect x="70" y="120" rx="3" ry="3" width="250" height="10" />
-
-        {/* Random shapes at the end, could mimic buttons or icons */}
-        <circle cx="370" cy="125" r="8" />
-        <circle cx="390" cy="125" r="8" />
+            {/* Optional: Additional elements inside each card, like title or buttons */}
+            <circle cx={25 + 120 * i} cy="30" r="8" />
+            <rect
+              x={45 + 120 * i}
+              y="25"
+              rx="3"
+              ry="3"
+              width="50"
+              height="10"
+            />
+            <rect
+              x={25 + 120 * i}
+              y="50"
+              rx="2"
+              ry="2"
+              width="70"
+              height="10"
+            />
+            <rect
+              x={25 + 120 * i}
+              y="70"
+              rx="2"
+              ry="2"
+              width="70"
+              height="10"
+            />
+            <rect
+              x={25 + 120 * i}
+              y="90"
+              rx="2"
+              ry="2"
+              width="70"
+              height="10"
+            />
+            {/* Add more elements as needed */}
+          </React.Fragment>
+        ))}
       </ContentLoader>
     </>
   );

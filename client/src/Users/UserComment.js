@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useEffect, useState, useContext } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import {
@@ -45,23 +46,14 @@ function UserComment({ projectData }) {
   const userEmail = context.email;
 
   const [user, setUser] = useState(null);
-  const [userImage, setUserImage] = useState(dummyImage);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
-    const savedImage = localStorage.getItem("userImage");
 
-    if (savedUser && savedImage) {
-      setUser(JSON.parse(savedUser));
-      setUserImage(savedImage);
-    } else {
-      const foundUser = leadsData.find((lead) => lead.email === userEmail);
-      if (foundUser) {
-        setUser(foundUser);
-        setUserImage(foundUser.path);
-        localStorage.setItem("user", JSON.stringify(foundUser));
-        localStorage.setItem("userImage", foundUser.path);
-      }
+    const foundUser = leadsData.find((lead) => lead.email === userEmail);
+    if (foundUser) {
+      setUser(foundUser);
+      localStorage.setItem("user", JSON.stringify(foundUser));
     }
   }, [userEmail]);
 
@@ -205,7 +197,6 @@ function UserComment({ projectData }) {
       ); //
 
       if (response.status === 200) {
-        console.log("Comment updated successfully");
         fetchUpdatedComments();
         closeEditModal();
       }
@@ -223,10 +214,8 @@ function UserComment({ projectData }) {
       );
 
       if (response.status === 200) {
-        console.log("Comment deleted successfully");
         closeDeleteModal();
       } else {
-        console.error("Failed to delete comment");
       }
     } catch (error) {
       console.error("Error deleting comment:", error);
@@ -305,7 +294,6 @@ function UserComment({ projectData }) {
                         <div className="comment-content">
                           <div className="avatar-container">
                             <img
-                              src={userImage}
                               alt={user ? user.name : "Default User"}
                               className="avatar-image"
                             />

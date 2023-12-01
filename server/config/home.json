@@ -2,17 +2,25 @@
   "URL": "http://192.168.212.10:5000",
   "PORT": 5000,
   "TOKEN": "TWORKS",
+  "STATUS_PATH": "/home/suhail/newsquad/server/utils/status.html",
+  "UPLOAD_PATH": "/home/suhail/newsquad/server/uploads/",
+
   "SQL": {
     "HOST": "localhost",
     "USERNAME": "suhail",
     "PASSWORD": "suhail",
     "DATABASE": "tworksdb"
   },
+  "CLOUD": {
+    "NAME": "dksonaea5",
+    "API_KEY": "281916479667611",
+    "API_SECRET_KEY": "sKL9VzpTZqHD-8Hib_KBzec5M9Q"
+  },
   "EMAIL_SMTP": {
     "HOST": "cpl12.main-hosting.eu",
     "AUTH": {
-      "USER": "suhail@suhailroushan.com",
-      "PASS": "+Ya-@DhRk&cP"
+      "USER": "mailer@tworks.in",
+      "PASS": "idchckwatlervflt"
     },
     "PORT": 465
   }

@@ -12,35 +12,31 @@ import { syncModels } from "../../utils/dbConnect.js";
 import multer from "multer";
 import path from "path";
 import { promises as fs } from "fs";
+import { fileURLToPath } from "url";
+import cloudinary from "cloudinary";
+import { dirname } from "path";
+
+// Use this to get the directory name of the current module
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 let TOKEN = config.get("TOKEN");
 
+cloudinary.config({
+  cloud_name: config.get("CLOUD.NAME"),
+  api_key: config.get("CLOUD.API_KEY"),
+  api_secret: config.get("CLOUD.API_SECRET_KEY"),
+});
+
 const router = express.Router();
-
-const formatDate = (date) => {
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-
-  let hours = date.getHours();
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-
-  // Convert to 12-hour format and set AM/PM
-  const ampm = hours >= 12 ? "PM" : "AM";
-  hours = hours % 12;
-  hours = hours ? hours : 12; // the hour '0' should be '12'
-  hours = String(hours).padStart(2, "0");
-
-  return `${day}-${month}-${year}-${hours}:${minutes}-${ampm}`;
-};
-
 const storage = multer.diskStorage({
-  destination: (req, file, cb) =>
-    cb(null, "/home/suhail/newsquad/server/uploads"),
-  filename: (req, file, cb) => {
+  destination: function (req, file, cb) {
+    cb(null, config.get("UPLOAD_PATH")); // Specify the folder where you want to store the uploaded files
+  },
+  filename: function (req, file, cb) {
     const userId = req.params.id;
-    const currentTime = formatDate(new Date());
-    cb(null, `${userId}-${currentTime}-${file.originalname}`);
+    const extension = path.extname(file.originalname);
+    const fileName = `${userId}${extension}`; // Use userId as the filename
+    cb(null, fileName);
   },
 });
 
@@ -62,7 +58,7 @@ const upload = multer({
 
     cb(new Error("Only images are allowed!"));
   },
-}).single("image");
+});
 
 // Fetch all users
 router.get("/getall", async (req, res) => {
@@ -74,6 +70,49 @@ router.get("/getall", async (req, res) => {
     res.status(500).json({
       success: false,
       error: "An error occurred while fetching users.",
+    });
+  }
+});
+
+router.get("/get/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Validate the userId if necessary, e.g., check if it's a number
+
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: "User not found.",
+      });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      error: "An error occurred while fetching the user.",
+    });
+  }
+});
+
+router.get("/getalladmins", async (req, res) => {
+  try {
+    // Retrieve only users with the role "Admin"
+    const admins = await User.findAll({
+      where: {
+        role: "Admin",
+      },
+    });
+    res.status(200).json(admins);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      error: "An error occurred while fetching admin users.",
     });
   }
 });
@@ -121,10 +160,28 @@ router.get("/getleads", async (req, res) => {
     }
   }
 });
+
 router.post("/add", async (req, res) => {
   try {
-    let { email, password, firstName, lastName, role, phone, fullName, title } =
-      req.body;
+    const {
+      email,
+      password,
+      role,
+      phone,
+      fullName,
+      title,
+      profileImage,
+      displayName,
+    } = req.body;
+
+    console.log(req.body);
+
+    if (!email || !email.endsWith("@tworks.in")) {
+      return res.status(400).json({
+        success: false,
+        message: "Only T-Works Email's Allowed",
+      });
+    }
 
     // Build the condition for finding an existing user
     const condition = {
@@ -132,6 +189,7 @@ router.post("/add", async (req, res) => {
         [Op.or]: [{ email }],
       },
     };
+
     if (phone) {
       condition.where[Op.or].push({ phone });
     }
@@ -147,22 +205,20 @@ router.post("/add", async (req, res) => {
       });
     }
 
-    let hashedPassword = null;
-
-    if (password && typeof password === "string" && password.trim() !== "") {
-      hashedPassword = await bcrypt.hash(password.trim(), 10);
-    }
+    const hashedPassword = password
+      ? await bcrypt.hash(password.trim(), 10)
+      : null;
 
     // Create a new user in the database
-    const newUser = await User.create({
+    await User.create({
       email: email || null,
-      password: hashedPassword, // It will be null if not provided or not valid
-      firstName: firstName || null,
-      lastName: lastName || null,
+      password: hashedPassword,
       fullName: fullName || null,
-      role,
+      displayName: displayName || null,
+      role: role || null,
+      profileImage: profileImage || null,
       title: title || null,
-      phone: phone || null, // Set phone to null if it's not provided
+      phone: phone || null,
     });
 
     res.status(201).json({
@@ -186,7 +242,6 @@ router.post("/add", async (req, res) => {
     }
   }
 });
-
 // // User login
 // router.post("/login", async (req, res) => {
 //   try {
@@ -249,16 +304,34 @@ router.post("/add", async (req, res) => {
 router.put("/update/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const { email, password, phone, firstName, lastName, role, bio } = req.body;
+    const {
+      email,
+      password,
+      phone,
+      fullName,
+      role,
+      bio,
+      title,
+      profileImage,
+      displayName,
+    } = req.body;
 
+    if (!email || !email.endsWith("@tworks.in")) {
+      return res.status(400).json({
+        success: false,
+        message: "Only T-Works Email's Allowed",
+      });
+    }
     // Prepare the data to update. Note that we're not adding the password here.
     const updatedData = {
       email,
       phone: phone ? phone : null,
-      firstName,
-      lastName,
+      fullName,
+      displayName,
       role,
+      title,
       bio,
+      profileImage,
     };
 
     // If the password is provided in the request, hash it and include it in the update.
@@ -394,72 +467,76 @@ router.delete("/dropusers", async (req, res) => {
 //     }
 //   }
 // );
-
+// Get all profile images for all users
 router.get("/getallimages", async (req, res) => {
   try {
-    // Find all users with profile images
-    const usersWithImages = await User.findAll({
-      where: { profileImage: { [Op.not]: null } }, // Filter users with non-null profileImage
-      attributes: ["id", "firstName", "email", "role", "profileImage"],
+    const usersWithProfileImages = await User.findAll({
+      where: {
+        profileImage: {
+          [Op.not]: null, // Filters users with non-null profileImage
+        },
+      },
     });
-
-    if (!usersWithImages || usersWithImages.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No users with profile images found.",
-      });
-    }
-
-    // Extract image data from each user and create an array of image objects
-    const imageUrls = usersWithImages.map((user) => ({
-      userId: user.id,
-      firstName: user.firstName,
+    // Extract user details and profile image URLs from each user
+    const userData = usersWithProfileImages.map((user) => ({
+      id: user.id,
+      fullName: user.fullName,
+      displayName: user.displayName,
       email: user.email,
       role: user.role,
-      imageUrl: user.profileImage,
+      profileImage: user.profileImage,
     }));
 
-    return res.json({ success: true, images: imageUrls });
+    res.json({
+      success: true,
+      users: userData,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: "An error occurred while fetching the profile images.",
+      message:
+        "An error occurred while fetching user details and profile images.",
     });
   }
 });
 
+// Get profile image URL for a user
 router.get("/getimage/:id", async (req, res) => {
   try {
     const userId = req.params.id;
 
-    // Find user by ID
-    const user = await User.findOne({
-      where: { id: userId },
-      attributes: ["id", "firstName", "email", "role", "profileImage"], // Include the specific attributes you want from User
-    });
+    // Use Sequelize to find the user by ID
+    const user = await User.findOne({ where: { id: userId } });
 
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found." });
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
     }
 
-    if (user.profileImage) {
-      const imagePath = user.profileImage;
-      return res.json({
-        success: true,
-        imageUrl: imagePath,
-        userId: user.id,
-        firstName: user.firstName,
-        email: user.email,
-        role: user.role,
+    if (!user.profileImage) {
+      return res.status(404).json({
+        success: false,
+        message: "Profile image not found for this user.",
       });
-    } else {
-      return res
-        .status(404)
-        .json({ success: false, message: "Profile image not found." });
     }
+
+    // Construct the response object with the desired user details
+    const userDetails = {
+      id: user.id,
+      fullName: user.fullName,
+      displayName: user.displayName,
+      email: user.email,
+      role: user.role,
+      profileImage: user.profileImage,
+    };
+
+    res.json({
+      success: true,
+      users: [userDetails],
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -469,137 +546,106 @@ router.get("/getimage/:id", async (req, res) => {
   }
 });
 
-router.post("/uploadimage/:id", async (req, res) => {
+router.post("/uploadimage/:id", upload.single("image"), async (req, res) => {
   try {
     const userId = req.params.id;
-    console.log(userId);
+    console.log(req);
 
-    await new Promise((resolve, reject) => {
-      upload(req, res, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No image uploaded.",
       });
-    });
+    }
 
-    // Update the user's profileImage in the User model
-    await User.update(
-      {
-        profileImage: req.file.path,
-      },
-      {
-        where: { id: userId },
-      }
-    );
-
-    res.json({
-      success: true,
-      message: "Profile image uploaded successfully!",
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      success: false,
-      message: "An error occurred while uploading the profile image.",
-    });
-  }
-});
-
-router.put("/updateimage/:id", async (req, res) => {
-  try {
-    const userId = req.params.id;
-
-    // Fetch user's current profile image path
     const user = await User.findOne({ where: { id: userId } });
+
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found." });
-    }
-
-    // If user has a profile image, delete it from the server
-    if (user.profileImage) {
-      try {
-        await fs.unlink(user.profileImage); // This deletes the old image file
-      } catch (err) {
-        console.warn(
-          "Failed to delete old profile image. Continuing with update."
-        );
-      }
-    }
-
-    // Now, use multer to handle the new image upload
-    await new Promise((resolve, reject) => {
-      upload(req, res, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
       });
-    });
+    }
 
-    // Update the user's profileImage in the User model with the new image's path
-    await User.update(
-      {
-        profileImage: req.file.path,
-      },
-      {
-        where: { id: userId },
-      }
-    );
+    // Upload the image to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path);
+
+    // Store the Cloudinary image URL in the user's profileImage field
+    user.profileImage = result.secure_url;
+    await user.save();
+
+    // Delete the local file after uploading to Cloudinary
+    // fs.unlinkSync(req.file.path);
 
     res.json({
       success: true,
-      message: "Profile image updated successfully!",
+      message: "Image uploaded successfully!",
+      imageUrl: result.secure_url,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: "An error occurred while updating the profile image.",
+      message: "An error occurred while uploading the image.",
     });
   }
 });
 
+// Delete profile image for a user
 router.delete("/deleteimage/:id", async (req, res) => {
   try {
-    const userId = req.params.id;
+    const { id } = req.params;
 
-    // Fetch user's current profile image path
-    const user = await User.findOne({ where: { id: userId } });
+    // Use Sequelize to find the user by ID
+    const user = await User.findOne({ where: { id } });
+
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found." });
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
     }
 
-    // If user has a profile image, delete it from the server
-    if (user.profileImage) {
-      await fs.unlink(user.profileImage); // This deletes the image file
-    }
+    // Clear the profileImage URL by setting it to null
+    user.profileImage = null;
 
-    // Update the user's profileImage in the User model to null
-    await User.update(
-      {
-        profileImage: null,
-      },
-      {
-        where: { id: userId },
-      }
-    );
+    // Save the updated user object to the database
+    await user.save();
 
     res.json({
       success: true,
-      message: "Profile image deleted successfully!",
+      message: "Profile image URL cleared successfully!",
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: "An error occurred while deleting the profile image.",
+      message: "An error occurred while clearing the profile image URL.",
+    });
+  }
+});
+
+// Delete all profile images for all users
+router.delete("/deleteallimages", async (req, res) => {
+  try {
+    // Use Sequelize to fetch all users
+    const users = await User.findAll();
+
+    // Clear the profileImage field for each user
+    for (const user of users) {
+      user.profileImage = null;
+      await user.save();
+    }
+
+    res.json({
+      success: true,
+      message: "All profile images deleted successfully!",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while deleting profile images.",
     });
   }
 });

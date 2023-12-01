@@ -12,13 +12,18 @@ const UserDashboardMenu = [
   },
 
   {
+    label: "Master Sheet",
+    link: "/user/mastersheet",
+    icon: "ri-file-excel-2-fill",
+  },
+  {
     label: "Legacy",
     link: "/user/legacy",
     icon: "ri-file-chart-line",
   },
   {
     label: "Feedback",
-    link: "https://forms.gle/77TomY2wKHGw3o6i7",
+    link: "https://forms.gle/3D1STiSCByeZkrsh8",
     icon: "ri-customer-service-line",
     target: "_blank", // This line opens the link in a new tab
   },
