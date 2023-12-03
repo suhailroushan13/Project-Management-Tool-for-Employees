@@ -40,7 +40,6 @@ const Login = () => {
       const response = await axios.post(`${url}/api/login`, payload);
       const { role, entity, success, token, user } = response.data;
 
-
       if (success) {
         localStorage.setItem("token", token);
         localStorage.setItem("role", role);
@@ -117,6 +116,14 @@ const Login = () => {
                   Log In
                 </Button>
               </form>
+              <br></br>
+              <Link
+                style={{ textDecoration: "none" }}
+                to="/forgot-password"
+                className="mb-5"
+              >
+                Forget Password
+              </Link>
             </Card.Body>
           </Card>
         </Col>

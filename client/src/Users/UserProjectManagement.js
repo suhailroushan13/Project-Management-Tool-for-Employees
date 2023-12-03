@@ -36,8 +36,7 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
-import Loader from "../Root/Loader.js";
-import Reload from "../Root/Reload.js";
+
 import { getLeads, getRest } from "../apps/data/Leadowner";
 import "../assets/css/react-datepicker.min.css";
 import {
@@ -54,7 +53,6 @@ import { useTableContext } from "../Context/TableContext";
 // //////////////////////
 
 import "chart.js/auto";
-import ReactApexChart from "react-apexcharts";
 
 import Select from "react-select";
 
@@ -233,7 +231,6 @@ const UserDashboard = () => {
     }
 
     try {
-
       taskData.createdBy = userID;
 
       await axios.post(`${url}/api/projects/add`, taskData);
@@ -318,11 +315,9 @@ const UserDashboard = () => {
 
   let fetchData = async () => {
     try {
-
       const response = await axios.get(
         `${url}/api/projects/getbylead/${userName}`
       );
-
 
       // Sort the array in descending order based on the "id" field
       const sortedData = response.data.sort((a, b) => b.id - a.id);
@@ -760,8 +755,8 @@ const UserDashboard = () => {
         .sort((a, b) => b.id - a.id);
 
       if (sortedData.length == 0) {
-        // window.location.reload(true);
-        // run();
+        window.location.reload(true);
+        run();
       } else {
         setLocalData(sortedData);
       }
@@ -861,7 +856,6 @@ const UserDashboard = () => {
     (project) => project.status === "NOT STARTED"
   ).length;
 
-
   const userValuesArray = Object.values(userStatusCounts);
   const userKeysArray = Object.keys(userStatusCounts);
 
@@ -896,7 +890,7 @@ const UserDashboard = () => {
   const chartData = Object.values(statusCounts);
   const maxCount = Math.ceil(localData.length / 10) * 10;
 
-  const hasData = dataBar.labels.length > 0;
+  const hasData = dataBar.labels.length > 0 || 0;
 
   const optionBar = {
     maintainAspectRatio: false,

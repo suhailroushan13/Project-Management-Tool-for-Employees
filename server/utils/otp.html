@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+        }
+
+        .header {
+            background-color: #ffffff;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .header-logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .card {
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 20px auto;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .card-content {
+            font-size: 16px;
+            margin-top: 10px;
+            color: #555;
+        }
+
+        .otp-display {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            padding: 12px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+            border-radius: 3px;
+            background-color: #eef;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <div class="card">
+        <div class="header">
+            <div class="header-logo">
+                <img height="200px" width="280px"
+                    src="https://images.squarespace-cdn.com/content/v1/5b03aa4f31d4df8db1fccf03/70133a8e-845f-4900-b63a-c6359131a5b7/T-WORKS+Logo-01.png?format=1500w"
+                    alt="">
+            </div>
+        </div>
+        <br>
+        <br>
+        <div class="card-title">Hey ${fullName} !</div>
+        <br>
+        <br>
+        <div class="card-title">Your OTP</div>
+        <div class="card-content">
+            <p>Please use the following OTP to proceed with your password reset:</p>
+            <div class="otp-display" id="otp-display">${otp}</div>
+        </div>
+    </div>
+
+
+</body>
+
+</html>

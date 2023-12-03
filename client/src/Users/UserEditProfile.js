@@ -6,6 +6,7 @@ import dummyImage from "../assets/users/user.png";
 import { useLocation, useParams } from "react-router-dom";
 import Context from "../Root/Context";
 import config from "../config.json";
+import Footer from "../layouts/Footer";
 
 import UserProjectHeader from "../layouts/UserProjectHeader";
 import HeaderMobile from "../layouts/HeaderMobile";
@@ -158,9 +159,7 @@ function UserEditProfile() {
         `${url}/api/users/update/${id}`,
         updatedFields
       );
-      setAlertMessage(
-        "Admin Updated successfully... Logging out in 3 seconds."
-      );
+      setAlertMessage("User Updated successfully... Logging out in 3 seconds.");
       setAlertType("success");
 
       // Countdown before logout
@@ -172,7 +171,7 @@ function UserEditProfile() {
           window.location.href = "/";
         } else {
           setAlertMessage(
-            `Admin Updated successfully... Logging out in ${countdown} seconds.`
+            `User Updated successfully... Logging out in ${countdown} seconds.`
           );
           countdown--;
         }
@@ -394,7 +393,7 @@ function UserEditProfile() {
                 <Form.Control
                   as="input"
                   name="role"
-                  placeholder="Lead, Owner, Admin, User"
+                  placeholder="Lead, Owner, User"
                   value={userData.role}
                   onChange={handleInputChange}
                 />
@@ -405,6 +404,7 @@ function UserEditProfile() {
               <Button variant="primary" type="submit" onClick={scrollToTop}>
                 Update
               </Button>
+        <Footer />
             </Form>
           </Col>
         </Row>

@@ -6,6 +6,7 @@ import { sequelize } from "../../utils/dbConnect.js";
 // import { Comment, CommentAttachment } from "../../models/Comment.js";
 import axios from "axios";
 import { syncModels } from "../../utils/dbConnect.js";
+import sendEmail from "../../utils/sendEmail.js";
 
 const router = express.Router();
 router.get("/getall", async (req, res) => {
@@ -233,6 +234,260 @@ router.post("/add", async (req, res) => {
       });
     }
 
+    let leadData = await User.findOne({
+      where: { displayName: lead },
+    });
+
+    let ownerData = await User.findOne({
+      where: { displayName: owner },
+    });
+
+    // /////////////////////////////////
+
+    let addLeadEmailBody = `<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            width: 400px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .card-content {
+            font-size: 14px;
+            padding: 5px;
+            text-align: left;
+            /* Smaller text size for email */
+            margin-top: 10px;
+        }
+
+        .contact-info {
+            margin-top: 20px;
+        }
+
+        .contact-info p {
+            margin: 5px 0;
+        }
+
+        .vertical-table {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding: 3px;
+        }
+
+        .vertical-table-label {
+            flex: 1;
+            font-weight: bold;
+        }
+
+        .vertical-table-value {
+            flex: 2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-title">Project Added In Your Bucket 🪣!</div>
+            <p><strong>Hello ${leadData.displayName} 👋</strong></p>
+            <p>You Have Created New Project
+            <p>Here are the Project Detail's</p>
+            </p>
+            <div class="card-content">
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Project Name:</div>
+                    <div class="vertical-table-value">${projectName}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Description:</div>
+                    <div class="vertical-table-value">${description}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Lead:</div>
+                    <div class="vertical-table-value">${lead}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Owner:</div>
+                    <div class="vertical-table-value">${owner}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">New End Date:</div>
+                    <div class="vertical-table-value">${newEndDate}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Priority:</div>
+                    <div class="vertical-table-value">${priority}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Status:</div>
+                    <div class="vertical-table-value">${status}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Next Review:</div>
+                    <div class="vertical-table-value">${nextReview}</div>
+                </div>
+                
+            </div>
+
+
+            <div class="card-content">
+                <p><strong>Best regards,</strong></p>
+                <p>T-Works</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>`;
+
+    let addOwnerEmailBody = `<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            width: 400px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .card-content {
+            font-size: 14px;
+            padding: 5px;
+            text-align: left;
+            /* Smaller text size for email */
+            margin-top: 10px;
+        }
+
+        .contact-info {
+            margin-top: 20px;
+        }
+
+        .contact-info p {
+            margin: 5px 0;
+        }
+
+        .vertical-table {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding: 3px;
+        }
+
+        .vertical-table-label {
+            flex: 1;
+            font-weight: bold;
+        }
+
+        .vertical-table-value {
+            flex: 2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-title">Project Added In Your Bucket 🪣!</div>
+            <p><strong> Hello ${ownerData.displayName} 👋 </strong></p>
+            <p>Look Like You Have a New Project Assigned By <strong> ${leadData.displayName} </strong></p>
+            <p>Here are the Project Detail's</p>
+            </p>
+            <div class="card-content">
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Project Name:</div>
+                    <div class="vertical-table-value">${projectName}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Description:</div>
+                    <div class="vertical-table-value">${description}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Lead:</div>
+                    <div class="vertical-table-value">${lead}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Owner:</div>
+                    <div class="vertical-table-value">${owner}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">New End Date:</div>
+                    <div class="vertical-table-value">${newEndDate}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Priority:</div>
+                    <div class="vertical-table-value">${priority}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Status:</div>
+                    <div class="vertical-table-value">${status}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Next Review:</div>
+                    <div class="vertical-table-value">${nextReview}</div>
+                </div>
+                
+            </div>
+
+
+            <div class="card-content">
+                <p><strong>Best regards,</strong></p>
+                <p>T-Works</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>`;
+
+    // ////////////////////////////////////
+
+    let recipient1 = [{ email: leadData.email, fullName: leadData.fullName }];
+
+    let recipient2 = [{ email: ownerData.email, fullName: ownerData.fullName }];
+
+    const subject = `Project Assigned By ${leadData.displayName} to ${ownerData.displayName} | T-Works`; // Custom subject
+    sendEmail(addLeadEmailBody, subject, recipient1);
+    sendEmail(addOwnerEmailBody, subject, recipient2);
+
+    console.log(leadData.email);
+    console.log(ownerData.email);
     // Create a new project in the database using Sequelize
     await Project.create(projectData);
 
@@ -259,6 +514,17 @@ router.put("/update/:id", async (req, res) => {
 
     // Find the project by ID in the database
     const project = await Project.findOne({ where: { id } });
+
+    const {
+      projectName,
+      description,
+      lead,
+      owner,
+      newEndDate,
+      priority,
+      status,
+      nextReview,
+    } = project;
 
     // Check if the project exists
     if (!project) {
@@ -288,6 +554,261 @@ router.put("/update/:id", async (req, res) => {
       }
     });
 
+    let leadData = await User.findOne({
+      where: { displayName: lead },
+    });
+
+    let ownerData = await User.findOne({
+      where: { displayName: owner },
+    });
+
+    // /////////////////////////////////
+
+    let addLeadEmailBody = `<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            width: 400px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .card-content {
+            font-size: 14px;
+            padding: 5px;
+            text-align: left;
+            /* Smaller text size for email */
+            margin-top: 10px;
+        }
+
+        .contact-info {
+            margin-top: 20px;
+        }
+
+        .contact-info p {
+            margin: 5px 0;
+        }
+
+        .vertical-table {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding: 3px;
+        }
+
+        .vertical-table-label {
+            flex: 1;
+            font-weight: bold;
+        }
+
+        .vertical-table-value {
+            flex: 2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-title">Project Updated In Your Bucket 🪣!</div>
+            <p><strong>Hello ${leadData.displayName} 👋</strong></p>
+            <p>You Have Updated The Project
+            <p>Here are the Updated Project Detail's</p>
+            </p>
+            <div class="card-content">
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Project Name:</div>
+                    <div class="vertical-table-value">${projectName}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Description:</div>
+                    <div class="vertical-table-value">${description}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Lead:</div>
+                    <div class="vertical-table-value">${lead}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Owner:</div>
+                    <div class="vertical-table-value">${owner}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">New End Date:</div>
+                    <div class="vertical-table-value">${newEndDate}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Priority:</div>
+                    <div class="vertical-table-value">${priority}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Status:</div>
+                    <div class="vertical-table-value">${status}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Next Review:</div>
+                    <div class="vertical-table-value">${nextReview}</div>
+                </div>
+                
+            </div>
+
+
+            <div class="card-content">
+                <p><strong>Best regards,</strong></p>
+                <p>T-Works</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>`;
+
+    let addOwnerEmailBody = `<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            width: 400px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .card-content {
+            font-size: 14px;
+            padding: 5px;
+            text-align: left;
+            /* Smaller text size for email */
+            margin-top: 10px;
+        }
+
+        .contact-info {
+            margin-top: 20px;
+        }
+
+        .contact-info p {
+            margin: 5px 0;
+        }
+
+        .vertical-table {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding: 3px;
+        }
+
+        .vertical-table-label {
+            flex: 1;
+            font-weight: bold;
+        }
+
+        .vertical-table-value {
+            flex: 2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-title">Project Updated In Your Bucket 🪣!</div>
+            <p><strong> Hello ${ownerData.displayName} 👋 </strong></p>
+            <p>Look Like You Have a Updated Assigned By <strong> ${leadData.displayName} </strong></p>
+            <p>Here are the Updated Project Detail's</p>
+            </p>
+            <div class="card-content">
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Project Name:</div>
+                    <div class="vertical-table-value">${projectName}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Description:</div>
+                    <div class="vertical-table-value">${description}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Lead:</div>
+                    <div class="vertical-table-value">${lead}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Owner:</div>
+                    <div class="vertical-table-value">${owner}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">New End Date:</div>
+                    <div class="vertical-table-value">${newEndDate}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Priority:</div>
+                    <div class="vertical-table-value">${priority}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Status:</div>
+                    <div class="vertical-table-value">${status}</div>
+                </div>
+                <div class="vertical-table">
+                    <div class="vertical-table-label">Next Review:</div>
+                    <div class="vertical-table-value">${nextReview}</div>
+                </div>
+                
+            </div>
+
+
+            <div class="card-content">
+                <p><strong>Best regards,</strong></p>
+                <p>T-Works</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>`;
+
+    // ////////////////////////////////////
+
+    let recipient1 = [{ email: leadData.email, fullName: leadData.fullName }];
+
+    let recipient2 = [{ email: ownerData.email, fullName: ownerData.fullName }];
+
+    const subject = `Project Updated By ${leadData.displayName} to ${ownerData.displayName} | T-Works`; // Custom subject
+    sendEmail(addLeadEmailBody, subject, recipient1);
+    sendEmail(addOwnerEmailBody, subject, recipient2);
+
+    console.log(leadData.email);
+    console.log(ownerData.email);
+
     await project.save();
 
     // Return the updated fields as a response
@@ -314,8 +835,107 @@ router.delete("/delete/:id", async (req, res) => {
         .json({ success: false, message: "Project not found." });
     }
 
+    const {
+      projectName,
+      description,
+      lead,
+      owner,
+      newEndDate,
+      priority,
+      status,
+      nextReview,
+      createdBy,
+    } = project;
+
+    let leadData = await User.findOne({
+      where: { displayName: lead },
+    });
+
+    let ownerData = await User.findOne({
+      where: { displayName: owner },
+    });
+
+    let EmailBody = `<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Deleted</title>
+    <style>
+        /* Reset some default styles for email clients */
+        body,
+        p {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Container for the card */
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9eaea;
+            /* Light red background color */
+            border: 1px solid #e74c3c;
+            /* Border color */
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        /* Heading style */
+        h1 {
+            font-size: 24px;
+            color: #e74c3c;
+            /* Red color for heading */
+        }
+
+        /* Text style */
+        p {
+            margin-top: 20px;
+        }
+
+        /* Link style */
+        a {
+            color: #3498db;
+            /* Blue color for links */
+            text-decoration: none;
+        }
+
+        /* Responsive styles */
+        @media screen and (max-width: 500px) {
+            .container {
+                width: 100%;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>${projectName} Project Deleted</h1>
+        <p>This project has been successfully deleted.</p>
+
+    </div>
+</body>
+
+</html>`;
+
     // Delete the project from the database
     await project.destroy();
+
+    let recipient1 = [{ email: leadData.email, fullName: leadData.fullName }];
+
+    let recipient2 = [{ email: ownerData.email, fullName: ownerData.fullName }];
+
+    const subject = ` ${project.projectName} Project is Deleted | T-Works`; // Custom subject
+    sendEmail(EmailBody, subject, recipient1);
+    sendEmail(EmailBody, subject, recipient2);
 
     // Return a success message as a response
     res

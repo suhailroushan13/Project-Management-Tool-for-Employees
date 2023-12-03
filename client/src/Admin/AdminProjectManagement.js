@@ -123,8 +123,10 @@ const AdminProjectManagement = () => {
   useEffect(() => {
     async function fetchData() {
       const leads = await getLeads();
+      console.log(leads);
 
       const owners = await getRest();
+      console.log(owners);
 
       setLeadSelectOptions(leads);
       setOwnerSelectOptions(owners);

@@ -16,12 +16,6 @@
     "API_KEY": "281916479667611",
     "API_SECRET_KEY": "sKL9VzpTZqHD-8Hib_KBzec5M9Q"
   },
-  "EMAIL_SMTP": {
-    "HOST": "cpl12.main-hosting.eu",
-    "AUTH": {
-      "USER": "mailer@tworks.in",
-      "PASS": "idchckwatlervflt"
-    },
-    "PORT": 465
-  }
+  "USER": "mailer@tworks.in",
+  "PASS": "tanfasamravfvqie"
 }

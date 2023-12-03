@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "suhail",
+    "password": "suhail",
+    "database": "tworksdb",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "suhail",
+    "password": "suhail",
+    "database": "tworksdb",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "suhail",
+    "password": "suhail",
+    "database": "tworksdb",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}

@@ -6,7 +6,7 @@ import dummyImage from "../assets/users/user.png";
 import { useLocation, useParams } from "react-router-dom";
 import Context from "../Root/Context";
 // import { leadsData } from "../data/Leads";
-
+import Footer from "../layouts/Footer";
 import config from "../config.json";
 import AdminProjectHeader from "../layouts/AdminProjectHeader";
 import HeaderMobile from "../layouts/HeaderMobile";
@@ -406,6 +406,7 @@ function AdminEditProfile() {
               <Button variant="primary" type="submit" onClick={scrollToTop}>
                 Update
               </Button>
+              <Footer />
             </Form>
           </Col>
         </Row>

@@ -172,8 +172,8 @@ function AdminViewProfile() {
             </tr>
           </tbody>
         </Table>
-      </div>
       <Footer />
+      </div>
     </>
   );
 }

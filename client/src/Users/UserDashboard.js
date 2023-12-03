@@ -19,6 +19,8 @@ function UserDashboard() {
   const [leadData, setLeadData] = useState([]);
   const [initialLoad, setInitialLoad] = useState(true);
   const [localData, setLocalData] = useState([]);
+  const [hasReloaded, setHasReloaded] = useState(false);
+
   const [dataAvailable, setDataAvailable] = useState(false); // Add a flag to track data availability
   const [error, setError] = useState(null); // Add state to track errors
   const url = config.URL;
@@ -26,10 +28,22 @@ function UserDashboard() {
   const name = JSON.parse(localStorage.getItem("user"))?.name;
 
   useEffect(() => {
-    Prism.highlightAll();
-    fetchData();
-    fetchAllData();
-  }, []);
+    const hasReloaded = localStorage.getItem("hasReloaded");
+
+    if (!hasReloaded) {
+      localStorage.setItem("hasReloaded", "true");
+      window.location.reload();
+    } else {
+      // fetchData and fetchAllData should ideally be combined into one function
+      fetchData();
+      fetchAllData();
+    }
+
+    return () => {
+      // Reset the flag when the component unmounts or data is successfully loaded
+      localStorage.removeItem("hasReloaded");
+    };
+  }, []); // Empty array to run only on initial mount
   const fetchData = async () => {
     try {
       const response = await axios.get(`${url}/api/projects/getleadsdata`);
@@ -401,7 +415,11 @@ function UserDashboard() {
             </>
           ) : (
             // Display this message when data is not available
-            <>{<Loader />}</>
+            <>
+              <center>
+                <h1>No Data Available</h1>
+              </center>
+            </>
           )}
           <Footer />
         </div>

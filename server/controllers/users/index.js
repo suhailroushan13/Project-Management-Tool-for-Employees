@@ -174,8 +174,6 @@ router.post("/add", async (req, res) => {
       displayName,
     } = req.body;
 
-    console.log(req.body);
-
     if (!email || !email.endsWith("@tworks.in")) {
       return res.status(400).json({
         success: false,

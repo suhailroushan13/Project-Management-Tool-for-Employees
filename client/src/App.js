@@ -1,7 +1,6 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import { Routes, Route } from "react-router-dom";
+import React, { useState } from "react";
 
-import Main from "./layouts/Main";
 import NotFound from "./pages/NotFound";
 import Login from "./Root/Login.js";
 import publicRoutes from "./routes/PublicRoutes.js";
@@ -41,6 +40,9 @@ export default function App() {
         <TableProvider>
           <Routes>
             <Route path="/" element={<Login />} />
+            {publicRoutes.map((route, index) => (
+              <Route key={index} path={route.path} element={route.element} />
+            ))}
             {protectedRoutes.map((route, index) => {
               const currentRole = localStorage.getItem("role");
 

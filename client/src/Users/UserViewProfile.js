@@ -172,8 +172,8 @@ function UserViewProfile() {
             </tr>
           </tbody>
         </Table>
+        <Footer />
       </div>
-      <Footer />
     </>
   );
 }

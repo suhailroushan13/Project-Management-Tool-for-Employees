@@ -39,6 +39,9 @@ const User = sequelize.define("users", {
   title: {
     type: DataTypes.TEXT,
   },
+  otp: {
+    type: DataTypes.TEXT,
+  },
   profileImage: {
     type: DataTypes.STRING, // Changed to TEXT for longer strings
     allowNull: true,

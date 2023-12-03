@@ -12,7 +12,7 @@ router.get("/getall", async (req, res) => {
   try {
     // Fetching projects without associated user details initially
     const projects = await Legacy.findAll();
-    console.log(projects);
+    // console.log(projects);
 
     for (let project of projects) {
       let updateFields = {};
