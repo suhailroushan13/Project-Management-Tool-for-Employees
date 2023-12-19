@@ -1,19 +1,19 @@
 [
   {
-    "projectName": "Zund press release",
-    "category": "",
-    "description": "",
-    "client": "",
-    "lead": "Firoz",
-    "owner": "Varun",
-    "actualStartDate": "",
-    "actualEndDate": "",
-    "newStartDate": "",
-    "newEndDate": "",
-    "priority": "NA",
-    "status": "COMPLETED",
-    "attentionRequired": "",
-    "comments": null,
+    "projectName": "Sprints - Desktop mill",
+    "category": "Product",
+    "description": "make an enlosure, finalise the electronics and make it functioning",
+    "client": "Internal",
+    "lead": "Sanjay",
+    "owner": " Nirmit",
+    "actualStartDate": "2023-06-24",
+    "actualEndDate": "2023-08-14",
+    "newStartDate": "2023-06-24",
+    "newEndDate": "2023-08-21",
+    "priority": "LOW",
+    "status": "IN PROGRESS",
+    "attentionRequired": "No",
+    "comments": "Pending review from Sharath, ",
     "nextReview": ""
   }
 ]

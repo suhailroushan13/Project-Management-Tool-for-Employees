@@ -1,7 +1,7 @@
 import axios from "axios";
 import fs from "fs/promises";
 
-const apiUrl = "https://work.tworks.in/api/legacy/add";
+const apiUrl = "https://work.tworks.in/api/projects/add";
 
 async function sendData() {
   try {
